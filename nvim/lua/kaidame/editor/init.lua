@@ -1,0 +1,11 @@
+-- Load all editor settings
+require("kaidame.editor.keybinds")
+require("kaidame.editor.linenumbers")
+require("kaidame.editor.spacing")
+require("kaidame.editor.search")
+require("kaidame.editor.spacing")
+require("kaidame.editor.terminal")
+require("kaidame.editor.undo")
+require("kaidame.editor.windows")
+require("kaidame.editor.misc")
+print("Loaded editor settings")
