@@ -119,4 +119,14 @@ fi
 eval "$(starship init bash)"
 
 . "$HOME/.local/bin/env"
+
 export PATH="$HOME/.local/bin:$PATH"
+export EDITOR="nvim"
+
+alias sbrc="source ~/.bashrc"
+alias ebrc="nvim ~./bashrc"
+
+
+if [ -f "$HOME/code/aivm/.venv/bin/activate" ]; then
+    source "$HOME/code/aivm/.venv/bin/activate"
+fi
