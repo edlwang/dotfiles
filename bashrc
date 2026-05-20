@@ -118,7 +118,9 @@ fi
 
 eval "$(starship init bash)"
 
-. "$HOME/.local/bin/env"
+if [ -f "$HOME/.local/bin/env" ]; then
+    . "$HOME/.local/bin/env"
+fi
 
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR="nvim"
