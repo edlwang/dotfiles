@@ -20,3 +20,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv venv py313 --seed
 ```
 
+## Global Git Config
+```bash
+git config --global url."git@github.com:edlwang/".insteadOf https://github.com/edlwang/
+git config --global url."git@github.com:AIQ-Kitware/".insteadOf https://github.com/AIQ-Kitware/
+git config --global alias.co checkout
+git config --global alias.submodpull 'submodule update --init --recursive'
+```
+
