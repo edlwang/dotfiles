@@ -116,7 +116,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-eval "$(starship init bash)"
 
 if [ -f "$HOME/.local/bin/env" ]; then
     . "$HOME/.local/bin/env"
@@ -132,3 +131,5 @@ alias ebrc="nvim ~./bashrc"
 if [ -f "$HOME/py313/bin/activate" ]; then
     source "$HOME/py313/bin/activate"
 fi
+
+eval "$(starship init bash)"
