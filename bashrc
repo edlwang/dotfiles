@@ -129,6 +129,6 @@ alias sbrc="source ~/.bashrc"
 alias ebrc="nvim ~./bashrc"
 
 
-if [ -f "$HOME/code/aivm/.venv/bin/activate" ]; then
-    source "$HOME/code/aivm/.venv/bin/activate"
+if [ -f "$HOME/py313/bin/activate" ]; then
+    source "$HOME/py313/bin/activate"
 fi
