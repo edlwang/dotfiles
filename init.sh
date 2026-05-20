@@ -1,5 +1,5 @@
 #!/bin/bash
-rm ~/.bashrc
+rm -f ~/.bashrc
 ln -s ~/dotfiles/bashrc ~/.bashrc
 
 rm -rf ~/.config/nvim
