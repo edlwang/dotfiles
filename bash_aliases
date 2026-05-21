@@ -20,3 +20,4 @@ cd() {
         builtin pushd "$@" > /dev/null
     fi
 }
+alias vdirs="dirs -v"
