@@ -1,6 +1,16 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
+#
+
+# Check OS
+OS="$(uname -s)"
+case "OS" in
+    Linux*)	export SYSTEM_OS="Linux";;
+    Darwin*)	export SYSTEM_OS="macOS";;
+    CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
+    *)		export SYSTEM_OS="Unknown";;
+esac
 
 # If not running interactively, don't do anything
 case $- in
@@ -72,29 +82,19 @@ xterm*|rxvt*)
     ;;
 esac
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  elif [ -f /opt/homebrew/etc/profile.d/bash_completion.sh ]; then
+    # macOS Homebrew support
+    . /opt/homebrew/etc/profile.d/bash_completion.sh
+  fi
 fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -105,31 +105,58 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
-
-
+# Load environment variables
 if [ -f "$HOME/.local/bin/env" ]; then
     . "$HOME/.local/bin/env"
 fi
 
-export PATH="$HOME/.local/bin:$PATH"
-export EDITOR="nvim"
-
-alias sbrc="source ~/.bashrc"
-alias ebrc="nvim ~./bashrc"
-
-
-if [ -f "$HOME/py313/bin/activate" ]; then
-    source "$HOME/py313/bin/activate"
+# Add local bin to path
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
-eval "$(starship init bash)"
+# Set editor based on availability
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR='nvim'
+  export VISUAL='nvim'
+elif command -v vim >/dev/null 2>&1; then
+  export EDITOR='vim'
+  export VISUAL='vim'
+else
+  export EDITOR='vi'
+  export VISUAL='vi'
+fi
+
+# Use starship if available
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init bash)"
+fi
+
+# Set up git
+if command -v git >/dev/null 2>&1; then
+    if [ -z "$(git config --global user.name)" ]; then
+	git_name="Edward Wang"
+        git config --global user.name "$git_name"
+        echo "Git user.name configured as '$git_name'."
+    fi
+
+    # Check and set user.email
+    if [ -z "$(git config --global user.email)" ]; then
+	git_email="edward.wang@kitware.com"
+        git config --global user.email "$git_email"
+        echo "Git user.email configured as '$git_email'."
+    fi
+    
+    # Set default branch to main
+    if [ -z "$(git config --global init.defaultBranch)" ]; then
+        git config --global init.defaultBranch main
+    fi
+    
+    # use ssh instead of https
+    git config --global url."git@github.com:edlwang/".insteadOf https://github.com/edlwang/
+    git config --global url."git@github.com:AIQ-Kitware/".insteadOf https://github.com/AIQ-Kitware/
+
+    # aliases
+    git config --global alias.co checkout
+    git config --global alias.submodpull 'submodule update --init --recursive'
+fi
