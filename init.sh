@@ -82,7 +82,6 @@ setup_dotfiles
 install_starship
 install_uv
 setup_pyenv
-
 . "$HOME/.bashrc"
 
 

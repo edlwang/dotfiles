@@ -96,14 +96,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
 
 # Load environment variables
 if [ -f "$HOME/.local/bin/env" ]; then
@@ -159,4 +151,13 @@ if command -v git >/dev/null 2>&1; then
     # aliases
     git config --global alias.co checkout
     git config --global alias.submodpull 'submodule update --init --recursive'
+fi
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
 fi
