@@ -1,6 +1,6 @@
 # System specific aliases
 if [ "$SYSTEM_OS" = "Linux" ]; then
-    alias ls='--color=auto'
+    alias ls='ls --color=auto'
 elif [ "$SYSTEM_OS" = "macOS" ]; then
     alias ls='ls -G'
 fi

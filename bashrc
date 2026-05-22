@@ -5,7 +5,7 @@
 
 # Check OS
 OS="$(uname -s)"
-case "OS" in
+case "$OS" in
     Linux*)	export SYSTEM_OS="Linux";;
     Darwin*)	export SYSTEM_OS="macOS";;
     CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
