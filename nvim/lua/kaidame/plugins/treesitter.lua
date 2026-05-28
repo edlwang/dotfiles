@@ -1,8 +1,10 @@
 local M = {
 	"nvim-treesitter/nvim-treesitter",
 	lazy = false,
+	branch = "master",
+	build = ":TSUpdate",
 	config = function()
-		local configs = require("nvim-treesitter")
+		local configs = require("nvim-treesitter.configs")
 		configs.setup({
 			highlight = { enable = true },
 			indent = { enable = true },
@@ -13,9 +15,6 @@ local M = {
 				"html",
 			},
 		})
-	end,
-	build = function()
-		require("nvim-treesitter").update({ with_sync = true })()
 	end,
 }
 
