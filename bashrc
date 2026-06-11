@@ -124,35 +124,6 @@ if command -v starship >/dev/null 2>&1; then
     eval "$(starship init bash)"
 fi
 
-# Set up git
-if command -v git >/dev/null 2>&1; then
-    if [ -z "$(git config --global user.name)" ]; then
-	git_name="Edward Wang"
-        git config --global user.name "$git_name"
-        echo "Git user.name configured as '$git_name'."
-    fi
-
-    # Check and set user.email
-    if [ -z "$(git config --global user.email)" ]; then
-	git_email="edward.wang@kitware.com"
-        git config --global user.email "$git_email"
-        echo "Git user.email configured as '$git_email'."
-    fi
-    
-    # Set default branch to main
-    if [ -z "$(git config --global init.defaultBranch)" ]; then
-        git config --global init.defaultBranch main
-    fi
-    
-    # use ssh instead of https
-    git config --global url."git@github.com:edlwang/".insteadOf https://github.com/edlwang/
-    git config --global url."git@github.com:AIQ-Kitware/".insteadOf https://github.com/AIQ-Kitware/
-
-    # aliases
-    git config --global alias.co checkout
-    git config --global alias.submodpull 'submodule update --init --recursive'
-fi
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.

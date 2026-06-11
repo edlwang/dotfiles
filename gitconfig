@@ -1,0 +1,10 @@
+[user]
+	email = edward.wang@kitware.com
+	name = Edward Wang
+[alias]
+	submodpull = submodule update --init --recursive
+[init]
+	defaultBranch = main
+[url "git@github.com:"]
+	pushInsteadOf = https://github.com/
+	pushInsteadOf = git@github.com:

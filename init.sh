@@ -40,6 +40,7 @@ setup_dotfiles() {
     setup_symlink "$DOTFILES_PATH/bash_profile" "$HOME/.bash_profile"
     setup_symlink "$DOTFILES_PATH/nvim" "$HOME/.config/nvim"
     setup_symlink "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
+    setup_symlink "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
 
     echo "Successfull setup dotfiles"
 }
