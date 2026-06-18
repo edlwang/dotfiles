@@ -164,3 +164,52 @@ vim.keymap.set("n", "<leader>tu", "<cmd>UndotreeToggle<cr>", { desc = "[T]oggle 
 
 -- fugitive (git)
 vim.keymap.set("n", "<leader>gs", "<cmd>Git<cr>", { desc = "[G]it [S]tatus (fugitive)" })
+
+-- gitsigns (in-buffer git hunks; the plugin loads on file open in
+-- plugins/gitsigns.lua, so signs are already shown by the time these fire).
+-- Hunk ops live under <leader>g (git); <leader>h is harpoon, so it's avoided.
+-- <leader>gs stays fugitive's status, so stage-hunk uses the capital <leader>gS.
+vim.keymap.set("n", "]c", function()
+	if vim.wo.diff then
+		vim.cmd.normal({ "]c", bang = true })
+	else
+		require("gitsigns").nav_hunk("next")
+	end
+end, { desc = "Next [c]hange (git hunk)" })
+vim.keymap.set("n", "[c", function()
+	if vim.wo.diff then
+		vim.cmd.normal({ "[c", bang = true })
+	else
+		require("gitsigns").nav_hunk("prev")
+	end
+end, { desc = "Previous [c]hange (git hunk)" })
+vim.keymap.set("n", "<leader>gp", function()
+	require("gitsigns").preview_hunk()
+end, { desc = "[G]it [P]review hunk" })
+vim.keymap.set("n", "<leader>gd", function()
+	require("gitsigns").diffthis()
+end, { desc = "[G]it [D]iff this" })
+vim.keymap.set("n", "<leader>gb", function()
+	require("gitsigns").blame_line({ full = true })
+end, { desc = "[G]it [B]lame line" })
+vim.keymap.set("n", "<leader>gS", function()
+	require("gitsigns").stage_hunk()
+end, { desc = "[G]it [S]tage hunk (toggle)" })
+vim.keymap.set("n", "<leader>gr", function()
+	require("gitsigns").reset_hunk()
+end, { desc = "[G]it [R]eset hunk" })
+vim.keymap.set("x", "<leader>gS", function()
+	require("gitsigns").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+end, { desc = "[G]it [S]tage selected lines" })
+vim.keymap.set("x", "<leader>gr", function()
+	require("gitsigns").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+end, { desc = "[G]it [R]eset selected lines" })
+vim.keymap.set("n", "<leader>tb", function()
+	require("gitsigns").toggle_current_line_blame()
+end, { desc = "[T]oggle git line [B]lame" })
+vim.keymap.set("n", "<leader>td", function()
+	require("gitsigns").toggle_deleted()
+end, { desc = "[T]oggle [D]eleted (git)" })
+vim.keymap.set({ "o", "x" }, "ih", function()
+	require("gitsigns").select_hunk()
+end, { desc = "[i]n [h]unk (git text object)" })
