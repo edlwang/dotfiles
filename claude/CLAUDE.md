@@ -5,8 +5,8 @@ Personal, cross-project preferences for every session. A repo's own
 
 ## Working preferences
 
-- After completing a task or answering a question, summarize each command ran
-  in order and explain the rationale.
+- After completing a task or answering a question, summarize the exact commands
+  you ran in order and explain the rationale behind each one.
 - Don't claim a change works unless you verified it (ran it, or tests pass). If you
   didn't verify, say so plainly.
 
