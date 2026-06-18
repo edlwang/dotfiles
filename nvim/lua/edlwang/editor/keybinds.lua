@@ -1,8 +1,7 @@
 -- handle remaps and keybinds
 -- Mapping descriptions use [bracketed] letters to show the keys pressed,
 -- e.g. "[C]ode [R]ename" => <leader>cr. They surface in which-key.
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+-- Leader is set in edlwang/init.lua (single source of truth), not here.
 
 --
 -- Editor / built-in keybinds
