@@ -1,0 +1,23 @@
+# System specific aliases
+if [ "$SYSTEM_OS" = "Linux" ]; then
+    alias ls='ls --color=auto'
+elif [ "$SYSTEM_OS" = "macOS" ]; then
+    alias ls='ls -G'
+fi
+
+# bashrc
+alias sbrc="source ~/.bashrc"
+alias ebrc="$EDITOR ~/.bashrc"
+
+# pyenv
+alias pyenv="source $HOME/py313/bin/activate"
+
+# cd using pushd, popd goes back, dirs -v lists stack
+cd() {
+    if [ $# -eq 0 ]; then
+        builtin pushd ~ > /dev/null
+    else
+        builtin pushd "$@" > /dev/null
+    fi
+}
+alias vdirs="dirs -v"
