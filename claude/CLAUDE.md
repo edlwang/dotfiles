@@ -12,6 +12,6 @@ Personal, cross-project preferences for every session. A repo's own
   (`feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `build`, `ci`). Pick the type
   by the change's intent, not the file touched; scope is optional.
 - After completing a task or answering a question, summarize each command ran
-  and explain the rationale.
+  in order and explain the rationale.
 - Don't claim a change works unless you verified it (ran it, or tests pass). If you
   didn't verify, say so plainly.
