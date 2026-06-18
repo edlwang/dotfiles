@@ -9,6 +9,6 @@
   "model": "opus",
   "alwaysThinkingEnabled": true,
   "theme": "auto",
-  "editorMode": "vim",
+  "editorMode": "normal",
   "effortLevel": "xhigh"
 }
