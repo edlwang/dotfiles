@@ -1,8 +1,8 @@
 return {
 	"mbbill/undotree",
-	lazy = false,
-	config = function()
-		-- The <leader>tu keymap lives in editor/keybinds.lua
+	-- The <leader>tu keymap (in editor/keybinds.lua) runs :UndotreeToggle.
+	cmd = "UndotreeToggle",
+	init = function()
 		vim.g.undotree_WindowLayout = 3
 	end,
 }
