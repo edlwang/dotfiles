@@ -24,7 +24,7 @@ Entry: `init.lua` → `require("edlwang")`. Everything lives under the personal 
 
 - `edlwang/init.lua` sets the leader (`<Space>`, single source of truth) before loading `edlwang.editor` (built-in settings) then `edlwang.lazy` (plugins).
 - `edlwang/lazy.lua` bootstraps **lazy.nvim** and auto-imports every file in `plugins/` via `{ import = "edlwang.plugins" }`.
-- `editor/` — one concern per file (`spacing`, `search`, `linenumbers`, `windows`, `undo`, `terminal`, `misc`, `keybinds`), each registered in `editor/init.lua`. To add a settings module, create the file and add a `require` line there.
+- `editor/` — one concern per file (`spacing`, `search`, `linenumbers`, `windows`, `undo`, `terminal`, `misc`, `diagnostics`, `keybinds`), each registered in `editor/init.lua`. To add a settings module, create the file and add a `require` line there.
 - `plugins/` — one plugin per file, each **returning a lazy.nvim spec table**. Just dropping a new `plugins/<name>.lua` that returns a spec is enough to register it; no central list to edit.
 
 ### Keybinding convention (important)
