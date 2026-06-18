@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git -* push)",
+      "Bash(git -* push *)"
+    ]
+  },
+  "model": "opus",
+  "alwaysThinkingEnabled": true,
+  "theme": "auto",
+  "editorMode": "vim",
+  "effortLevel": "xhigh"
+}

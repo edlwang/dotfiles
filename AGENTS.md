@@ -51,3 +51,11 @@ When adding a leader-prefixed group, also add its label to the `spec` in `plugin
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`) lists it.
 - `pyenv` alias activates the `~/py313` uv venv created by `init.sh`.
 - `gitconfig` rewrites `https://github.com/` push URLs to SSH (`git@github.com:`).
+
+## Claude Code config (`claude/`)
+
+Default Claude Code config lives in `claude/` (e.g. `settings.json`). `init.sh`'s `setup_claude` step symlinks **each top-level entry** of `claude/` into `~/.claude/` — it globs the directory, so nothing to edit on the symlink side — and leaves the rest of `~/.claude/` (credentials, history, sessions, jobs — all runtime state) untouched. Because everything in `claude/` is symlinked, **only put config files here**, never runtime state or secrets.
+
+**Git tracking uses a whitelist, decoupled from that glob.** `.gitignore` ignores all of `claude/` and re-includes only `CLAUDE.md`, `settings.json`, `commands/`, and `agents/` — a fail-safe so credentials or runtime state can never be committed even if copied in. The catch: `setup_claude` will symlink *anything* you drop in `claude/`, but git **silently ignores** a new config type (e.g. `output-styles/`, a `statusline.sh`) until you add a matching `!claude/<name>` line — plus `!claude/<name>/**` for a directory — to `.gitignore`. So adding a new *kind* of config is a two-step: drop the file, then whitelist it.
+
+`setup_claude` symlinks each **top-level** entry, so a subdirectory like `claude/commands/` becomes a whole-directory symlink (`~/.claude/commands` → repo). If a real `~/.claude/commands/` already exists, `setup_symlink` moves it to the backup dir and replaces it with the link — so only track directories whose contents you fully own in the repo, not ones Claude or plugins also write to at runtime.

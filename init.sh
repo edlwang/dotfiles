@@ -45,6 +45,20 @@ setup_dotfiles() {
     echo "Successfully set up dotfiles"
 }
 
+setup_claude() {
+    echo "Setting up Claude config"
+
+    # Symlink each tracked config entry from claude/ into ~/.claude/.
+    # Only config files belong in claude/; ~/.claude runtime state
+    # (credentials, history, sessions, jobs) is left untouched.
+    for src in "$DOTFILES_PATH/claude/"*; do
+        [ -e "$src" ] || continue
+        setup_symlink "$src" "$HOME/.claude/$(basename "$src")"
+    done
+
+    echo "Successfully set up Claude config"
+}
+
 install_starship() {
     # If starship exists
     if command -v starship >/dev/null 2>&1; then
@@ -80,6 +94,7 @@ setup_pyenv() {
 }
 
 setup_dotfiles
+setup_claude
 install_starship
 install_uv
 setup_pyenv

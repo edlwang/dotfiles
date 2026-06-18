@@ -1,0 +1,14 @@
+# Editor / OS noise
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Claude Code: deny-by-default — track only config, never secrets/runtime state
+claude/*
+!claude/CLAUDE.md
+!claude/settings.json
+!claude/commands/
+!claude/commands/**
+!claude/agents/
+!claude/agents/**
