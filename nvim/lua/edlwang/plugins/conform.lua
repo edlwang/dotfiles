@@ -1,6 +1,7 @@
 return { -- Autoformat
 	"stevearc/conform.nvim",
-	lazy = false,
+	event = "BufWritePre",
+	cmd = "ConformInfo",
 	-- The <leader>f format keymap lives in editor/keybinds.lua
 	opts = {
 		notify_on_error = false,
