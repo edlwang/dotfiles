@@ -4,7 +4,7 @@ return {
 	config = function()
 		require("lualine").setup({
 			options = {
-				theme = "dracula",
+				theme = "dracula", -- intentionally not tokyonight, i think dracula line looks better
 			},
 		})
 	end,
