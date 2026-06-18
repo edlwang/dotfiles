@@ -60,8 +60,11 @@ vim.keymap.set("n", "J", "mzJ`z", { desc = "[J]oin line below (keep cursor)" })
 -- Plugin keybinds
 --
 -- Plugin modules are required lazily inside callbacks so this file can be
--- loaded before the plugins themselves (and so lazy-loading still works:
--- the require fires on first keypress, loading the plugin on demand).
+-- loaded before the plugins themselves. For plugins that declare a lazy
+-- trigger (cmd/keys/event/ft), the require fires on first keypress and loads
+-- the plugin on demand; for plugins with no trigger (telescope, harpoon,
+-- neo-tree) it just defers the require until after they've already loaded at
+-- startup, keeping this file order-independent either way.
 --
 -- A few mappings necessarily live with their plugins and are NOT here:
 --   * LSP maps (gd, gr, <leader>cr, <leader>ca, <leader>th, ...) are
