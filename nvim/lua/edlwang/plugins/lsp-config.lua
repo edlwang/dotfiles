@@ -203,16 +203,13 @@ return {
 				vim.lsp.config(server_name, server)
 			end
 
-			-- Ensure the servers and tools above are installed
-			--  To check the current status of installed tools and/or manually install
-			--  other tools, you can run
-			--    :Mason
-			--
-			--  You can press `g?` for help in this menu.
-			require("mason").setup()
+			-- mason itself is already set up by its dependency spec above
+			-- ({ "mason-org/mason.nvim", config = true }), which lazy runs before
+			-- this config, so we don't call require("mason").setup() again here.
+			-- Run :Mason to view/install tools manually (press g? for help).
 
-			-- You can add other tools here that you want Mason to install
-			-- for you, so that they are available from within Neovim.
+			-- Ensure the servers and tools above are installed, and add any other
+			-- tools here that you want Mason to install for use within Neovim.
 			local ensure_installed = vim.tbl_keys(servers or {})
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format Lua code
