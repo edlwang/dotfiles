@@ -139,7 +139,7 @@ vim.keymap.set("n", "<leader>n", "<cmd>Neotree filesystem reveal left<cr>", { de
 
 -- conform (format buffer; "" => normal, visual, operator-pending, select)
 vim.keymap.set("", "<leader>cf", function()
-	require("conform").format({ async = true, lsp_fallback = true })
+	require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "[C]ode [F]ormat buffer" })
 
 -- diagnostics (vim.diagnostic works without an attached LSP)

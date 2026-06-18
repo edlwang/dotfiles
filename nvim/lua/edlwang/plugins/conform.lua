@@ -11,7 +11,7 @@ return { -- Autoformat
 			local disable_filetypes = {}
 			return {
 				timeout_ms = 500,
-				lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+				lsp_format = not disable_filetypes[vim.bo[bufnr].filetype] and "fallback" or "never",
 			}
 		end,
 		formatters_by_ft = {
