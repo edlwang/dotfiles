@@ -12,3 +12,6 @@ claude/*
 !claude/commands/**
 !claude/agents/
 !claude/agents/**
+
+# Temporary Files
+tmp/
