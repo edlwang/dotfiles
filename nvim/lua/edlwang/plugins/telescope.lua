@@ -21,7 +21,6 @@ return {
 			require("telescope").load_extension("fzf")
 			require("telescope").load_extension("ui-select")
 			-- Telescope keymaps live in editor/keybinds.lua
-			print("Loaded telescope config")
 		end,
 	},
 }

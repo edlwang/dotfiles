@@ -164,5 +164,3 @@ vim.keymap.set("n", "<leader>tu", "<cmd>UndotreeToggle<cr>", { desc = "[T]oggle 
 
 -- fugitive (git)
 vim.keymap.set("n", "<leader>gs", "<cmd>Git<cr>", { desc = "[G]it [S]tatus (fugitive)" })
-
-print("Loaded keybind settings")

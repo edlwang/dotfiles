@@ -6,7 +6,6 @@ return {
 		config = function()
 			-- load colorscheme
 			vim.cmd([[colorscheme tokyonight-moon]])
-			print("Loaded colorscheme config")
 		end,
 	},
 }
