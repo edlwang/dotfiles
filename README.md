@@ -1,10 +1,21 @@
 # dotfiles
 
+> Runs on **Linux**, **macOS**, and **Windows** (via Git Bash).
+
 Personal dotfiles for bash, Neovim, and WezTerm. `init.sh` symlinks the tracked
 files in this repo into `$HOME`, so **editing a file here immediately changes the
 live config** (the symlinks point back into this repo). There is no build or test
 step — the "product" is the configuration itself. The Neovim config is the bulk
 of the repository.
+
+## Contents
+
+- [Quickstart](#quickstart)
+- [Repository layout](#repository-layout)
+- [Common tasks](#common-tasks)
+- [Dependencies](#dependencies)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Claude Code](#claude-code-config-claude)
+- [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
 
@@ -24,6 +35,58 @@ elevated shell) and installs tools via `winget`/`scoop` instead of the
 Apply later edits with `source ~/.bashrc` (alias `sbrc`) for `bashrc`/
 `bash_aliases` changes. Neovim changes take effect on next launch; WezTerm
 auto-reloads its config on save.
+
+## Repository layout
+
+```text
+.
+├── init.sh             Idempotent installer: symlinks dotfiles, installs tools
+├── init_linux.sh       Linux install hook (WezTerm .desktop + Ctrl+Alt+T binding)
+├── init_windows.sh     Windows install hook (winget/scoop)
+├── os_env              Sets $SYSTEM_OS; sourced by bashrc + init.sh
+├── bashrc              Cross-platform shell config (the entry point)
+├── bash_aliases        Cross-platform aliases
+├── bash_profile        Sources ~/.bashrc so login shells match interactive ones
+├── bashrc_linux        }
+├── bashrc_macos        }  Per-OS shell config, sourced by bashrc
+├── bashrc_windows      }
+├── gitconfig           Git config (rewrites GitHub https push URLs to ssh)
+├── nvim/               Neovim config — the bulk of the repo
+│   ├── init.lua            → require("edlwang")
+│   ├── lazy-lock.json      Plugin lockfile (commit when versions change)
+│   └── lua/edlwang/        editor/ (built-in settings) + plugins/ (one per plugin)
+├── wezterm/
+│   ├── wezterm.lua                     The entire WezTerm config
+│   ├── org.wezfurlong.wezterm.desktop  Linux launcher override (persistent mux)
+│   └── tmux-testing.md                 Manual test checklist for the command layer
+├── claude/             Claude Code config → symlinked into ~/.claude
+│   ├── settings.json
+│   └── CLAUDE.md
+├── AGENTS.md           Working rules for AI coding agents (points back here)
+├── CLAUDE.md           Sources AGENTS.md for Claude Code
+├── init-tooling-plan.md  Plan to auto-install more tooling from init.sh
+└── README.md           You are here
+```
+
+## Common tasks
+
+Quick map of "I want to change X" → where to do it. See
+[Architecture](#architecture) for the *why* behind each.
+
+| Goal | Where |
+| --- | --- |
+| Apply shell edits | `source ~/.bashrc` (alias `sbrc`) |
+| Add a shell alias | edit `bash_aliases`, then `sbrc` |
+| Add OS-specific shell behavior | edit `bashrc_<os>` (keep `bashrc`/`bash_aliases` cross-platform) |
+| Add a Neovim plugin | drop `nvim/lua/edlwang/plugins/<name>.lua` returning a lazy.nvim spec |
+| Add a Neovim settings module | create `editor/<name>.lua` + add a `require` in `editor/init.lua` |
+| Enable/configure an LSP server | add a key to the `servers` table in `plugins/lsp-config.lua` |
+| Add a formatter | `ensure_installed` in `plugins/lsp-config.lua` + `formatters_by_ft` in `plugins/conform.lua` |
+| Add/change a keybinding | `editor/keybinds.lua` (follow the `[bracketed]`-`desc` rule; new groups → `plugins/whichkey.lua`) |
+| Change the colorscheme | `plugins/themes.lua` (currently `tokyonight-moon`) |
+| Update plugins | `:Lazy` in Neovim, then commit `nvim/lazy-lock.json` |
+| Update treesitter parsers | `:TSUpdate` in Neovim |
+| Per-machine git name/email | create `~/.gitconfig.local` (see below) |
 
 ## Dependencies
 
@@ -158,31 +221,39 @@ how it's structured:
   through it, not as plain `{ key = …, mods = L }` entries.
 - **Multiplexing + persistence are always on:** `config.unix_domains` plus
   `default_gui_startup_args = { "connect", "unix" }` run panes/tabs in a
-  background mux server that reattaches on next launch — the `tmux
-  detach`/`attach` equivalent (survives closing the window, not a reboot).
-  `default_gui_startup_args` only applies when `wezterm-gui` is launched with
-  **no subcommand**: on Windows the `default_prog`/shortcut flow does exactly
-  that, but Linux's distro `.desktop` entry hardcodes `Exec=wezterm start --cwd
-  .`, whose explicit `start` overrides it and opens non-persistent local-domain
-  windows. So `init.sh`'s `setup_os` (in `init_linux.sh`) installs a user-level
-  `org.wezfurlong.wezterm.desktop` (tracked at
-  `wezterm/org.wezfurlong.wezterm.desktop`) that shadows the system one and
-  launches `wezterm-gui connect unix`. It assumes a native install (binary on
-  `PATH`); Flatpak/Snap would need a different `Exec`.
-- **The `.desktop` override only fixes the applications-list launcher — not
-  `Ctrl+Alt+T`.** That chord is GNOME's `media-keys` *terminal* action, which
-  launches `x-terminal-emulator` (on Ubuntu, `update-alternatives`'d to the
-  wezterm package's `open-wezterm-here`, i.e. `wezterm start --cwd …`) rather
-  than the `.desktop` entry, so it hits the same non-persistent `start` path.
-  `setup_os`'s `bind_terminal_shortcut` takes the shortcut over at the user
-  level: a GNOME custom keybinding (`gsettings`, relocatable schema path
-  `…/custom-keybindings/wezterm-mux/`) bound to `<Primary><Alt>t` → `wezterm-gui
-  connect unix`, plus unbinding the built-in `terminal` key so the chord doesn't
-  double-fire. This is **the one place init writes live user settings (dconf)
-  instead of symlinking a tracked file**, so it's not reverted by removing a
-  symlink. It's GNOME-gated (skips silently when the `media-keys` schema is
-  absent — other DEs would each need their own mechanism), idempotent, root-free,
-  and the `terminal` unbind is guarded for GNOME builds that lack that key.
+  background mux server that reattaches on next launch — the `tmux detach`/`attach`
+  equivalent (survives closing the window, not a reboot). On Linux the distro
+  launchers don't use it without help (collapsed below).
+
+<details>
+<summary><b>Why the Linux launchers need extra handling</b> (the <code>.desktop</code> entry and <code>Ctrl+Alt+T</code>)</summary>
+
+`default_gui_startup_args` only applies when `wezterm-gui` is launched with **no
+subcommand**: on Windows the `default_prog`/shortcut flow does exactly that, but
+Linux's distro `.desktop` entry hardcodes `Exec=wezterm start --cwd .`, whose
+explicit `start` overrides it and opens non-persistent local-domain windows. So
+`init.sh`'s `setup_os` (in `init_linux.sh`) installs a user-level
+`org.wezfurlong.wezterm.desktop` (tracked at
+`wezterm/org.wezfurlong.wezterm.desktop`) that shadows the system one and
+launches `wezterm-gui connect unix`. It assumes a native install (binary on
+`PATH`); Flatpak/Snap would need a different `Exec`.
+
+**The `.desktop` override only fixes the applications-list launcher — not
+`Ctrl+Alt+T`.** That chord is GNOME's `media-keys` *terminal* action, which
+launches `x-terminal-emulator` (on Ubuntu, `update-alternatives`'d to the
+wezterm package's `open-wezterm-here`, i.e. `wezterm start --cwd …`) rather than
+the `.desktop` entry, so it hits the same non-persistent `start` path.
+`setup_os`'s `bind_terminal_shortcut` takes the shortcut over at the user level:
+a GNOME custom keybinding (`gsettings`, relocatable schema path
+`…/custom-keybindings/wezterm-mux/`) bound to `<Primary><Alt>t` → `wezterm-gui
+connect unix`, plus unbinding the built-in `terminal` key so the chord doesn't
+double-fire. This is **the one place init writes live user settings (dconf)
+instead of symlinking a tracked file**, so it's not reverted by removing a
+symlink. It's GNOME-gated (skips silently when the `media-keys` schema is absent
+— other DEs would each need their own mechanism), idempotent, root-free, and the
+`terminal` unbind is guarded for GNOME builds that lack that key.
+
+</details>
 
 The config-dir symlinking and the Windows-only login-shell `default_prog` are
 driven by `init.sh`/`os_env` and documented under [Shell](#shell-bashrc-bash_aliases)
