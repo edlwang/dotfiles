@@ -150,6 +150,42 @@ setup_pyenv() {
     echo "run pyenv to activate"
 }
 
+# Generate bash completions into the user completions dir, where bash-completion
+# lazy-loads each file on the first TAB for that command -- so there's no shell
+# startup cost (unlike eval-ing them in bashrc, where uv alone is ~10k lines).
+# Gate every file on the command it completes existing, so an uninstalled tool
+# produces no file and the loader just falls back to default completion. This is
+# the per-tool completion install the authors document (e.g. rustup). Files go
+# stale on a tool upgrade; re-run init.sh to refresh them.
+setup_completions() {
+    echo "Generating bash completions"
+    local dir="${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/completions"
+    mkdir -p "$dir"
+
+    # gen_completion <completed-command> <generator...>: the file is named after
+    # the command bash-completion looks up, but the generator can differ (cargo's
+    # completion is emitted by rustup). Write to .tmp then mv so a failed
+    # generation never leaves an empty file shadowing the real completion.
+    gen_completion() {
+        local cmd="$1"; shift
+        command -v "$cmd" >/dev/null 2>&1 || return 0
+        if "$@" > "$dir/$cmd.tmp" 2>/dev/null; then
+            mv "$dir/$cmd.tmp" "$dir/$cmd"
+        else
+            rm -f "$dir/$cmd.tmp"
+            echo "Warning: could not generate $cmd completion"
+        fi
+    }
+
+    gen_completion uv     uv  generate-shell-completion bash
+    gen_completion uvx    uvx --generate-shell-completion bash
+    gen_completion pixi   pixi completion --shell bash
+    gen_completion rustup rustup completions bash
+    gen_completion cargo  rustup completions bash cargo
+
+    echo "Completions written to $dir"
+}
+
 # Per-OS extra setup hook. Default no-op; a per-OS init file (init_<os>.sh,
 # sourced below) may override it -- e.g. Linux installs a WezTerm desktop entry.
 # Runs as a step below, after the core setup.
@@ -171,6 +207,7 @@ setup_claude
 setup_os
 install_tools
 setup_pyenv
+setup_completions
 
 # Don't `source ~/.bashrc` here: this script runs in its own non-interactive
 # subshell (`bash init.sh`), so bashrc's interactive guard early-returns before

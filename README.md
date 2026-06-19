@@ -317,6 +317,14 @@ layer.
   OS-gated (lives in the `bashrc_<os>` files, not `bash_aliases`, since those are
   sourced after the platform files): `bin/activate` on Unix, `Scripts/activate`
   on Windows. `setup_pyenv` resolves the same path via `SYSTEM_OS`.
+- **Tool completions are generated at install time, not eval'd at startup.**
+  `init.sh`'s `setup_completions` writes each tool's bash completion (uv, uvx,
+  pixi, rustup, cargo) to `~/.local/share/bash-completion/completions/<cmd>`,
+  where bash-completion lazy-loads it on the first TAB for that command — so
+  there's no shell-startup cost (uv's script alone is ~10k lines). Each file is
+  gated on its command existing (an absent tool generates nothing), and the
+  `cargo` file is emitted by `rustup`. The files don't auto-update — re-run
+  `init.sh` to refresh them after a tool upgrade.
 - `gitconfig` rewrites `https://github.com/` push URLs to SSH
   (`git@github.com:`).
 
