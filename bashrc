@@ -74,17 +74,14 @@ path_prepend() {
 # Add local bin to path
 path_prepend "$HOME/.local/bin"
 
-# Set editor based on availability
-if command -v nvim >/dev/null 2>&1; then
-  export EDITOR='nvim'
-  export VISUAL='nvim'
-elif command -v vim >/dev/null 2>&1; then
-  export EDITOR='vim'
-  export VISUAL='vim'
-else
-  export EDITOR='vi'
-  export VISUAL='vi'
-fi
+# Set editor to the first one available, preferring nvim.
+for ed in nvim vim vi; do
+  if command -v "$ed" >/dev/null 2>&1; then
+    export EDITOR="$ed" VISUAL="$ed"
+    break
+  fi
+done
+unset ed  # don't leak the loop temporary (cf. os_rc above)
 
 # Use starship if available; otherwise fall back to a simple, portable prompt
 # (user@host:dir). starship is the real prompt — installed by init.sh — so this
