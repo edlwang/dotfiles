@@ -11,6 +11,14 @@ local config = wezterm.config_builder()
 config.color_scheme = "tokyonight_moon"
 config.font = wezterm.font("FiraMono Nerd Font")
 config.window_close_confirmation = "NeverPrompt"
+
+-- Make the active pane stand out: dim + desaturate inactive panes well below
+-- WezTerm's subtle defaults (saturation 0.9, brightness 0.8) so the focused
+-- pane is obvious at a glance when several are open.
+config.inactive_pane_hsb = {
+	saturation = 0.7,
+	brightness = 0.5,
+}
 local launch_menu = {}
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
