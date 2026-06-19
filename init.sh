@@ -150,6 +150,13 @@ setup_pyenv() {
     echo "run pyenv to activate"
 }
 
+# Per-OS extra setup hook. Default no-op; a per-OS init file (init_<os>.sh,
+# sourced below) may override it -- e.g. Linux installs a WezTerm desktop entry.
+# Runs as a step below, after the core setup.
+setup_os() {
+    :
+}
+
 # Source per-OS overrides (e.g. install_tools, env like MSYS). Done after the
 # default definitions above so an OS file can override them, but before the
 # steps run below so its setup (e.g. MSYS for symlinks) takes effect. Sourced
@@ -161,6 +168,7 @@ fi
 
 setup_dotfiles
 setup_claude
+setup_os
 install_tools
 setup_pyenv
 
