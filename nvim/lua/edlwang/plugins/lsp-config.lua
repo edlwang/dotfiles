@@ -216,7 +216,19 @@ return {
 			})
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
-			require("mason-lspconfig").setup()
+			-- `automatic_enable` (on by default) calls vim.lsp.enable() on every
+			-- installed Mason package that maps to an lspconfig name. The mason
+			-- registry now maps the `stylua` package to nvim-lspconfig's bundled
+			-- `lsp/stylua.lua` (cmd `stylua --lsp`), so opening a Lua file tried to
+			-- launch stylua as a language server — but we install stylua as a
+			-- *formatter* (run by conform), it has no `--lsp` flag and exits 2.
+			-- Exclude it so it stays formatter-only; every other server still
+			-- auto-enables.
+			require("mason-lspconfig").setup({
+				automatic_enable = {
+					exclude = { "stylua" },
+				},
+			})
 		end,
 	},
 }
