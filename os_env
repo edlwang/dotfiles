@@ -1,6 +1,6 @@
-# Single source of truth for OS detection. Sets SYSTEM_OS, sourced by both
-# bashrc (at shell startup) and init.sh (at install time) so they always agree.
-# Keep this side-effect-free apart from setting SYSTEM_OS.
+# Shared shell bootstrap, sourced by both bashrc (at shell startup) and init.sh
+# (at install time) so they always agree. Sets SYSTEM_OS and defines helpers;
+# keep it side-effect-free apart from that.
 OS="$(uname -s)"
 case "$OS" in
     Linux*)                 export SYSTEM_OS="Linux";;
@@ -8,3 +8,13 @@ case "$OS" in
     CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
     *)                      export SYSTEM_OS="Unknown";;
 esac
+
+# Convert an MSYS path (/c/...) to Windows-mixed form (C:/...) so native Windows
+# tools can resolve it; a no-op where cygpath doesn't exist (i.e. on Unix).
+winpath() {
+    if command -v cygpath >/dev/null 2>&1; then
+        cygpath -m "$1"
+    else
+        printf '%s' "$1"
+    fi
+}

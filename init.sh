@@ -2,12 +2,21 @@
 set -euo pipefail
 
 DOTFILES_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 
-# Detect OS (sets SYSTEM_OS) from the same file bashrc uses, so the installer
-# and the shell never disagree. Source the repo copy: the ~/.os_env symlink
-# may not exist yet on a first run.
+# Detect OS (sets SYSTEM_OS) and load shared helpers (winpath) from the same
+# file bashrc uses, so the installer and the shell never disagree. Source the
+# repo copy: the ~/.os_env symlink may not exist yet on a first run.
 . "$DOTFILES_PATH/os_env"
+
+# Use Windows-form (C:/...) paths for both DOTFILES_PATH and HOME so each
+# symlink's link and target are paths native Windows tools resolve, not the
+# MSYS "/c/..." form (which non-MSYS tools like nvim.exe can't follow). pwd
+# yields "/c/..." while bashrc normalizes HOME to "C:/...", so without this the
+# two halves of every symlink would disagree. winpath is a no-op off Windows.
+DOTFILES_PATH="$(winpath "$DOTFILES_PATH")"
+export HOME="$(winpath "$HOME")"
+
+BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 
 # Backup existing settings and symlink new settings
 setup_symlink() {
