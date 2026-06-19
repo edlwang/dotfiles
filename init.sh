@@ -37,6 +37,9 @@ setup_dotfiles() {
     echo "Setting up dotfiles"
 
     setup_symlink "$DOTFILES_PATH/bashrc" "$HOME/.bashrc"
+    setup_symlink "$DOTFILES_PATH/bashrc_linux" "$HOME/.bashrc_linux"
+    setup_symlink "$DOTFILES_PATH/bashrc_macos" "$HOME/.bashrc_macos"
+    setup_symlink "$DOTFILES_PATH/bashrc_windows" "$HOME/.bashrc_windows"
     setup_symlink "$DOTFILES_PATH/bash_profile" "$HOME/.bash_profile"
     setup_symlink "$DOTFILES_PATH/nvim" "$HOME/.config/nvim"
     setup_symlink "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"

@@ -1,0 +1,11 @@
+# Windows (Git Bash/MSYS) specific shell config.
+# Sourced by bashrc when SYSTEM_OS=Windows. Put Windows-only code here.
+
+# HOME defaults to the MSYS form "/c/Users/..." which native Windows tools
+# that read $HOME can't parse (they treat the leading "/" as the drive root).
+# Normalize it to "C:/Users/..." instead.
+if command -v cygpath >/dev/null 2>&1; then
+    export HOME="$(cygpath -m "$HOME")"
+elif [ -n "${USERPROFILE:-}" ]; then
+    export HOME="$(printf '%s' "$USERPROFILE" | tr '\\' '/')"
+fi

@@ -12,6 +12,15 @@ case "$OS" in
     *)		export SYSTEM_OS="Unknown";;
 esac
 
+# Source platform-specific config so OS-only code stays out of this shared
+# bashrc. Each platform has its own ~/.bashrc_<os> file. Done early (before
+# the interactive guard below) so things like the Windows HOME fix always run.
+case "$SYSTEM_OS" in
+    Linux)   [ -f "$HOME/.bashrc_linux" ]   && . "$HOME/.bashrc_linux";;
+    macOS)   [ -f "$HOME/.bashrc_macos" ]   && . "$HOME/.bashrc_macos";;
+    Windows) [ -f "$HOME/.bashrc_windows" ] && . "$HOME/.bashrc_windows";;
+esac
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;

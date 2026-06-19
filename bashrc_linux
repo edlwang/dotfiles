@@ -1,0 +1,4 @@
+# Linux-specific shell config.
+# Sourced by bashrc when SYSTEM_OS=Linux. Put Linux-only code here.
+
+alias ls='ls --color=auto'

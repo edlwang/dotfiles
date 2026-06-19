@@ -1,0 +1,4 @@
+# macOS-specific shell config.
+# Sourced by bashrc when SYSTEM_OS=macOS. Put macOS-only code here.
+
+alias ls='ls -G'

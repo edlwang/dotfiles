@@ -47,7 +47,8 @@ When adding a leader-prefixed group, also add its label to the `spec` in `plugin
 
 ## Shell config (`bashrc`, `bash_aliases`)
 
-- `SYSTEM_OS` is derived from `uname` and gates OS-specific behavior (e.g. the `ls` alias).
+- `SYSTEM_OS` is derived from `uname` (`Linux`/`macOS`/`Windows`/`Unknown`).
+- **OS-specific code lives in per-platform files**, not inline in `bashrc`. `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` in a `case "$SYSTEM_OS"` block (early, before the interactive guard, so e.g. the Windows `HOME` normalization always runs). To add OS-only behavior, edit the matching `bashrc_<os>` file — keep `bashrc`/`bash_aliases` cross-platform. New platform files must also be added to `init.sh`'s `setup_dotfiles` to be symlinked.
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`) lists it.
 - `pyenv` alias activates the `~/py313` uv venv created by `init.sh`.
 - `gitconfig` rewrites `https://github.com/` push URLs to SSH (`git@github.com:`).
