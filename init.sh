@@ -31,7 +31,14 @@ setup_symlink() {
 
     # Check if dotfiles already exist/symlinked and backup accordingly
     if [ -e "$dest_file" ] || [ -L "$dest_file" ]; then
-        if [ -L "$dest_file" ] && [ "$(readlink "$dest_file")" = "$src_file" ]; then
+        # Treat the link as correct if it already points at src_file, comparing
+        # both paths in winpath form. On Windows `ln -s` is handed the winpath
+        # target (C:/Users/...) but readlink reports it back in MSYS form
+        # (/c/Users/...), so a raw string compare never matches and every run
+        # would needlessly back up and recreate the link. winpath is a no-op on
+        # Unix, where the two sides already agree.
+        if [ -L "$dest_file" ] && \
+           [ "$(winpath "$(readlink "$dest_file")")" = "$(winpath "$src_file")" ]; then
             echo "Symlink already correct for $dest_file"
             return 0
         fi
