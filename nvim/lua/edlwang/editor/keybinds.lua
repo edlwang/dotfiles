@@ -138,7 +138,7 @@ vim.keymap.set("n", "<leader>hn", function()
 end, { desc = "[H]arpoon [N]ext" })
 
 -- neo-tree
-vim.keymap.set("n", "<leader>n", "<cmd>Neotree filesystem reveal left<cr>", { desc = "[N]eo-tree reveal filesystem" })
+vim.keymap.set("n", "<leader>tn", "<cmd>Neotree filesystem toggle reveal left<cr>", { desc = "[T]oggle [N]eo-tree" })
 
 -- conform (format buffer; "" => normal, visual, operator-pending, select)
 vim.keymap.set("", "<leader>cf", function()
