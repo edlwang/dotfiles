@@ -310,8 +310,9 @@ layer.
   occurrence). The calls run last — after the tool-env scripts (`~/.local/bin/env`,
   `~/.cargo/env`) — so the *last* call wins and re-sourcing `bashrc` is idempotent.
   `~/.local/bin` is prepended last, giving it priority over `~/.pixi/bin`.
-- `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`)
-  lists it.
+- `cd` is overridden to use `pushd` (a directory stack); `vdirs` lists it
+  newest-first, capped to the top 10 so a long-lived stack stays readable
+  (`vdirs N` for the top N, `vdirs all` for the whole stack).
 - `pyenv` alias activates the `~/py313` uv venv created by `init.sh`. It's
   OS-gated (lives in the `bashrc_<os>` files, not `bash_aliases`, since those are
   sourced after the platform files): `bin/activate` on Unix, `Scripts/activate`

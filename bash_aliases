@@ -5,12 +5,18 @@
 alias sbrc="source ~/.bashrc"
 alias ebrc='$EDITOR ~/.bashrc'
 
-# cd using pushd, popd goes back, dirs -v lists stack
+# cd using pushd, popd goes back, vdirs lists the stack. pushd always needs a
+# target, so default to $HOME when called with no args (plain `cd`).
 cd() {
-    if [ $# -eq 0 ]; then
-        builtin pushd ~ > /dev/null
-    else
-        builtin pushd "$@" > /dev/null
-    fi
+    builtin pushd "${@:-$HOME}" > /dev/null
 }
-alias vdirs="dirs -v"
+
+# List the directory stack newest-first (like `dirs -v`), but capped so a
+# long-lived stack stays readable: `vdirs` shows the top 10, `vdirs N` the top
+# N, `vdirs all` the whole stack.
+vdirs() {
+    case "$1" in
+        all|-a) dirs -v ;;
+        *)      dirs -v | head -n "${1:-10}" ;;
+    esac
+}
