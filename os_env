@@ -1,8 +1,7 @@
 # Shared shell bootstrap, sourced by both bashrc (at shell startup) and init.sh
 # (at install time) so they always agree. Sets SYSTEM_OS and defines helpers;
 # keep it side-effect-free apart from that.
-OS="$(uname -s)"
-case "$OS" in
+case "$(uname -s)" in
     Linux*)                 export SYSTEM_OS="Linux";;
     Darwin*)                export SYSTEM_OS="macOS";;
     CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
