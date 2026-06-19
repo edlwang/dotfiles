@@ -1,9 +1,13 @@
 [user]
-	email = edward.wang@kitware.com
 	name = Edward Wang
+	email = work@edlwang.com
 [alias]
 	submodpull = submodule update --init --recursive
 [init]
 	defaultBranch = main
 [url "git@github.com:"]
 	pushInsteadOf = https://github.com/
+; Per-machine overrides (identity, etc.) — untracked, optional. Must come
+; last so it wins over the default [user] above when present.
+[include]
+	path = ~/.gitconfig.local
