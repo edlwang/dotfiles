@@ -9,6 +9,14 @@ BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 # may not exist yet on a first run.
 . "$DOTFILES_PATH/os_env"
 
+# On Windows, make `ln -s` create real symlinks instead of silently copying
+# (the default). nativestrict fails loudly rather than degrading to a copy if
+# symlinks can't be created -- that needs Developer Mode on, or an elevated
+# shell (the SeCreateSymbolicLinkPrivilege).
+if [ "$SYSTEM_OS" = "Windows" ]; then
+    export MSYS=winsymlinks:nativestrict
+fi
+
 # Backup existing settings and symlink new settings
 setup_symlink() {
     local src_file="$1"
