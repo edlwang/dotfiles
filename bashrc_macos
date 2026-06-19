@@ -2,3 +2,6 @@
 # Sourced by bashrc when SYSTEM_OS=macOS. Put macOS-only code here.
 
 alias ls='ls -G'
+
+# Activate the ~/py313 uv venv created by init.sh (Unix layout: bin/activate).
+alias pyenv="source $HOME/py313/bin/activate"

@@ -9,3 +9,7 @@ if command -v cygpath >/dev/null 2>&1; then
 elif [ -n "${USERPROFILE:-}" ]; then
     export HOME="$(printf '%s' "$USERPROFILE" | tr '\134' '/')"
 fi
+
+# Activate the ~/py313 uv venv created by init.sh (Windows layout:
+# Scripts/activate, not bin/activate).
+alias pyenv="source $HOME/py313/Scripts/activate"

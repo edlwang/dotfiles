@@ -51,7 +51,7 @@ When adding a leader-prefixed group, also add its label to the `spec` in `plugin
 - **OS-specific code lives in per-platform files**, not inline in `bashrc`. `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` in a `case "$SYSTEM_OS"` block (early, before the interactive guard, so e.g. the Windows `HOME` normalization always runs). To add OS-only behavior, edit the matching `bashrc_<os>` file — keep `bashrc`/`bash_aliases` cross-platform. New platform files must also be added to `init.sh`'s `setup_dotfiles` to be symlinked.
 - **Neovim's config dir is platform-specific.** `init.sh`'s `nvim_config_dir` (branching on `SYSTEM_OS`) symlinks the repo's `nvim/` to `$XDG_CONFIG_HOME/nvim` if set, else `~/AppData/Local/nvim` on Windows or `~/.config/nvim` elsewhere — matching where Neovim actually looks.
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`) lists it.
-- `pyenv` alias activates the `~/py313` uv venv created by `init.sh`.
+- `pyenv` alias activates the `~/py313` uv venv created by `init.sh`. It's OS-gated (lives in the `bashrc_<os>` files, not `bash_aliases`, since those are sourced after the platform files): `bin/activate` on Unix, `Scripts/activate` on Windows. `setup_pyenv` resolves the same path via `SYSTEM_OS`.
 - `gitconfig` rewrites `https://github.com/` push URLs to SSH (`git@github.com:`).
 
 ## Claude Code config (`claude/`)

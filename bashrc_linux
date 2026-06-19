@@ -2,3 +2,6 @@
 # Sourced by bashrc when SYSTEM_OS=Linux. Put Linux-only code here.
 
 alias ls='ls --color=auto'
+
+# Activate the ~/py313 uv venv created by init.sh (Unix layout: bin/activate).
+alias pyenv="source $HOME/py313/bin/activate"

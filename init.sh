@@ -107,11 +107,15 @@ install_uv() {
 }
 
 setup_pyenv() {
-    if [ -e "$HOME/py313/bin/activate" ]; then
+    # uv puts the activate script under Scripts/ on Windows, bin/ on Unix.
+    local activate="$HOME/py313/bin/activate"
+    [ "$SYSTEM_OS" = "Windows" ] && activate="$HOME/py313/Scripts/activate"
+
+    if [ -e "$activate" ]; then
         echo "Virtual env already set up"
     else
         echo "Setting up pyenv"
-        uv venv "$HOME/py313" --seed
+        uv venv "$HOME/py313" --seed --python 3.13
         echo "Pyenv setup"
     fi
     echo "run pyenv to activate"
