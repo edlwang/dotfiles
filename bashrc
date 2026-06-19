@@ -108,10 +108,13 @@ if [ -f "$HOME/.local/bin/env" ]; then
     . "$HOME/.local/bin/env"
 fi
 
+# Prepend a directory to PATH, but only if it exists and isn't already there.
+path_prepend() {
+    [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]] && export PATH="$1:$PATH"
+}
+
 # Add local bin to path
-if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-    export PATH="$HOME/.local/bin:$PATH"
-fi
+path_prepend "$HOME/.local/bin"
 
 # Set editor based on availability
 if command -v nvim >/dev/null 2>&1; then
@@ -145,6 +148,4 @@ if [ -f "$HOME/.cargo/env" ]; then
 fi
 
 # Add pixi bin to path
-if [ -d "$HOME/.pixi/bin" ] && [[ ":$PATH:" != *":$HOME/.pixi/bin:"* ]]; then
-    export PATH="$HOME/.pixi/bin:$PATH"
-fi
+path_prepend "$HOME/.pixi/bin"
