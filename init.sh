@@ -62,6 +62,17 @@ nvim_config_dir() {
     fi
 }
 
+# WezTerm reads its config from $XDG_CONFIG_HOME/wezterm if set, else
+# ~/.config/wezterm on every platform -- unlike Neovim it does NOT use AppData
+# on Windows. Same XDG handling as nvim_config_dir, minus the Windows branch.
+wezterm_config_dir() {
+    if [ -n "${XDG_CONFIG_HOME:-}" ]; then
+        printf '%s/wezterm' "$(printf '%s' "$XDG_CONFIG_HOME" | tr '\134' '/')"
+    else
+        printf '%s/wezterm' "$HOME/.config"
+    fi
+}
+
 setup_dotfiles() {
     echo "Setting up dotfiles"
 
@@ -72,6 +83,7 @@ setup_dotfiles() {
     setup_symlink "$DOTFILES_PATH/bashrc_windows" "$HOME/.bashrc_windows"
     setup_symlink "$DOTFILES_PATH/bash_profile" "$HOME/.bash_profile"
     setup_symlink "$DOTFILES_PATH/nvim" "$(nvim_config_dir)"
+    setup_symlink "$DOTFILES_PATH/wezterm" "$(wezterm_config_dir)"
     setup_symlink "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
     setup_symlink "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
 

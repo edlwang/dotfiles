@@ -13,7 +13,10 @@ config.window_close_confirmation = "NeverPrompt"
 local launch_menu = {}
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-	config.default_prog = { "C:/Program Files/Git/usr/bin/bash" }
+	-- Launch Git Bash as a login + interactive shell (-l -i). Without -l, MSYS's
+	-- /etc/profile never runs, so /usr/bin (uname, etc.) is absent from PATH and
+	-- os_env's `uname -s` fails on startup with "uname: command not found".
+	config.default_prog = { "C:/Program Files/Git/bin/bash.exe", "-l", "-i" }
 	table.insert(launch_menu, {
 		label = "PowerShell",
 		args = { "powershell.exe", "-NoLogo" },
