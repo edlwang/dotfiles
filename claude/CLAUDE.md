@@ -17,4 +17,4 @@ Personal, cross-project preferences for every session. A repo's own
 - Write commit messages in Conventional Commits format: `type(scope): summary`
   (`feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `build`, `ci`). Pick the type
   by the change's intent, not the file touched; scope is optional.
-- Always merge using --no-ff
+- Whenever you are asked to merge, always use --no-ff
