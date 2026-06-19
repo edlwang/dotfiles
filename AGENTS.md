@@ -47,8 +47,9 @@ When adding a leader-prefixed group, also add its label to the `spec` in `plugin
 
 ## Shell config (`bashrc`, `bash_aliases`)
 
-- `SYSTEM_OS` is derived from `uname` (`Linux`/`macOS`/`Windows`/`Unknown`).
+- **OS detection has a single source of truth: `os_env`** (symlinked to `~/.os_env`). It sets `SYSTEM_OS` (`Linux`/`macOS`/`Windows`/`Unknown`) and is sourced by both `bashrc` (at shell startup) and `init.sh` (at install time, from the repo copy since the symlink may not exist on a first run) so they never disagree. Keep it side-effect-free apart from setting `SYSTEM_OS`.
 - **OS-specific code lives in per-platform files**, not inline in `bashrc`. `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` in a `case "$SYSTEM_OS"` block (early, before the interactive guard, so e.g. the Windows `HOME` normalization always runs). To add OS-only behavior, edit the matching `bashrc_<os>` file — keep `bashrc`/`bash_aliases` cross-platform. New platform files must also be added to `init.sh`'s `setup_dotfiles` to be symlinked.
+- **Neovim's config dir is platform-specific.** `init.sh`'s `nvim_config_dir` (branching on `SYSTEM_OS`) symlinks the repo's `nvim/` to `$XDG_CONFIG_HOME/nvim` if set, else `~/AppData/Local/nvim` on Windows or `~/.config/nvim` elsewhere — matching where Neovim actually looks.
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`) lists it.
 - `pyenv` alias activates the `~/py313` uv venv created by `init.sh`.
 - `gitconfig` rewrites `https://github.com/` push URLs to SSH (`git@github.com:`).

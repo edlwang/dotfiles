@@ -4,6 +4,11 @@ set -euo pipefail
 DOTFILES_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 
+# Detect OS (sets SYSTEM_OS) from the same file bashrc uses, so the installer
+# and the shell never disagree. Source the repo copy: the ~/.os_env symlink
+# may not exist yet on a first run.
+. "$DOTFILES_PATH/os_env"
+
 # Backup existing settings and symlink new settings
 setup_symlink() {
     local src_file="$1"
@@ -33,15 +38,31 @@ setup_symlink() {
     ln -s "$src_file" "$dest_file"
 }
 
+# Mirror Neovim's own config-dir resolution: $XDG_CONFIG_HOME/nvim if set
+# (honored on every platform), else the OS default — ~/AppData/Local/nvim on
+# Windows (%LOCALAPPDATA%), ~/.config/nvim elsewhere. Branches on SYSTEM_OS
+# from os_env.
+nvim_config_dir() {
+    if [ -n "${XDG_CONFIG_HOME:-}" ]; then
+        printf '%s/nvim' "$(printf '%s' "$XDG_CONFIG_HOME" | tr '\134' '/')"
+    elif [ "$SYSTEM_OS" = "Windows" ]; then
+        local base="${LOCALAPPDATA:-$HOME/AppData/Local}"
+        printf '%s/nvim' "$(printf '%s' "$base" | tr '\134' '/')"
+    else
+        printf '%s/nvim' "$HOME/.config"
+    fi
+}
+
 setup_dotfiles() {
     echo "Setting up dotfiles"
 
+    setup_symlink "$DOTFILES_PATH/os_env" "$HOME/.os_env"
     setup_symlink "$DOTFILES_PATH/bashrc" "$HOME/.bashrc"
     setup_symlink "$DOTFILES_PATH/bashrc_linux" "$HOME/.bashrc_linux"
     setup_symlink "$DOTFILES_PATH/bashrc_macos" "$HOME/.bashrc_macos"
     setup_symlink "$DOTFILES_PATH/bashrc_windows" "$HOME/.bashrc_windows"
     setup_symlink "$DOTFILES_PATH/bash_profile" "$HOME/.bash_profile"
-    setup_symlink "$DOTFILES_PATH/nvim" "$HOME/.config/nvim"
+    setup_symlink "$DOTFILES_PATH/nvim" "$(nvim_config_dir)"
     setup_symlink "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
     setup_symlink "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
 

@@ -1,0 +1,10 @@
+# Single source of truth for OS detection. Sets SYSTEM_OS, sourced by both
+# bashrc (at shell startup) and init.sh (at install time) so they always agree.
+# Keep this side-effect-free apart from setting SYSTEM_OS.
+OS="$(uname -s)"
+case "$OS" in
+    Linux*)                 export SYSTEM_OS="Linux";;
+    Darwin*)                export SYSTEM_OS="macOS";;
+    CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
+    *)                      export SYSTEM_OS="Unknown";;
+esac

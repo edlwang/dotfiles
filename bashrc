@@ -3,14 +3,10 @@
 # for examples
 #
 
-# Check OS
-OS="$(uname -s)"
-case "$OS" in
-    Linux*)	export SYSTEM_OS="Linux";;
-    Darwin*)	export SYSTEM_OS="macOS";;
-    CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
-    *)		export SYSTEM_OS="Unknown";;
-esac
+# Detect OS (sets SYSTEM_OS). Shared with init.sh — see os_env.
+if [ -f "$HOME/.os_env" ]; then
+    . "$HOME/.os_env"
+fi
 
 # Source platform-specific config so OS-only code stays out of this shared
 # bashrc. Each platform has its own ~/.bashrc_<os> file. Done early (before

@@ -7,5 +7,5 @@
 if command -v cygpath >/dev/null 2>&1; then
     export HOME="$(cygpath -m "$HOME")"
 elif [ -n "${USERPROFILE:-}" ]; then
-    export HOME="$(printf '%s' "$USERPROFILE" | tr '\\' '/')"
+    export HOME="$(printf '%s' "$USERPROFILE" | tr '\134' '/')"
 fi
