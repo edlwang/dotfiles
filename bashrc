@@ -9,13 +9,13 @@ if [ -f "$HOME/.os_env" ]; then
 fi
 
 # Source platform-specific config so OS-only code stays out of this shared
-# bashrc. Each platform has its own ~/.bashrc_<os> file. Done early (before
-# the interactive guard below) so things like the Windows HOME fix always run.
-case "$SYSTEM_OS" in
-    Linux)   [ -f "$HOME/.bashrc_linux" ]   && . "$HOME/.bashrc_linux";;
-    macOS)   [ -f "$HOME/.bashrc_macos" ]   && . "$HOME/.bashrc_macos";;
-    Windows) [ -f "$HOME/.bashrc_windows" ] && . "$HOME/.bashrc_windows";;
-esac
+# bashrc. Each platform has its own ~/.bashrc_<os> file, named by the lowercased
+# SYSTEM_OS (the same convention init.sh uses for init_<os>.sh). Done early
+# (before the interactive guard below) so things like the Windows HOME fix
+# always run; a missing file (e.g. SYSTEM_OS=Unknown) is skipped by the -f test.
+os_rc="$HOME/.bashrc_$(printf '%s' "$SYSTEM_OS" | tr '[:upper:]' '[:lower:]')"
+[ -f "$os_rc" ] && . "$os_rc"
+unset os_rc
 
 # If not running interactively, don't do anything
 case $- in

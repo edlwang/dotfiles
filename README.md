@@ -268,12 +268,13 @@ layer.
   from the repo copy since the symlink may not exist on a first run) so they
   never disagree. Keep it side-effect-free apart from setting `SYSTEM_OS`.
 - **OS-specific code lives in per-platform files**, not inline in `bashrc`.
-  `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` in
-  a `case "$SYSTEM_OS"` block (early, before the interactive guard, so e.g. the
-  Windows `HOME` normalization always runs). To add OS-only behavior, edit the
-  matching `bashrc_<os>` file — keep `bashrc`/`bash_aliases` cross-platform. New
-  platform files must also be added to `init.sh`'s `setup_dotfiles` to be
-  symlinked.
+  `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` by
+  deriving the filename from the lowercased `SYSTEM_OS` (the same
+  convention-over-mapping dispatch `init.sh` uses for `init_<os>.sh`), early —
+  before the interactive guard, so e.g. the Windows `HOME` normalization always
+  runs. To add OS-only behavior, edit the matching `bashrc_<os>` file — keep
+  `bashrc`/`bash_aliases` cross-platform. New platform files must also be added to
+  `init.sh`'s `setup_dotfiles` to be symlinked.
 - **`bash_profile` just sources `~/.bashrc`** (symlinked to `~/.bash_profile`) so
   *login* shells load the same interactive config as non-login ones — notably the
   `bash -l` WezTerm launches on Windows and the login shell macOS terminals use
