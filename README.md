@@ -304,9 +304,11 @@ layer.
   `starship init bash` when starship is present and otherwise silently falls back
   to a simple, portable `PS1` (`user@host:dir`, no distro-specific bits), so the
   shell stays usable even without starship.
-- **`PATH` additions go through a `path_prepend` helper** in `bashrc` that adds a
-  directory only if it exists and isn't already on `PATH` (used for `~/.local/bin`
-  and `~/.pixi/bin`).
+- **`PATH` additions go through a `path_prepend` helper** in `bashrc` that, when
+  the directory exists, moves it to the front of `PATH` (dropping any earlier
+  occurrence). The calls run last — after the tool-env scripts (`~/.local/bin/env`,
+  `~/.cargo/env`) — so the *last* call wins and re-sourcing `bashrc` is idempotent.
+  `~/.local/bin` is prepended last, giving it priority over `~/.pixi/bin`.
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`)
   lists it.
 - `pyenv` alias activates the `~/py313` uv venv created by `init.sh`. It's

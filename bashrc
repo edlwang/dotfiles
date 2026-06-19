@@ -66,14 +66,6 @@ if [ -f "$HOME/.local/bin/env" ]; then
     . "$HOME/.local/bin/env"
 fi
 
-# Prepend a directory to PATH, but only if it exists and isn't already there.
-path_prepend() {
-    [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]] && export PATH="$1:$PATH"
-}
-
-# Add local bin to path
-path_prepend "$HOME/.local/bin"
-
 # Set editor to the first one available, preferring nvim.
 for ed in nvim vim vi; do
   if command -v "$ed" >/dev/null 2>&1; then
@@ -112,5 +104,16 @@ if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-# Add pixi bin to path
+# PATH priorities, asserted last so they win over whatever the tool-env scripts
+# above (uv's ~/.local/bin/env, ~/.cargo/env) already put on PATH. path_prepend
+# moves a directory to the FRONT of PATH (dropping any earlier occurrence) when
+# it exists, so the last call wins and re-sourcing this file is idempotent.
+path_prepend() {
+    [ -d "$1" ] || return
+    local p=":${PATH}:"
+    p="${p//:$1:/:}"        # drop any existing occurrence
+    p="${p#:}"; p="${p%:}"  # trim the framing colons
+    export PATH="$1${p:+:$p}"
+}
 path_prepend "$HOME/.pixi/bin"
+path_prepend "$HOME/.local/bin"   # last call = highest priority
