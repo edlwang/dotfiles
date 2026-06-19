@@ -45,7 +45,7 @@ vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Focus window up ([k])" })
 vim.keymap.set("n", "<leader>ci", "<S-g>vgg=", { desc = "[C]ode [I]ndent (re-indent whole file)" })
 
 -- toggle wrap
-vim.keymap.set("n", "<leader>tw", ":set wrap!<enter>", { desc = "[T]oggle [W]rap" })
+vim.keymap.set("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "[T]oggle [W]rap" })
 
 -- window resizing
 vim.keymap.set("n", "<leader>wk", "<C-w>+", { desc = "[W]indow height up ([k])" })
