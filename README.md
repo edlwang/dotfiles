@@ -300,6 +300,13 @@ layer.
   steps run. Small per-OS *values* (the nvim dir, pyenv path) stay as inline
   `SYSTEM_OS` branches in `init.sh`; only divergent *procedures* move to
   `init_<os>.sh`.
+- **The prompt comes from starship**, installed by `init.sh`. `bashrc` runs
+  `starship init bash` when starship is present and otherwise silently falls back
+  to a simple, portable `PS1` (`user@host:dir`, no distro-specific bits), so the
+  shell stays usable even without starship.
+- **`PATH` additions go through a `path_prepend` helper** in `bashrc` that adds a
+  directory only if it exists and isn't already on `PATH` (used for `~/.local/bin`
+  and `~/.pixi/bin`).
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` (`dirs -v`)
   lists it.
 - `pyenv` alias activates the `~/py313` uv venv created by `init.sh`. It's
