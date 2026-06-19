@@ -3,7 +3,7 @@
 
 # bashrc
 alias sbrc="source ~/.bashrc"
-alias ebrc="$EDITOR ~/.bashrc"
+alias ebrc='$EDITOR ~/.bashrc'
 
 # cd using pushd, popd goes back, dirs -v lists stack
 cd() {
