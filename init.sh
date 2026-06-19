@@ -163,7 +163,13 @@ setup_dotfiles
 setup_claude
 install_tools
 setup_pyenv
-. "$HOME/.bashrc"
+
+# Don't `source ~/.bashrc` here: this script runs in its own non-interactive
+# subshell (`bash init.sh`), so bashrc's interactive guard early-returns before
+# loading bash_aliases, and anything it did set couldn't propagate to the parent
+# shell that ran the script. The user must reload it themselves.
+echo
+echo "Done. Open a new shell or run:  source ~/.bashrc"
 
 
 
