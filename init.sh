@@ -9,14 +9,6 @@ BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 # may not exist yet on a first run.
 . "$DOTFILES_PATH/os_env"
 
-# On Windows, make `ln -s` create real symlinks instead of silently copying
-# (the default). nativestrict fails loudly rather than degrading to a copy if
-# symlinks can't be created -- that needs Developer Mode on, or an elevated
-# shell (the SeCreateSymbolicLinkPrivilege).
-if [ "$SYSTEM_OS" = "Windows" ]; then
-    export MSYS=winsymlinks:nativestrict
-fi
-
 # Backup existing settings and symlink new settings
 setup_symlink() {
     local src_file="$1"
@@ -114,6 +106,14 @@ install_uv() {
     fi
 }
 
+# Install external tools. This is the default (Unix) implementation using the
+# upstream curl|sh installers; a per-OS init file (see init_<os>.sh, sourced
+# below) may override it -- e.g. Windows uses a package manager instead.
+install_tools() {
+    install_starship
+    install_uv
+}
+
 setup_pyenv() {
     # uv puts the activate script under Scripts/ on Windows, bin/ on Unix.
     local activate="$HOME/py313/bin/activate"
@@ -129,10 +129,18 @@ setup_pyenv() {
     echo "run pyenv to activate"
 }
 
+# Source per-OS overrides (e.g. install_tools, env like MSYS). Done after the
+# default definitions above so an OS file can override them, but before the
+# steps run below so its setup (e.g. MSYS for symlinks) takes effect. Sourced
+# from the repo copy since the ~/.* symlinks may not exist yet on a first run.
+os_init="$DOTFILES_PATH/init_$(printf '%s' "$SYSTEM_OS" | tr '[:upper:]' '[:lower:]').sh"
+if [ -f "$os_init" ]; then
+    . "$os_init"
+fi
+
 setup_dotfiles
 setup_claude
-install_starship
-install_uv
+install_tools
 setup_pyenv
 . "$HOME/.bashrc"
 
