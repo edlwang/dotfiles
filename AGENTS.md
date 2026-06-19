@@ -24,7 +24,7 @@ Entry: `init.lua` → `require("edlwang")`. Everything lives under the personal 
 
 - `edlwang/init.lua` sets the leader (`<Space>`, single source of truth) before loading `edlwang.editor` (built-in settings) then `edlwang.lazy` (plugins).
 - `edlwang/lazy.lua` bootstraps **lazy.nvim** and auto-imports every file in `plugins/` via `{ import = "edlwang.plugins" }`.
-- `editor/` — one concern per file (`spacing`, `search`, `linenumbers`, `windows`, `undo`, `terminal`, `misc`, `diagnostics`, `keybinds`), each registered in `editor/init.lua`. To add a settings module, create the file and add a `require` line there.
+- `editor/` — one concern per file (`spacing`, `search`, `linenumbers`, `windows`, `undo`, `terminal`, `misc`, `diagnostics`, `providers`, `keybinds`), each registered in `editor/init.lua`. To add a settings module, create the file and add a `require` line there.
 - `plugins/` — one plugin per file, each **returning a lazy.nvim spec table**. Just dropping a new `plugins/<name>.lua` that returns a spec is enough to register it; no central list to edit.
 
 ### Keybinding convention (important)
@@ -45,10 +45,22 @@ When adding a leader-prefixed group, also add its label to the `spec` in `plugin
 
 `plugins/lsp-config.lua` wires **mason + mason-lspconfig + mason-tool-installer**. To enable a language server, add a key to the `servers` table (e.g. `gopls = {}`); it's then auto-installed and configured, with capabilities merged from nvim-cmp. Per-server overrides (settings/cmd/filetypes) go in that table's value. Add non-LSP tools (formatters, etc.) to the `ensure_installed` list. Completion is nvim-cmp (`plugins/cmp.lua`); autoformat is conform (`plugins/conform.lua`, add filetypes under `formatters_by_ft`). Colorscheme is `tokyonight-moon`.
 
+## WezTerm config (`wezterm/`)
+
+One file: `wezterm/wezterm.lua`, returning a table built with `wezterm.config_builder()`; WezTerm auto-reloads it on save. A few things shape how it's structured:
+
+- **Two keybinding layers, both feeding `config.keys`.** Terminator-style *direct* binds (`Ctrl+Shift+…`, `Alt+hjkl`) are set straight on `config.keys`; a **tmux-style command layer** behind a leader prefix (`config.leader` = `Ctrl+Space`) is assembled in the `tmux_keys` table and appended at the bottom. The prefix is `Ctrl+Space` deliberately so it never collides with tmux's `Ctrl+b` — a real tmux can run inside a WezTerm pane (locally or over SSH) with both layers live at once.
+- **Split names are inverted vs. Terminator/tmux.** Those call the *below* split "horizontal"; WezTerm calls it `SplitVertical` (and the *right* split `SplitHorizontal`). The binds map Terminator's `Ctrl+Shift+O` and tmux's `"` to `SplitVertical`, etc. — matching muscle memory, not the names. Don't "correct" the apparent mismatch.
+- **Leader symbol keys (`%` `"` `&` `:` `[` `]` `,`) go through the `leader_symbol()` helper.** A bare `{ key = "%" }` matches by physical key position and silently fails for shifted symbols; the helper binds by produced character (with `mapped:`, and both with and without `SHIFT`, since WezTerm versions disagree on whether the shift is reported). Add new symbol binds through it, not as plain `{ key = …, mods = L }` entries.
+- **Multiplexing + persistence are always on:** `config.unix_domains` plus `default_gui_startup_args = { "connect", "unix" }` run panes/tabs in a background mux server that reattaches on next launch — the `tmux detach`/`attach` equivalent (survives closing the window, not a reboot).
+
+The config-dir symlinking and the Windows-only login-shell `default_prog` are driven by `init.sh`/`os_env` and documented in the Shell config section below. `wezterm/tmux-testing.md` is a manual test checklist for the command layer.
+
 ## Shell config (`bashrc`, `bash_aliases`)
 
 - **OS detection has a single source of truth: `os_env`** (symlinked to `~/.os_env`). It sets `SYSTEM_OS` (`Linux`/`macOS`/`Windows`/`Unknown`) and is sourced by both `bashrc` (at shell startup) and `init.sh` (at install time, from the repo copy since the symlink may not exist on a first run) so they never disagree. Keep it side-effect-free apart from setting `SYSTEM_OS`.
 - **OS-specific code lives in per-platform files**, not inline in `bashrc`. `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` in a `case "$SYSTEM_OS"` block (early, before the interactive guard, so e.g. the Windows `HOME` normalization always runs). To add OS-only behavior, edit the matching `bashrc_<os>` file — keep `bashrc`/`bash_aliases` cross-platform. New platform files must also be added to `init.sh`'s `setup_dotfiles` to be symlinked.
+- **`bash_profile` just sources `~/.bashrc`** (symlinked to `~/.bash_profile`) so *login* shells load the same interactive config as non-login ones — notably the `bash -l` WezTerm launches on Windows and the login shell macOS terminals use by default.
 - **Neovim's config dir is platform-specific.** `init.sh`'s `nvim_config_dir` (branching on `SYSTEM_OS`) symlinks the repo's `nvim/` to `$XDG_CONFIG_HOME/nvim` if set, else `~/AppData/Local/nvim` on Windows or `~/.config/nvim` elsewhere — matching where Neovim actually looks.
 - **WezTerm's config dir is `~/.config/wezterm` on every platform.** `init.sh`'s `wezterm_config_dir` symlinks the repo's `wezterm/` to `$XDG_CONFIG_HOME/wezterm` if set, else `~/.config/wezterm` — WezTerm, unlike Neovim, does *not* use AppData on Windows, so there's no Windows branch. On Windows, `wezterm.lua` sets `default_prog` to launch Git Bash as a **login** shell (`bash.exe -l -i`); without `-l`, MSYS's `/etc/profile` never runs and `/usr/bin` (so `uname`, which `os_env` calls at startup) is missing from `PATH`.
 - **`init.sh`'s OS-specific *install* logic lives in per-OS files** (`init_<os>.sh`, e.g. `init_windows.sh`), sourced by `init.sh` from the repo copy (not symlinked into `$HOME` — they're install-time only, unlike `bashrc_<os>`). `init.sh` defines the default (Unix) `install_tools`; a present `init_<os>.sh` overrides it (and can set env like `MSYS`). The sourcing happens after the default definitions but before the steps run. Small per-OS *values* (the nvim dir, pyenv path) stay as inline `SYSTEM_OS` branches in `init.sh`; only divergent *procedures* move to `init_<os>.sh`.
