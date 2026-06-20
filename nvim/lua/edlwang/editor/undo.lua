@@ -1,4 +1,3 @@
--- change backup and undo settings
 vim.opt.swapfile = false
 vim.opt.backup = false
 -- Use expand("~") rather than os.getenv("HOME"): on Windows $HOME is unset when

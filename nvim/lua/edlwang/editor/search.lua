@@ -1,4 +1,3 @@
--- search settings
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
 

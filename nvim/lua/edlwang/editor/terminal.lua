@@ -1,4 +1,3 @@
--- terminal settings
 vim.opt.termguicolors = true
 
 -- On Windows, Neovim picks up $SHELL (Git Bash exports it as bash.exe) for

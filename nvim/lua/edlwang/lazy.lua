@@ -8,16 +8,14 @@ vim.opt.rtp:prepend(lazypath)
 
 -- mapleader/maplocalleader are set in edlwang/init.lua, which runs before this.
 
--- Setup lazy.nvim
 require("lazy").setup({
 	spec = {
-		-- import your plugins
+		-- Auto-import every spec under lua/edlwang/plugins/ — adding a file there
+		-- is all it takes to register a plugin; there's no central list.
 		{ import = "edlwang.plugins" },
 	},
-	-- Configure any other settings here. See the documentation for more details.
-	-- colorscheme that will be used when installing plugins.
 	install = { colorscheme = { "tokyonight-moon" } },
-	-- automatically check for plugin updates (quietly; no startup popups)
+	-- Check for plugin updates in the background, without a startup popup.
 	checker = { enabled = true, notify = false },
 	-- No plugin here uses luarocks; disabling it skips the hererocks bootstrap
 	-- and silences the related :checkhealth warnings.
