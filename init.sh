@@ -197,9 +197,15 @@ setup_pyenv() {
     fi
 
     echo "Setting up pyenv"
-    uv venv "$HOME/py313" --seed --python 3.13
-    echo "Pyenv setup"
-    echo "run pyenv to activate"
+    # Best-effort like install_tools: `uv venv --python 3.13` fetches a CPython
+    # build when none is present, so a transient network failure must warn rather
+    # than abort init under set -e (setup_completions still needs to run after).
+    if uv venv "$HOME/py313" --seed --python 3.13; then
+        echo "Pyenv setup"
+        echo "run pyenv to activate"
+    else
+        echo "Warning: 'uv venv' failed; skipping. Re-run init.sh to retry." >&2
+    fi
 }
 
 # Generate bash completions into the user completions dir, where bash-completion
