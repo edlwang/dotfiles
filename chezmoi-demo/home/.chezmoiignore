@@ -1,0 +1,14 @@
+# .chezmoiignore — target paths chezmoi should NOT manage in $HOME.
+# This file is itself a template: the conditionals are evaluated per machine at
+# apply time, so one source tree produces the right set of files everywhere
+# (the job init.sh did by only symlinking certain files per OS).
+
+# The WezTerm desktop launcher is Linux-only (init_linux.sh installs it today).
+{{ if ne .chezmoi.os "linux" }}
+.config/wezterm/org.wezfurlong.wezterm.desktop
+{{ end }}
+
+# Example: skip Claude config except on a specific machine.
+# {{ if ne .chezmoi.hostname "my-laptop" }}
+# .claude
+# {{ end }}

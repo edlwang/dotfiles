@@ -1,0 +1,17 @@
+# .chezmoiexternal.toml — files/archives chezmoi fetches from the network at
+# `apply` time and caches (refreshPeriod). This is interpreted as a template.
+#
+# Use case for THIS repo: the README lists "FiraMono Nerd Font" as a manual
+# dependency. An external turns that into managed state — chezmoi downloads and
+# unpacks it for you, and `chezmoi update` keeps it fresh.
+
+{{ if eq .chezmoi.os "linux" -}}
+[".local/share/fonts/FiraMono"]
+    type = "archive"
+    url = "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraMono.zip"
+    exact = true
+    refreshPeriod = "168h"
+{{ end -}}
+# macOS fonts live in ~/Library/Fonts and Windows installs fonts via the shell,
+# so this example is gated to Linux. Verify the asset name against the upstream
+# release before relying on it.

@@ -1,0 +1,94 @@
+# ~/.bashrc — managed by chezmoi (generated from dot_bashrc.tmpl).
+#
+# The per-OS blocks below are resolved by chezmoi at `apply` time via
+# {{ "{{ .chezmoi.os }}" }}, replacing the runtime ~/.bashrc_<os> dispatch the symlink
+# setup used. shellenv is still sourced for the *runtime* helpers it defines
+# (path_prepend, winpath) — chezmoi resolves the OS once, at apply time, but the
+# shell still wants those functions live.
+
+if [ -f "$HOME/.shellenv" ]; then
+    . "$HOME/.shellenv"
+fi
+
+{{ if eq .chezmoi.os "windows" -}}
+# Windows (Git Bash/MSYS): HOME arrives as "/c/Users/..."; native Windows tools
+# need "C:/Users/...". Normalize early (winpath comes from shellenv, above).
+export HOME="$(winpath "$HOME")"
+# Activate the ~/py313 uv venv (Windows layout: Scripts/activate).
+alias pyenv="source $HOME/py313/Scripts/activate"
+{{ else if eq .chezmoi.os "darwin" -}}
+alias ls='ls -G'
+# Activate the ~/py313 uv venv (Unix layout: bin/activate).
+alias pyenv="source $HOME/py313/bin/activate"
+{{ else -}}
+alias ls='ls --color=auto'
+# Activate the ~/py313 uv venv (Unix layout: bin/activate).
+alias pyenv="source $HOME/py313/bin/activate"
+{{ end }}
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# don't put duplicate lines or lines starting with space in the history.
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=100000
+HISTFILESIZE=200000
+HISTTIMEFORMAT='%F %T '
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# enable programmable completion features
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  elif [ -f /opt/homebrew/etc/profile.d/bash_completion.sh ]; then
+    # macOS Homebrew support
+    . /opt/homebrew/etc/profile.d/bash_completion.sh
+  fi
+fi
+
+# Load environment variables (uv's env script)
+if [ -f "$HOME/.local/bin/env" ]; then
+    . "$HOME/.local/bin/env"
+fi
+
+# Set editor to the first one available, preferring nvim.
+for ed in nvim vim vi; do
+  if command -v "$ed" >/dev/null 2>&1; then
+    export EDITOR="$ed" VISUAL="$ed"
+    break
+  fi
+done
+unset ed
+
+# Use starship if available; otherwise fall back to a simple, portable prompt.
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init bash)"
+else
+    case "$TERM" in
+        xterm-color|*-256color)
+            PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ ';;
+        *)
+            PS1='\u@\h:\w\$ ';;
+    esac
+fi
+
+if [ -f "$HOME/.bash_aliases" ]; then
+    . "$HOME/.bash_aliases"
+fi
+
+# Load Rust/cargo environment if installed
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
+
+# PATH priorities, asserted last so they win over the tool-env scripts above.
+path_prepend "$HOME/.pixi/bin"
+path_prepend "$HOME/.local/bin"   # last call = highest priority

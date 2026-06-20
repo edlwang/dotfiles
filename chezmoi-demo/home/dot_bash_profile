@@ -1,0 +1,6 @@
+# ~/.bash_profile — managed by chezmoi (plain file → symlinked in symlink mode).
+# Login shells load the same interactive config as non-login ones — notably the
+# `bash -l` WezTerm launches on Windows and macOS terminals' default login shell.
+if [ -f "$HOME/.bashrc" ]; then
+    . "$HOME/.bashrc"
+fi

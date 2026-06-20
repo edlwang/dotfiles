@@ -1,0 +1,23 @@
+# chezmoi config template. Processed once at `chezmoi init` to write
+# ~/.config/chezmoi/chezmoi.toml. NOT applied to $HOME.
+#
+# The prompts below replace this repo's ~/.gitconfig.local escape hatch: instead
+# of hand-writing an untracked per-machine identity file, chezmoi asks once and
+# stores the answers as template data (.name / .email), used by dot_gitconfig.tmpl.
+
+{{- $name := promptStringOnce . "name" "Full name for git" "Edward Wang" -}}
+{{- $email := promptStringOnce . "email" "Email for git" "work@edlwang.com" -}}
+
+# mode = "symlink" makes chezmoi symlink *plain* files (non-template,
+# non-script, non-encrypted) into $HOME instead of copying them — so editing a
+# managed plain file in this source tree changes the live config immediately,
+# the same edit-in-place workflow init.sh's symlinks give you today.
+#
+# Caveat: templates (*.tmpl) and scripts can't be symlinked — they're generated
+# or run — so editing dot_bashrc.tmpl needs a `chezmoi apply` to take effect,
+# whereas editing dot_bash_aliases (plain) is live. See README → Tradeoffs.
+mode = "symlink"
+
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}

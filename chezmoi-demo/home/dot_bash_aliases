@@ -1,0 +1,22 @@
+# ~/.bash_aliases — managed by chezmoi (plain file → symlinked into $HOME in
+# symlink mode, so edits here are live without `chezmoi apply`).
+#
+# OS-specific aliases (ls, pyenv) are NOT here — under chezmoi they move into the
+# templated dot_bashrc.tmpl's per-OS blocks instead of separate bashrc_<os> files.
+
+# bashrc
+alias sbrc="source ~/.bashrc"
+alias ebrc='$EDITOR ~/.bashrc'
+
+# cd using pushd, popd goes back, vdirs lists the stack.
+cd() {
+    builtin pushd "${@:-$HOME}" > /dev/null
+}
+
+# List the directory stack newest-first, capped (vdirs / vdirs N / vdirs all).
+vdirs() {
+    case "$1" in
+        all|-a) dirs -v ;;
+        *)      dirs -v | head -n "${1:-10}" ;;
+    esac
+}

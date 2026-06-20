@@ -1,0 +1,33 @@
+# ~/.shellenv — managed by chezmoi (plain file → symlinked in symlink mode).
+#
+# Kept almost verbatim from the symlink setup: chezmoi templating handles
+# *apply-time* OS differences (which file/block lands on disk), but the shell
+# still needs these helpers at *runtime*. SYSTEM_OS stays too — runtime code
+# (e.g. interactive functions) may still branch on it. Note that init.sh's
+# install-time use of this file is gone: under chezmoi the installer logic lives
+# in .chezmoiscripts/ (which get .chezmoi.os from templates instead of uname).
+case "$(uname -s)" in
+    Linux*)                 export SYSTEM_OS="Linux";;
+    Darwin*)                export SYSTEM_OS="macOS";;
+    CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
+    *)                      export SYSTEM_OS="Unknown";;
+esac
+
+# Convert an MSYS path (/c/...) to Windows-mixed form (C:/...); no-op off Windows.
+winpath() {
+    if command -v cygpath >/dev/null 2>&1; then
+        cygpath -m "$1"
+    else
+        printf '%s' "$1"
+    fi
+}
+
+# Move a directory to the FRONT of PATH (dropping any earlier occurrence) when
+# it exists; a no-op for a missing dir.
+path_prepend() {
+    [ -d "$1" ] || return
+    local p=":${PATH}:"
+    p="${p//:$1:/:}"        # drop any existing occurrence
+    p="${p#:}"; p="${p%:}"  # trim the framing colons
+    export PATH="$1${p:+:$p}"
+}

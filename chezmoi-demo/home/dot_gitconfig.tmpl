@@ -1,0 +1,13 @@
+# ~/.gitconfig — managed by chezmoi (from dot_gitconfig.tmpl).
+# Identity comes from the values prompted at `chezmoi init` (.chezmoi.toml.tmpl),
+# so there is no committed name/email and no separate ~/.gitconfig.local include.
+[user]
+	name = {{ .name }}
+	email = {{ .email }}
+[alias]
+	submodpull = submodule update --init --recursive
+[init]
+	defaultBranch = main
+# Rewrite GitHub HTTPS push URLs to SSH.
+[url "git@github.com:"]
+	pushInsteadOf = https://github.com/

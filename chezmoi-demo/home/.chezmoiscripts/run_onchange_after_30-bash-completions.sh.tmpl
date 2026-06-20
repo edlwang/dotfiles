@@ -1,0 +1,27 @@
+#!/bin/bash
+# run_onchange_after_*: regenerate bash completions into the user completions dir,
+# where bash-completion lazy-loads them on first TAB (no shell-startup cost).
+# Mirrors init.sh's setup_completions. Each file is gated on its command existing,
+# so an uninstalled tool produces nothing. `run_onchange` is the right trigger:
+# edit this script (e.g. add a tool) and chezmoi regenerates on next apply.
+set -euo pipefail
+
+dir="${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/completions"
+mkdir -p "$dir"
+
+gen_completion() {
+    local cmd="$1"; shift
+    command -v "$cmd" >/dev/null 2>&1 || return 0
+    if "$@" > "$dir/$cmd.tmp" 2>/dev/null; then
+        mv "$dir/$cmd.tmp" "$dir/$cmd"
+    else
+        rm -f "$dir/$cmd.tmp"
+        echo "Warning: could not generate $cmd completion" >&2
+    fi
+}
+
+gen_completion uv     uv  generate-shell-completion bash
+gen_completion uvx    uvx --generate-shell-completion bash
+gen_completion pixi   pixi completion --shell bash
+gen_completion rustup rustup completions bash
+gen_completion cargo  rustup completions bash cargo

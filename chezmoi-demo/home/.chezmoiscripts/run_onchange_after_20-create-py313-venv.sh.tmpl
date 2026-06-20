@@ -1,0 +1,23 @@
+#!/bin/bash
+# run_onchange_after_*: re-runs whenever this script's rendered contents change,
+# AFTER the target state is written. Mirrors init.sh's setup_pyenv. Bump the
+# Python version below and chezmoi re-runs it; otherwise it's a no-op once the
+# venv exists. uv must be on PATH (the install-tools script ran first).
+set -euo pipefail
+
+# python: 3.13
+
+if ! command -v uv >/dev/null 2>&1; then
+    echo "uv not found; skipping ~/py313 venv. Re-run after installing uv." >&2
+    exit 0
+fi
+
+{{ if eq .chezmoi.os "windows" -}}
+activate="$HOME/py313/Scripts/activate"
+{{ else -}}
+activate="$HOME/py313/bin/activate"
+{{ end -}}
+
+if [ ! -e "$activate" ]; then
+    uv venv "$HOME/py313" --seed --python 3.13 || echo "Warning: 'uv venv' failed; re-run to retry." >&2
+fi

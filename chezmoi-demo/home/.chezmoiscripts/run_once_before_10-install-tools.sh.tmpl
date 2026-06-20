@@ -1,0 +1,28 @@
+#!/bin/bash
+# run_once_before_*: chezmoi runs this ONCE (it tracks the script's hash) BEFORE
+# writing the rest of the target state, on the first `apply` and again whenever
+# the script's contents change. This replaces init.sh's install_tools +
+# init_<os>.sh override — the OS branch is resolved by the template, not uname.
+set -euo pipefail
+
+{{ if eq .chezmoi.os "windows" -}}
+# Windows: prefer winget, fall back to scoop (mirrors init_windows.sh).
+if command -v winget >/dev/null 2>&1; then
+    command -v starship >/dev/null 2>&1 || winget install --id Starship.Starship -e --silent --accept-package-agreements --accept-source-agreements || echo "Warning: starship install failed" >&2
+    command -v uv       >/dev/null 2>&1 || winget install --id astral-sh.uv     -e --silent --accept-package-agreements --accept-source-agreements || echo "Warning: uv install failed" >&2
+elif command -v scoop >/dev/null 2>&1; then
+    command -v starship >/dev/null 2>&1 || scoop install starship || echo "Warning: starship install failed" >&2
+    command -v uv       >/dev/null 2>&1 || scoop install uv       || echo "Warning: uv install failed" >&2
+else
+    echo "Neither winget nor scoop found; install starship and uv manually." >&2
+fi
+{{ else -}}
+# Linux/macOS: upstream curl|sh installers (mirrors init.sh).
+if ! command -v starship >/dev/null 2>&1; then
+    mkdir -p "$HOME/.local/bin"
+    curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin" || echo "Warning: starship install failed" >&2
+fi
+if ! command -v uv >/dev/null 2>&1; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh || echo "Warning: uv install failed" >&2
+fi
+{{ end -}}
