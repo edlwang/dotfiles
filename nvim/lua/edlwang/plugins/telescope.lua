@@ -12,15 +12,13 @@ return {
 				extensions = {
 					fzf = {},
 					["ui-select"] = {
-						require("telescope.themes").get_dropdown({
-							-- even more opts
-						}),
+						require("telescope.themes").get_dropdown({}),
 					},
 				},
 			})
 			require("telescope").load_extension("fzf")
 			require("telescope").load_extension("ui-select")
-			-- Telescope keymaps live in editor/keybinds.lua
+			-- Telescope keymaps live in editor/keybinds.lua.
 		end,
 	},
 }

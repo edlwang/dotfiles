@@ -2,27 +2,22 @@ return { -- Autoformat
 	"stevearc/conform.nvim",
 	event = "BufWritePre",
 	cmd = "ConformInfo",
-	-- The <leader>f format keymap lives in editor/keybinds.lua
+	-- The <leader>cf format keymap lives in editor/keybinds.lua.
 	opts = {
 		notify_on_error = false,
 		format_on_save = function(bufnr)
-			-- Disable "format_on_save lsp_fallback" for languages that don't
-			-- have a well standardized coding style. You can add additional
-			-- languages here or re-enable it for the disabled ones.
+			-- Per-filetype opt-out of format-on-save, for languages without a
+			-- well-standardized style. Empty for now (nothing opted out).
 			local disable_filetypes = {}
 			return {
 				timeout_ms = 500,
 				lsp_format = not disable_filetypes[vim.bo[bufnr].filetype] and "fallback" or "never",
 			}
 		end,
+		-- Filetype → formatters. A value can be a list to run sequentially, or a
+		-- sub-list to run the first available (e.g. { { "prettierd", "prettier" } }).
 		formatters_by_ft = {
 			lua = { "stylua" },
-			-- Conform can also run multiple formatters sequentially
-			-- python = { "isort", "black" },
-			--
-			-- You can use a sub-list to tell conform to run *until* a formatter
-			-- is found.
-			-- javascript = { { "prettierd", "prettier" } },
 		},
 	},
 }

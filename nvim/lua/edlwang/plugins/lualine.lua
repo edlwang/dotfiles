@@ -4,7 +4,7 @@ return {
 	event = "VeryLazy",
 	opts = {
 		options = {
-			theme = "dracula", -- intentionally not tokyonight, i think dracula line looks better
+			theme = "dracula", -- intentionally not tokyonight; the dracula statusline reads better
 		},
 	},
 }
