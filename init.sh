@@ -23,7 +23,6 @@ setup_symlink() {
     local src_file="$1"
     local dest_file="$2"
 
-    # error if file doesn't exist in dotfiles repo
     if [ ! -e "$src_file" ]; then
         echo "Error: $src_file does not exist"
         return 1
@@ -48,7 +47,6 @@ setup_symlink() {
         mv "$dest_file" "$BACKUP_DIR/"
     fi
 
-    # Create symlink
     mkdir -p "$(dirname "$dest_file")"
     echo "Creating symlink $dest_file -> $src_file"
     ln -s "$src_file" "$dest_file"
@@ -118,7 +116,6 @@ setup_claude() {
 }
 
 install_starship() {
-    # If starship exists
     if command -v starship >/dev/null 2>&1; then
         echo "Starship already installed"
         return
@@ -136,7 +133,6 @@ install_starship() {
 }
 
 install_uv() {
-    # If uv exists
     if command -v uv >/dev/null 2>&1; then
         echo "uv already installed"
         return
@@ -274,6 +270,3 @@ setup_completions
 # shell that ran the script. The user must reload it themselves.
 echo
 echo "Done. Open a new shell or run:  source ~/.bashrc"
-
-
-

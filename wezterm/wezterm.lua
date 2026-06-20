@@ -1,13 +1,7 @@
--- Pull in the wezterm API
 local wezterm = require("wezterm")
 local act = wezterm.action
-
--- This will hold the configuration.
 local config = wezterm.config_builder()
 
--- This is where you actually apply your config choices
-
--- For example, changing the color scheme:
 config.color_scheme = "tokyonight_moon"
 config.font = wezterm.font("FiraMono Nerd Font")
 config.window_close_confirmation = "NeverPrompt"
@@ -202,5 +196,4 @@ for _, k in ipairs(tmux_keys) do
 	table.insert(config.keys, k)
 end
 
--- and finally, return the configuration to wezterm
 return config
