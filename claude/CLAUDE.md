@@ -5,6 +5,8 @@ Personal, cross-project preferences for every session. A repo's own
 
 ## Working preferences
 
+- When writing or refactoring code, prioritize correctness, then elegance and
+  readability, and performance last.
 - Don't claim a change works unless you verified it (ran it, or tests pass). If you
   didn't verify, say so plainly.
 
