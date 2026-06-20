@@ -17,3 +17,16 @@ winpath() {
         printf '%s' "$1"
     fi
 }
+
+# Move a directory to the FRONT of PATH (dropping any earlier occurrence) when
+# it exists; a no-op for a missing dir. Shared so both callers agree: bashrc
+# asserts its PATH priorities with it at shell startup, and init.sh uses it to
+# surface a freshly-installed tool mid-run. Drop-then-prepend keeps re-sourcing
+# idempotent and lets the last call win.
+path_prepend() {
+    [ -d "$1" ] || return
+    local p=":${PATH}:"
+    p="${p//:$1:/:}"        # drop any existing occurrence
+    p="${p#:}"; p="${p%:}"  # trim the framing colons
+    export PATH="$1${p:+:$p}"
+}

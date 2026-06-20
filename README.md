@@ -305,11 +305,14 @@ layer.
   `starship init bash` when starship is present and otherwise silently falls back
   to a simple, portable `PS1` (`user@host:dir`, no distro-specific bits), so the
   shell stays usable even without starship.
-- **`PATH` additions go through a `path_prepend` helper** in `bashrc` that, when
-  the directory exists, moves it to the front of `PATH` (dropping any earlier
-  occurrence). The calls run last — after the tool-env scripts (`~/.local/bin/env`,
-  `~/.cargo/env`) — so the *last* call wins and re-sourcing `bashrc` is idempotent.
-  `~/.local/bin` is prepended last, giving it priority over `~/.pixi/bin`.
+- **`PATH` additions go through a `path_prepend` helper** defined in `os_env`
+  (shared, so `init.sh` reuses it too) that, when the directory exists, moves it
+  to the front of `PATH` (dropping any earlier occurrence). In `bashrc` the calls
+  run last — after the tool-env scripts (`~/.local/bin/env`, `~/.cargo/env`) — so
+  the *last* call wins and re-sourcing `bashrc` is idempotent. `~/.local/bin` is
+  prepended last, giving it priority over `~/.pixi/bin`. `init.sh`'s
+  `ensure_tools_on_path` calls it after `install_tools` so a just-installed tool
+  is on `PATH` for the rest of that run (no second run needed).
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` lists it
   newest-first, capped to the top 10 so a long-lived stack stays readable
   (`vdirs N` for the top N, `vdirs all` for the whole stack).

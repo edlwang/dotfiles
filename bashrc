@@ -106,14 +106,8 @@ fi
 
 # PATH priorities, asserted last so they win over whatever the tool-env scripts
 # above (uv's ~/.local/bin/env, ~/.cargo/env) already put on PATH. path_prepend
-# moves a directory to the FRONT of PATH (dropping any earlier occurrence) when
-# it exists, so the last call wins and re-sourcing this file is idempotent.
-path_prepend() {
-    [ -d "$1" ] || return
-    local p=":${PATH}:"
-    p="${p//:$1:/:}"        # drop any existing occurrence
-    p="${p#:}"; p="${p%:}"  # trim the framing colons
-    export PATH="$1${p:+:$p}"
-}
+# (defined in os_env, sourced at the top) moves a directory to the FRONT of PATH
+# (dropping any earlier occurrence) when it exists, so the last call wins and
+# re-sourcing this file is idempotent.
 path_prepend "$HOME/.pixi/bin"
 path_prepend "$HOME/.local/bin"   # last call = highest priority

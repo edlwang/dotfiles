@@ -115,11 +115,17 @@ install_starship() {
     # If starship exists
     if command -v starship >/dev/null 2>&1; then
         echo "Starship already installed"
-    else
-        echo "Installing starship"
-        mkdir -p ~/.local/bin
-        curl -sS https://starship.rs/install.sh | sh -s -- -b ~/.local/bin
+        return
+    fi
+    echo "Installing starship"
+    mkdir -p ~/.local/bin
+    # Test the pipe with `if` so set -e doesn't abort the whole run on a
+    # transient network failure -- the symlinks are the point; an optional tool
+    # is best-effort. Only claim success when the install actually succeeded.
+    if curl -sS https://starship.rs/install.sh | sh -s -- -b ~/.local/bin; then
         echo "Starship installed"
+    else
+        echo "Warning: starship install failed; skipping." >&2
     fi
 }
 
@@ -127,10 +133,15 @@ install_uv() {
     # If uv exists
     if command -v uv >/dev/null 2>&1; then
         echo "uv already installed"
-    else
-        echo "Installing uv"
-        curl -LsSf https://astral.sh/uv/install.sh | sh
+        return
+    fi
+    echo "Installing uv"
+    # Best-effort like install_starship: a failed install warns instead of
+    # aborting init under set -e.
+    if curl -LsSf https://astral.sh/uv/install.sh | sh; then
         echo "uv installed"
+    else
+        echo "Warning: uv install failed; skipping." >&2
     fi
 }
 
@@ -142,6 +153,21 @@ install_tools() {
     install_uv
 }
 
+# After install_tools, put any freshly-installed tool on PATH for the rest of
+# this run. A tool installed this session lands in a dir that wasn't on PATH
+# when the shell started, so command -v would miss it and setup_pyenv /
+# setup_completions would skip -- forcing a needless second init.sh run. The
+# Unix curl|sh installers target ~/.local/bin (starship is pinned there; uv
+# defaults there but honors XDG_BIN_HOME / CARGO_HOME), and rustup/cargo live in
+# ~/.cargo/bin. path_prepend (from os_env) no-ops on a missing dir, so listing
+# every candidate adds only the real ones. A per-OS init file may override this
+# (Windows uses the package managers' shim dirs).
+ensure_tools_on_path() {
+    path_prepend "$HOME/.local/bin"
+    path_prepend "${XDG_BIN_HOME:-$HOME/.local/bin}"
+    path_prepend "${CARGO_HOME:-$HOME/.cargo}/bin"
+}
+
 setup_pyenv() {
     # uv puts the activate script under Scripts/ on Windows, bin/ on Unix.
     local activate="$HOME/py313/bin/activate"
@@ -149,11 +175,24 @@ setup_pyenv() {
 
     if [ -e "$activate" ]; then
         echo "Virtual env already set up"
-    else
-        echo "Setting up pyenv"
-        uv venv "$HOME/py313" --seed --python 3.13
-        echo "Pyenv setup"
+        echo "run pyenv to activate"
+        return
     fi
+
+    # ensure_tools_on_path (run just before this step) should have surfaced a
+    # uv that install_tools just installed. If it's still missing, the install
+    # failed or its dir couldn't be found -- skip rather than abort under set -e
+    # (the symlinks are already done), mirroring setup_completions, which also
+    # no-ops per tool when the command is absent.
+    if ! command -v uv >/dev/null 2>&1; then
+        echo "uv not found after install; skipping venv." \
+             "Install uv (or re-run init.sh in a new shell) to create it."
+        return
+    fi
+
+    echo "Setting up pyenv"
+    uv venv "$HOME/py313" --seed --python 3.13
+    echo "Pyenv setup"
     echo "run pyenv to activate"
 }
 
@@ -213,6 +252,7 @@ setup_dotfiles
 setup_claude
 setup_os
 install_tools
+ensure_tools_on_path
 setup_pyenv
 setup_completions
 
