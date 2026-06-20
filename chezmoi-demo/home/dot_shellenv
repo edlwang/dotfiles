@@ -1,11 +1,14 @@
 # ~/.shellenv — managed by chezmoi (plain file → symlinked in symlink mode).
 #
-# Kept almost verbatim from the symlink setup: chezmoi templating handles
-# *apply-time* OS differences (which file/block lands on disk), but the shell
-# still needs these helpers at *runtime*. SYSTEM_OS stays too — runtime code
-# (e.g. interactive functions) may still branch on it. Note that init.sh's
-# install-time use of this file is gone: under chezmoi the installer logic lives
-# in .chezmoiscripts/ (which get .chezmoi.os from templates instead of uname).
+# Why this file survives the move to chezmoi: its two helpers act on RUNTIME
+# state that apply-time templating can't precompute —
+#   * path_prepend inspects the live $PATH and whether a dir exists right now;
+#   * winpath transforms a path value ($HOME as the running shell sees it), via a
+#     cygpath capability probe.
+# The uname-based SYSTEM_OS dispatch, by contrast, is an APPLY-TIME fact: chezmoi
+# resolves it in the templates (dot_bashrc.tmpl) and the run_ scripts, so nothing
+# in the rendered config consults SYSTEM_OS at runtime. It's kept below only as an
+# optional convenience for future runtime branching — you can delete it.
 case "$(uname -s)" in
     Linux*)                 export SYSTEM_OS="Linux";;
     Darwin*)                export SYSTEM_OS="macOS";;

@@ -85,9 +85,11 @@ alias pyenv="source $HOME/py313/bin/activate"
 {{ end }}
 ```
 
-`shellenv` is kept as a plain file because its `path_prepend` / `winpath`
-helpers are needed at shell **runtime**, which templating (resolved once at apply
-time) can't provide.
+`shellenv` is kept only for its `path_prepend` / `winpath` helpers, which act on
+**runtime** state (the live `$PATH`, the running shell's `$HOME`) that apply-time
+templating can't precompute. The old `uname`→`SYSTEM_OS` *dispatch*, by contrast,
+is an apply-time fact, so it moves into the templates — nothing in the rendered
+config consults `SYSTEM_OS` at runtime anymore, and the variable could be dropped.
 
 ## `run_` scripts replace `init.sh`
 
@@ -114,6 +116,12 @@ Honest accounting, since this isn't a strict upgrade:
   so editing them needs `chezmoi apply`. Today *every* file is live via symlink.
   Workflow becomes `chezmoi edit --apply <file>` / `chezmoi apply` for templated
   files.
+- **Or skip symlinks entirely.** If you don't need live editing, drop
+  `mode = "symlink"` (copy mode is the default): *every* file becomes a rendered
+  copy refreshed by `chezmoi apply`, which is more uniform (no "which files are
+  live?" split) and removes the symlink-privilege requirement on Windows — along
+  with the whole class of `init.sh` symlink-target gymnastics. `chezmoi edit
+  --watch <file>` re-applies on each save if you want something close to live.
 - **OS is baked at apply time.** A symlinked `bashrc` reads `SYSTEM_OS` live; a
   templated one is resolved for the machine you applied on. Fine for
   per-machine dotfiles, but it's a real behavioral change.
