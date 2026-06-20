@@ -21,7 +21,7 @@ config.inactive_pane_hsb = {
 }
 local launch_menu = {}
 
-if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+if wezterm.target_triple:find("windows") then
 	-- Launch Git Bash as a login + interactive shell (-l -i). Without -l, MSYS's
 	-- /etc/profile never runs, so /usr/bin (uname, etc.) is absent from PATH and
 	-- shellenv's `uname -s` fails on startup with "uname: command not found".
@@ -85,7 +85,11 @@ config.keys = {
 
 	-- Font size
 	{ key = "=", mods = "CTRL", action = act.IncreaseFontSize },
-	{ key = "+", mods = "CTRL", action = act.IncreaseFontSize },
+	-- `+` is Shift+`=`; bind it by produced character (mapped:) and both with and
+	-- without SHIFT, for the same reason leader_symbol() does with its symbols —
+	-- a plain `key = "+"` matches by physical position and silently fails.
+	{ key = "mapped:+", mods = "CTRL", action = act.IncreaseFontSize },
+	{ key = "mapped:+", mods = "CTRL|SHIFT", action = act.IncreaseFontSize },
 	{ key = "-", mods = "CTRL", action = act.DecreaseFontSize },
 	{ key = "0", mods = "CTRL", action = act.ResetFontSize },
 
