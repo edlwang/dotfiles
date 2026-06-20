@@ -43,7 +43,7 @@ install_tools() {
 # doesn't see, so command -v would miss uv and setup_pyenv would skip. Rather
 # than re-read the registry, point PATH at the package managers' shim dirs:
 # winget aliases portable installs (uv) into %LOCALAPPDATA%\Microsoft\WinGet\Links;
-# scoop shims into ~/scoop/shims. path_prepend (from os_env) no-ops on a missing
+# scoop shims into ~/scoop/shims. path_prepend (from shellenv) no-ops on a missing
 # dir, so listing both is safe whichever manager ran; winpath normalizes the
 # LOCALAPPDATA backslashes to the C:/... form bashrc already uses on PATH.
 # (starship installs elsewhere, but nothing later in init needs it.)

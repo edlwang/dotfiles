@@ -3,9 +3,9 @@
 # for examples
 #
 
-# Detect OS (sets SYSTEM_OS). Shared with init.sh — see os_env.
-if [ -f "$HOME/.os_env" ]; then
-    . "$HOME/.os_env"
+# Detect OS (sets SYSTEM_OS). Shared with init.sh — see shellenv.
+if [ -f "$HOME/.shellenv" ]; then
+    . "$HOME/.shellenv"
 fi
 
 # Source platform-specific config so OS-only code stays out of this shared
@@ -106,7 +106,7 @@ fi
 
 # PATH priorities, asserted last so they win over whatever the tool-env scripts
 # above (uv's ~/.local/bin/env, ~/.cargo/env) already put on PATH. path_prepend
-# (defined in os_env, sourced at the top) moves a directory to the FRONT of PATH
+# (defined in shellenv, sourced at the top) moves a directory to the FRONT of PATH
 # (dropping any earlier occurrence) when it exists, so the last call wins and
 # re-sourcing this file is idempotent.
 path_prepend "$HOME/.pixi/bin"

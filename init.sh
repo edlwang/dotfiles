@@ -5,8 +5,8 @@ DOTFILES_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Detect OS (sets SYSTEM_OS) and load shared helpers (winpath) from the same
 # file bashrc uses, so the installer and the shell never disagree. Source the
-# repo copy: the ~/.os_env symlink may not exist yet on a first run.
-. "$DOTFILES_PATH/os_env"
+# repo copy: the ~/.shellenv symlink may not exist yet on a first run.
+. "$DOTFILES_PATH/shellenv"
 
 # Use Windows-form (C:/...) paths for both DOTFILES_PATH and HOME so each
 # symlink's link and target are paths native Windows tools resolve, not the
@@ -57,7 +57,7 @@ setup_symlink() {
 # Mirror Neovim's own config-dir resolution: $XDG_CONFIG_HOME/nvim if set
 # (honored on every platform), else the OS default — ~/AppData/Local/nvim on
 # Windows (%LOCALAPPDATA%), ~/.config/nvim elsewhere. Branches on SYSTEM_OS
-# from os_env.
+# from shellenv.
 nvim_config_dir() {
     if [ -n "${XDG_CONFIG_HOME:-}" ]; then
         printf '%s/nvim' "$(printf '%s' "$XDG_CONFIG_HOME" | tr '\134' '/')"
@@ -83,7 +83,13 @@ wezterm_config_dir() {
 setup_dotfiles() {
     echo "Setting up dotfiles"
 
-    setup_symlink "$DOTFILES_PATH/os_env" "$HOME/.os_env"
+    setup_symlink "$DOTFILES_PATH/shellenv" "$HOME/.shellenv"
+    # Migration: os_env was renamed to shellenv -- drop the now-dangling
+    # ~/.os_env symlink older installs left behind (only if it's a symlink, never
+    # a real file the user owns). Safe to remove once all machines are migrated.
+    if [ -L "$HOME/.os_env" ]; then
+        rm -f "$HOME/.os_env"
+    fi
     setup_symlink "$DOTFILES_PATH/bashrc" "$HOME/.bashrc"
     setup_symlink "$DOTFILES_PATH/bashrc_linux" "$HOME/.bashrc_linux"
     setup_symlink "$DOTFILES_PATH/bashrc_macos" "$HOME/.bashrc_macos"
@@ -159,7 +165,7 @@ install_tools() {
 # setup_completions would skip -- forcing a needless second init.sh run. The
 # Unix curl|sh installers target ~/.local/bin (starship is pinned there; uv
 # defaults there but honors XDG_BIN_HOME / CARGO_HOME), and rustup/cargo live in
-# ~/.cargo/bin. path_prepend (from os_env) no-ops on a missing dir, so listing
+# ~/.cargo/bin. path_prepend (from shellenv) no-ops on a missing dir, so listing
 # every candidate adds only the real ones. A per-OS init file may override this
 # (Windows uses the package managers' shim dirs).
 ensure_tools_on_path() {

@@ -3,7 +3,7 @@
 
 # HOME defaults to the MSYS form "/c/Users/..." which native Windows tools
 # that read $HOME can't parse (they treat the leading "/" as the drive root).
-# Normalize it to "C:/Users/..." instead (winpath is defined in os_env, sourced
+# Normalize it to "C:/Users/..." instead (winpath is defined in shellenv, sourced
 # by bashrc before this file).
 export HOME="$(winpath "$HOME")"
 

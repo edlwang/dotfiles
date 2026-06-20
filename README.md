@@ -43,7 +43,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent installer: symlinks dotfiles, installs tools
 ├── init_linux.sh       Linux install hook (WezTerm .desktop + Ctrl+Alt+T binding)
 ├── init_windows.sh     Windows install hook (winget/scoop)
-├── os_env              Sets $SYSTEM_OS; sourced by bashrc + init.sh
+├── shellenv            Sets $SYSTEM_OS + PATH helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
 ├── bash_aliases        Cross-platform aliases
 ├── bash_profile        Sources ~/.bashrc so login shells match interactive ones
@@ -256,14 +256,14 @@ symlink. It's GNOME-gated (skips silently when the `media-keys` schema is absent
 </details>
 
 The config-dir symlinking and the Windows-only login-shell `default_prog` are
-driven by `init.sh`/`os_env` and documented under [Shell](#shell-bashrc-bash_aliases)
+driven by `init.sh`/`shellenv` and documented under [Shell](#shell-bashrc-bash_aliases)
 below. `wezterm/tmux-testing.md` is a manual test checklist for the command
 layer.
 
 ### Shell (`bashrc`, `bash_aliases`)
 
-- **OS detection has a single source of truth: `os_env`** (symlinked to
-  `~/.os_env`). It sets `SYSTEM_OS` (`Linux`/`macOS`/`Windows`/`Unknown`) and is
+- **OS detection has a single source of truth: `shellenv`** (symlinked to
+  `~/.shellenv`). It sets `SYSTEM_OS` (`Linux`/`macOS`/`Windows`/`Unknown`) and is
   sourced by both `bashrc` (at shell startup) and `init.sh` (at install time,
   from the repo copy since the symlink may not exist on a first run) so they
   never disagree. Keep it side-effect-free apart from setting `SYSTEM_OS`.
@@ -289,7 +289,7 @@ layer.
   AppData on Windows, so there's no Windows branch. On Windows, `wezterm.lua`
   sets `default_prog` to launch Git Bash as a **login** shell (`bash.exe -l -i`);
   without `-l`, MSYS's `/etc/profile` never runs and `/usr/bin` (so `uname`, which
-  `os_env` calls at startup) is missing from `PATH`.
+  `shellenv` calls at startup) is missing from `PATH`.
 - **`init.sh`'s OS-specific *install* logic lives in per-OS files**
   (`init_<os>.sh`, e.g. `init_windows.sh`), sourced by `init.sh` from the repo
   copy (not symlinked into `$HOME` — they're install-time only, unlike
@@ -305,7 +305,7 @@ layer.
   `starship init bash` when starship is present and otherwise silently falls back
   to a simple, portable `PS1` (`user@host:dir`, no distro-specific bits), so the
   shell stays usable even without starship.
-- **`PATH` additions go through a `path_prepend` helper** defined in `os_env`
+- **`PATH` additions go through a `path_prepend` helper** defined in `shellenv`
   (shared, so `init.sh` reuses it too) that, when the directory exists, moves it
   to the front of `PATH` (dropping any earlier occurrence). In `bashrc` the calls
   run last — after the tool-env scripts (`~/.local/bin/env`, `~/.cargo/env`) — so
