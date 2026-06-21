@@ -1,6 +1,9 @@
 return {
 	{ -- LSP Configuration & Plugins
 		"neovim/nvim-lspconfig",
+		-- Defer the whole LSP stack (mason, fidget, cmp_nvim_lsp, …) until a real
+		-- file is opened, instead of loading it during startup.
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			-- Installs LSP servers and related tools into Neovim's data dir.
 			{ "mason-org/mason.nvim", config = true }, -- NOTE: must load before its dependants

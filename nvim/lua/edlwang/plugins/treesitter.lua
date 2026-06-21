@@ -1,6 +1,8 @@
 local M = {
 	"nvim-treesitter/nvim-treesitter",
-	lazy = false,
+	-- Load just before the first file renders so highlighting is ready without a
+	-- flash, but isn't paid on an empty/dashboard startup.
+	event = { "BufReadPre", "BufNewFile" },
 	branch = "master",
 	build = ":TSUpdate",
 	config = function()
