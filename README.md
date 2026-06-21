@@ -116,6 +116,10 @@ Provision per OS:
   scoop bucket add nerd-fonts && scoop install FiraMono-NF
   ```
 
+  winget/scoop update only the *persisted* PATH, so **open a new shell before
+  running `init.sh`** — otherwise it won't see `uv` and will skip the `~/py313`
+  venv (re-run it in a fresh shell to create it).
+
 - **Linux** — your package manager for `nodejs npm`, `ripgrep`, `fd`, and
   `tree-sitter`; **starship** and **uv** via their official `curl | sh` installers
   (starship.rs / astral.sh); **Neovim ≥ 0.11** from a recent build (distro
@@ -130,16 +134,29 @@ What each is for:
   and markdown-preview's `npx yarn` build.
 - **tree-sitter CLI** — treesitter parser generation.
 - **ripgrep (`rg`)** — Telescope `live_grep` / `grep_string`.
-- **fd** — speeds up Telescope `find_files`; on Debian/Ubuntu and Fedora the
-  package is `fd-find` and the binary `fdfind` (Telescope handles that name).
+- **fd** — speeds up Telescope `find_files`; the package is `fd-find` on both
+  Debian/Ubuntu (binary `fdfind`, which Telescope handles) and Fedora (binary
+  `fd`).
 - **FiraMono Nerd Font** — Neovim's icons (neo-tree, lualine, which-key, fidget)
   and WezTerm glyphs.
 - **Neovim ≥ 0.11** — the config uses the `vim.lsp.config` API introduced in 0.11.
+- **git** — lazy.nvim bootstraps itself with `git clone` and clones/updates every
+  Neovim plugin through git, so it's required on **every** platform, not just
+  Windows. macOS gets it with the Xcode Command Line Tools, Windows from Git for
+  Windows, Linux from your package manager.
 - **C compiler (`gcc`/`clang`/`cc`) + `make`** — nvim-treesitter compiles parsers
   from C, and `telescope-fzf-native.nvim` builds with `make` (on macOS both come
   with the Xcode Command Line Tools that Homebrew requires).
 - **WezTerm** — the terminal; on Linux a native install is assumed (binary on
   `PATH`); see [WezTerm](#wezterm-wezterm).
+- **Clipboard tool** *(Linux only)* — `<leader>y` / `<leader>Y` yank to the system
+  clipboard (the `"+` register), which needs `xclip`/`xsel` (X11) or `wl-clipboard`
+  (Wayland). macOS (`pbcopy`) and Windows (`clip.exe`) have one built in. Without a
+  provider the yank silently no-ops; everything else still works.
+- **bash-completion** *(optional)* — the shell's tab-completion loader. `bashrc`
+  sources it and `init.sh` writes per-tool completion files into its completions dir
+  for it to lazy-load; without the package those files never load and you fall back
+  to bash's default completion. On macOS it's Homebrew's `bash-completion@2`.
 - **TeX distribution + PDF viewer** *(optional)* — only for LaTeX via VimTeX /
   the `texlab` LSP.
 
