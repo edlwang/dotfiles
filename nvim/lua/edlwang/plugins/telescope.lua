@@ -2,6 +2,10 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		version = "*",
+		-- Lazy-load on the :Telescope command. The keymaps in editor/keybinds.lua
+		-- call require("telescope.builtin"), which lazy.nvim's require hook also
+		-- uses to load the plugin on first use, so there's nothing to load eagerly.
+		cmd = "Telescope",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },

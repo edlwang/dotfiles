@@ -2,6 +2,9 @@ return {
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		branch = "v3.x",
+		-- Lazy-load on the :Neotree command (used by the <leader>tn keymap in
+		-- editor/keybinds.lua). No longer force-opened at startup.
+		cmd = "Neotree",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons", -- file-type icons (optional but recommended)
