@@ -120,12 +120,22 @@ Provision per OS:
   running `init.sh`** — otherwise it won't see `uv` and will skip the `~/py313`
   venv (re-run it in a fresh shell to create it).
 
-- **Linux** — your package manager for `nodejs npm`, `ripgrep`, `fd`, and
-  `tree-sitter`; **starship** and **uv** via their official `curl | sh` installers
-  (starship.rs / astral.sh); **Neovim ≥ 0.11** from a recent build (distro
-  packages are often older — PPA / AppImage / `bob` / Homebrew) and **WezTerm**
-  natively (binary on `PATH`); the FiraMono Nerd Font from the
-  [Nerd Fonts release](https://github.com/ryanoasis/nerd-fonts/releases/latest).
+- **Linux** — your package manager for `nodejs npm`, `ripgrep`, `fd`,
+  `tree-sitter`, and a clipboard tool (`xclip`/`xsel` on X11, `wl-clipboard` on
+  Wayland — see the rationale below); **starship** and **uv** via their official
+  `curl | sh` installers (starship.rs / astral.sh); **Neovim ≥ 0.11** from a
+  recent build (distro packages are often older — PPA / AppImage / `bob` /
+  Homebrew) and **WezTerm** natively (binary on `PATH`); the FiraMono Nerd Font
+  from the [Nerd Fonts release](https://github.com/ryanoasis/nerd-fonts/releases/latest).
+
+  - **Aurora** — Homebrew (the standard path on this atomic Fedora image):
+
+    ```bash
+    brew install starship uv npm ripgrep fd tree-sitter-cli neovim wl-clipboard
+    brew tap wezterm/wezterm-linuxbrew
+    brew install --HEAD wezterm/wezterm-linuxbrew/wezterm
+    brew install --cask font-fira-mono-nerd-font
+    ```
 
 What each is for:
 
