@@ -327,6 +327,15 @@ layer.
 - **`bash_profile` just sources `~/.bashrc`** so *login* shells load the same
   config as non-login ones — notably the `bash -l` WezTerm launches on Windows and
   the login shell macOS terminals use by default.
+- **`bashrc` sources the system-wide `/etc/bashrc`** where the distro keeps one at
+  that path (Fedora/RHEL family, macOS). There it's what runs `/etc/profile.d/*.sh`
+  for non-login *interactive* shells (the Homebrew/Linuxbrew shellenv, terminal cwd
+  tracking, …), which a WezTerm pane would otherwise miss — this is what makes
+  brew-installed tools work on Aurora. It mirrors the stock Fedora `~/.bashrc`;
+  Debian keeps its system file at `/etc/bash.bashrc` (auto-sourced by interactive
+  bash), so the `-f` guard cleanly no-ops there. It runs before the rest of
+  `bashrc`, so starship's prompt and the `HIST*`/`PATH` settings override anything
+  it sets.
 - **Neovim's config dir is platform-specific.** `init.sh`'s `nvim_config_dir`
   symlinks `nvim/` to `$XDG_CONFIG_HOME/nvim` if set, else `~/AppData/Local/nvim`
   on Windows or `~/.config/nvim` elsewhere — matching where Neovim looks.

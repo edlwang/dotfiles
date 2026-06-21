@@ -16,6 +16,18 @@ else
     return
 fi
 
+# Pull in the system-wide bashrc where the distro keeps one at this path
+# (Fedora/RHEL family, macOS). There it's what runs /etc/profile.d/*.sh for
+# non-login interactive shells -- e.g. the Homebrew shellenv and terminal cwd
+# tracking -- which a bare ~/.bashrc (like a WezTerm pane) would otherwise miss.
+# Mirrors the stock Fedora ~/.bashrc. Debian keeps its system file at
+# /etc/bash.bashrc (auto-sourced by interactive bash), so the -f test correctly
+# no-ops there. Sourced before our own settings below so starship's prompt and
+# the HIST*/PATH tweaks further down win.
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
 # Source platform-specific config so OS-only code stays out of this shared
 # bashrc. Each platform has its own ~/.bashrc_<os> file, named by the lowercased
 # SYSTEM_OS (the same convention init.sh uses for init_<os>.sh). Done early
