@@ -26,11 +26,11 @@ source ~/.bashrc   # or open a new shell
 ```
 
 `init.sh` is idempotent — safe to re-run. It backs up any pre-existing real files
-to `~/dotfiles_backup_<timestamp>/` before symlinking, installs `starship` and
-`uv` if missing, and creates a `~/py313` uv venv. On Windows it enables real
-symlinks (`MSYS=winsymlinks:nativestrict`, which needs Developer Mode or an
-elevated shell) and installs tools via `winget`/`scoop` instead of the
-`curl | sh` scripts.
+to `~/dotfiles_backup_<timestamp>/`, symlinks the configs into place, and (if `uv`
+is installed) creates a `~/py313` uv venv. It is **config-only**: it installs no
+tools — provision those yourself (see [Install yourself](#install-yourself)). On
+Windows it also enables real symlinks (`MSYS=winsymlinks:nativestrict`, which
+needs Developer Mode or an elevated shell).
 
 Apply later edits with `source ~/.bashrc` (alias `sbrc`) for `bashrc`/
 `bash_aliases` changes. Neovim changes take effect on next launch; WezTerm
@@ -40,10 +40,10 @@ auto-reloads its config on save.
 
 ```text
 .
-├── init.sh             Idempotent installer: symlinks dotfiles, installs tools
-├── init_linux.sh       Linux install hook (WezTerm .desktop + Ctrl+Alt+T binding)
-├── init_windows.sh     Windows install hook (winget/scoop)
-├── shellenv            Sets $SYSTEM_OS + PATH helpers; sourced by bashrc + init.sh
+├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
+├── init_linux.sh       Linux setup hook (WezTerm .desktop + Ctrl+Alt+T shortcut)
+├── init_windows.sh     Windows setup hook (enables real symlinks)
+├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
 ├── bash_aliases        Cross-platform aliases
 ├── bash_profile        Sources ~/.bashrc so login shells match interactive ones
@@ -64,7 +64,6 @@ auto-reloads its config on save.
 │   └── CLAUDE.md
 ├── AGENTS.md           Working rules for AI coding agents (points back here)
 ├── CLAUDE.md           Sources AGENTS.md for Claude Code
-├── init-tooling-plan.md  Plan to auto-install more tooling from init.sh
 └── README.md           You are here
 ```
 
@@ -93,34 +92,78 @@ Quick map of "I want to change X" → where to do it. See
 Derived by reading the configs, not by provisioning a clean machine — treat it
 as the known set, not a guarantee.
 
-### Installed by `init.sh`
-
-- **starship** and **uv** — via `curl | sh` on Linux/macOS, via winget/scoop on
-  Windows.
-- **`~/py313`** — a Python 3.13 venv created by uv; the `pyenv` alias activates it.
-
 ### Install yourself
 
-`init.sh` symlinks the configs but does **not** install these. Nothing checks for
-them, so a missing one fails quietly or only when you hit the feature.
+`init.sh` is **config-only**: it symlinks the configs and, if `uv` is already
+present, creates the `~/py313` venv — but it installs **no** tools. Nothing checks
+for them, so a missing one fails quietly or only when you hit the feature.
 
-- **Neovim ≥ 0.11** — the config uses the `vim.lsp.config` API introduced in 0.11.
-- **Node.js + npm** — Mason installs several LSP servers as npm packages
-  (`pyright`, `jsonls`, `html`); markdown-preview builds via `npx yarn`.
-- **tree-sitter CLI** — treesitter parser builds (incl. the LaTeX parser).
+Provision per OS:
+
+- **macOS** — Homebrew:
+
+  ```bash
+  brew install starship uv node ripgrep fd tree-sitter neovim
+  brew install --cask wezterm font-fira-mono-nerd-font
+  ```
+
+- **Windows** — `winget` for most, `scoop` for the two with no winget package:
+
+  ```bash
+  winget install Starship.Starship astral-sh.uv OpenJS.NodeJS \
+      BurntSushi.ripgrep.MSVC sharkdp.fd Neovim.Neovim wez.wezterm
+  scoop install tree-sitter                          # no winget package
+  scoop bucket add nerd-fonts && scoop install FiraMono-NF
+  ```
+
+  winget/scoop update only the *persisted* PATH, so **open a new shell before
+  running `init.sh`** — otherwise it won't see `uv` and will skip the `~/py313`
+  venv (re-run it in a fresh shell to create it).
+
+- **Linux** — your package manager for `nodejs npm`, `ripgrep`, `fd`, and
+  `tree-sitter`; **starship** and **uv** via their official `curl | sh` installers
+  (starship.rs / astral.sh); **Neovim ≥ 0.11** from a recent build (distro
+  packages are often older — PPA / AppImage / `bob` / Homebrew) and **WezTerm**
+  natively (binary on `PATH`); the FiraMono Nerd Font from the
+  [Nerd Fonts release](https://github.com/ryanoasis/nerd-fonts/releases/latest).
+
+What each is for:
+
+- **starship** / **uv** — the prompt and Python tooling (uv builds `~/py313`).
+- **Node.js + npm** — Mason's npm-based LSP servers (`pyright`, `jsonls`, `html`)
+  and markdown-preview's `npx yarn` build.
+- **tree-sitter CLI** — treesitter parser generation.
 - **ripgrep (`rg`)** — Telescope `live_grep` / `grep_string`.
-- **fd** *(optional)* — speeds up Telescope `find_files`; on Debian/Ubuntu the
-  binary is `fdfind`.
+- **fd** — speeds up Telescope `find_files`; the package is `fd-find` on both
+  Debian/Ubuntu (binary `fdfind`, which Telescope handles) and Fedora (binary
+  `fd`).
+- **FiraMono Nerd Font** — Neovim's icons (neo-tree, lualine, which-key, fidget)
+  and WezTerm glyphs.
+- **Neovim ≥ 0.11** — the config uses the `vim.lsp.config` API introduced in 0.11.
+- **git** — lazy.nvim bootstraps itself with `git clone` and clones/updates every
+  Neovim plugin through git, so it's required on **every** platform, not just
+  Windows. macOS gets it with the Xcode Command Line Tools, Windows from Git for
+  Windows, Linux from your package manager.
 - **C compiler (`gcc`/`clang`/`cc`) + `make`** — nvim-treesitter compiles parsers
-  from C, and `telescope-fzf-native.nvim` builds with `make`.
-- **WezTerm** + **FiraMono Nerd Font** — the terminal and the font that renders
-  Neovim's icons (neo-tree, lualine, which-key, fidget).
+  from C, and `telescope-fzf-native.nvim` builds with `make` (on macOS both come
+  with the Xcode Command Line Tools that Homebrew requires).
+- **WezTerm** — the terminal; on Linux a native install is assumed (binary on
+  `PATH`); see [WezTerm](#wezterm-wezterm).
+- **Clipboard tool** *(Linux only)* — `<leader>y` / `<leader>Y` yank to the system
+  clipboard (the `"+` register), which needs `xclip`/`xsel` (X11) or `wl-clipboard`
+  (Wayland). macOS (`pbcopy`) and Windows (`clip.exe`) have one built in. Without a
+  provider the yank silently no-ops; everything else still works.
+- **bash-completion** *(optional)* — the shell's tab-completion loader. `bashrc`
+  sources it and `init.sh` writes per-tool completion files into its completions dir
+  for it to lazy-load; without the package those files never load and you fall back
+  to bash's default completion. On macOS it's Homebrew's `bash-completion@2`.
 - **TeX distribution + PDF viewer** *(optional)* — only for LaTeX via VimTeX /
   the `texlab` LSP.
-- **Windows only:** **Git for Windows** (provides the bash that runs `init.sh`,
-  and WezTerm launches `C:/Program Files/Git/bin/bash.exe` as its shell — it must
-  be at that path); **winget or scoop**; **Developer Mode** on, or an elevated
-  shell, so `init.sh` can create real symlinks.
+
+**Windows prerequisites:** **Git for Windows** provides the bash that runs
+`init.sh`, and WezTerm launches `C:/Program Files/Git/bin/bash.exe` as its shell —
+it must be at that path. Turn on **Developer Mode** (or use an elevated shell) so
+`init.sh` can create the real symlinks.
 
 ### Handled inside Neovim
 
@@ -128,10 +171,6 @@ On first launch, **Mason** auto-installs the LSP servers (`pyright`, `jsonls`,
 `html`, `lua_ls`, `rust_analyzer`, `texlab`) and `stylua` declared in
 `plugins/lsp-config.lua`. `rust_analyzer` / `texlab` arrive as standalone
 binaries but need a Rust toolchain / TeX install to be useful.
-
-> **Planned:** extend `init.sh` to auto-install Node, the tree-sitter CLI,
-> ripgrep, and fd so the manual list above shrinks to a minimal bootstrap. See
-> [init-tooling-plan.md](init-tooling-plan.md).
 
 ## Architecture
 
@@ -263,56 +302,45 @@ layer.
 ### Shell (`bashrc`, `bash_aliases`)
 
 - **OS detection has a single source of truth: `shellenv`** (symlinked to
-  `~/.shellenv`). It sets `SYSTEM_OS` (`Linux`/`macOS`/`Windows`/`Unknown`) and is
-  sourced by both `bashrc` (at shell startup) and `init.sh` (at install time,
-  from the repo copy since the symlink may not exist on a first run) so they
-  never disagree. Keep it side-effect-free apart from setting `SYSTEM_OS`.
-- **OS-specific code lives in per-platform files**, not inline in `bashrc`.
-  `bashrc` sources `~/.bashrc_linux` / `~/.bashrc_macos` / `~/.bashrc_windows` by
-  deriving the filename from the lowercased `SYSTEM_OS` (the same
-  convention-over-mapping dispatch `init.sh` uses for `init_<os>.sh`), early —
-  before the interactive guard, so e.g. the Windows `HOME` normalization always
-  runs. To add OS-only behavior, edit the matching `bashrc_<os>` file — keep
-  `bashrc`/`bash_aliases` cross-platform. New platform files must also be added to
-  `init.sh`'s `setup_dotfiles` to be symlinked.
-- **`bash_profile` just sources `~/.bashrc`** (symlinked to `~/.bash_profile`) so
-  *login* shells load the same interactive config as non-login ones — notably the
-  `bash -l` WezTerm launches on Windows and the login shell macOS terminals use
-  by default.
+  `~/.shellenv`), sourced by both `bashrc` (at startup) and `init.sh` (at install
+  time, from the repo copy since the symlink may not exist yet) so they never
+  disagree. It sets `SYSTEM_OS` (`Linux`/`macOS`/`Windows`/`Unknown`) and defines
+  the shared helpers both rely on: `have_cmd` (a quiet `command -v` wrapper),
+  `winpath` (MSYS↔Windows path converter), and `path_prepend` (below). Keep it
+  side-effect-free apart from setting `SYSTEM_OS`.
+- **OS-specific code lives in per-platform files**, not inline in `bashrc`, which
+  sources `~/.bashrc_<os>` (lowercased `SYSTEM_OS`, same dispatch as
+  `init_<os>.sh`) early — before the interactive guard, so e.g. the Windows `HOME`
+  normalization always runs. Add OS-only behavior to the matching `bashrc_<os>`;
+  keep `bashrc`/`bash_aliases` cross-platform. New platform files also need adding
+  to `init.sh`'s `setup_dotfiles`.
+- **`bash_profile` just sources `~/.bashrc`** so *login* shells load the same
+  config as non-login ones — notably the `bash -l` WezTerm launches on Windows and
+  the login shell macOS terminals use by default.
 - **Neovim's config dir is platform-specific.** `init.sh`'s `nvim_config_dir`
-  (branching on `SYSTEM_OS`) symlinks the repo's `nvim/` to `$XDG_CONFIG_HOME/nvim`
-  if set, else `~/AppData/Local/nvim` on Windows or `~/.config/nvim` elsewhere —
-  matching where Neovim actually looks.
-- **WezTerm's config dir is `~/.config/wezterm` on every platform.** `init.sh`'s
-  `wezterm_config_dir` symlinks the repo's `wezterm/` to `$XDG_CONFIG_HOME/wezterm`
-  if set, else `~/.config/wezterm` — WezTerm, unlike Neovim, does *not* use
-  AppData on Windows, so there's no Windows branch. On Windows, `wezterm.lua`
-  sets `default_prog` to launch Git Bash as a **login** shell (`bash.exe -l -i`);
-  without `-l`, MSYS's `/etc/profile` never runs and `/usr/bin` (so `uname`, which
-  `shellenv` calls at startup) is missing from `PATH`.
-- **`init.sh`'s OS-specific *install* logic lives in per-OS files**
-  (`init_<os>.sh`, e.g. `init_windows.sh`), sourced by `init.sh` from the repo
-  copy (not symlinked into `$HOME` — they're install-time only, unlike
-  `bashrc_<os>`). `init.sh` defines defaults — the Unix `install_tools` and a
-  no-op `setup_os` hook — and a present `init_<os>.sh` overrides them (and can set
-  env like `MSYS`): `init_windows.sh` overrides `install_tools` to use
-  winget/scoop; `init_linux.sh` overrides `setup_os` to install the WezTerm
-  desktop entry. The sourcing happens after the default definitions but before the
-  steps run. Small per-OS *values* (the nvim dir, pyenv path) stay as inline
-  `SYSTEM_OS` branches in `init.sh`; only divergent *procedures* move to
-  `init_<os>.sh`.
-- **The prompt comes from starship**, installed by `init.sh`. `bashrc` runs
-  `starship init bash` when starship is present and otherwise silently falls back
-  to a simple, portable `PS1` (`user@host:dir`, no distro-specific bits), so the
-  shell stays usable even without starship.
-- **`PATH` additions go through a `path_prepend` helper** defined in `shellenv`
-  (shared, so `init.sh` reuses it too) that, when the directory exists, moves it
-  to the front of `PATH` (dropping any earlier occurrence). In `bashrc` the calls
-  run last — after the tool-env scripts (`~/.local/bin/env`, `~/.cargo/env`) — so
-  the *last* call wins and re-sourcing `bashrc` is idempotent. `~/.local/bin` is
-  prepended last, giving it priority over `~/.pixi/bin`. `init.sh`'s
-  `ensure_tools_on_path` calls it after `install_tools` so a just-installed tool
-  is on `PATH` for the rest of that run (no second run needed).
+  symlinks `nvim/` to `$XDG_CONFIG_HOME/nvim` if set, else `~/AppData/Local/nvim`
+  on Windows or `~/.config/nvim` elsewhere — matching where Neovim looks.
+- **WezTerm's config dir is `~/.config/wezterm` everywhere** (unlike Neovim, no
+  AppData on Windows); `wezterm_config_dir` honors `$XDG_CONFIG_HOME` too. On
+  Windows, `wezterm.lua` launches Git Bash as a **login** shell (`bash.exe -l -i`);
+  without `-l`, `/etc/profile` never runs and `/usr/bin` is off `PATH`, so
+  git/starship can't be found.
+- **`init.sh`'s OS-specific setup lives in per-OS files** (`init_<os>.sh`), sourced
+  from the repo copy (init-time only, not symlinked). `init.sh` defines a no-op
+  `setup_os` hook that a present `init_<os>.sh` overrides (and can set env like
+  `MSYS`): `init_linux.sh` adds the WezTerm desktop entry + GNOME shortcut;
+  `init_windows.sh` only sets `MSYS`; macOS has no file. Small per-OS *values* (nvim
+  dir, pyenv path) stay as inline `SYSTEM_OS` branches; only *procedures* move out.
+- **The prompt comes from starship** (which you install). `bashrc` runs `starship
+  init bash` when it's present, else falls back to a simple, portable `PS1`, so the
+  shell stays usable without it.
+- **`PATH` additions go through `path_prepend`** (from `shellenv`): it moves an
+  existing dir to the front, dropping any earlier occurrence. `bashrc` calls it
+  last — after the tool-env scripts (`~/.local/bin/env`, `~/.cargo/env`) — so the
+  last call wins and re-sourcing is idempotent; `~/.local/bin` is prepended last
+  for top priority. `init.sh`'s `ensure_tools_on_path` calls it before
+  `setup_pyenv`/`setup_completions` so a `uv` you installed to `~/.local/bin` is
+  found this run.
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` lists it
   newest-first, capped to the top 10 so a long-lived stack stays readable
   (`vdirs N` for the top N, `vdirs all` for the whole stack).

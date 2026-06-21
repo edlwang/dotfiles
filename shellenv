@@ -1,30 +1,46 @@
-# Shared shell bootstrap, sourced by both bashrc (at shell startup) and init.sh
-# (at install time) so they always agree. Sets SYSTEM_OS and defines helpers;
-# keep it side-effect-free apart from that.
-case "$(uname -s)" in
-    Linux*)                 export SYSTEM_OS="Linux";;
-    Darwin*)                export SYSTEM_OS="macOS";;
-    CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
-    *)                      export SYSTEM_OS="Unknown";;
+# Shared shell bootstrap, sourced by bashrc (at startup) and init.sh (at install
+# time) so they agree. Sets SYSTEM_OS and defines helpers; keep it
+# side-effect-free apart from that.
+# Branch on $OSTYPE (set by bash itself) to avoid forking `uname` on every shell
+# startup -- ~30ms on MSYS, and uname needs /usr/bin (only sure under a login
+# shell). Both consumers run under bash; uname is the fallback for an $OSTYPE we
+# don't recognize.
+case "${OSTYPE:-}" in
+    linux*)         export SYSTEM_OS="Linux";;
+    darwin*)        export SYSTEM_OS="macOS";;
+    msys*|cygwin*)  export SYSTEM_OS="Windows";;
+    *)
+        case "$(uname -s)" in
+            Linux*)                 export SYSTEM_OS="Linux";;
+            Darwin*)                export SYSTEM_OS="macOS";;
+            CYGWIN*|MINGW*|MSYS*)   export SYSTEM_OS="Windows";;
+            *)                      export SYSTEM_OS="Unknown";;
+        esac;;
 esac
 
-# Convert an MSYS path (/c/...) to Windows-mixed form (C:/...) so native Windows
-# tools can resolve it; a no-op where cygpath doesn't exist (i.e. on Unix).
+# True if any of the given command names is on PATH -- a quiet `command -v`
+# wrapper. Accepts several names for a tool known under more than one (node/nodejs).
+have_cmd() {
+    local c
+    for c in "$@"; do command -v "$c" >/dev/null 2>&1 && return 0; done
+    return 1
+}
+
+# Convert an MSYS path (/c/...) to Windows-mixed form (C:/...) so native tools can
+# resolve it; a no-op where cygpath is absent (i.e. on Unix).
 winpath() {
-    if command -v cygpath >/dev/null 2>&1; then
+    if have_cmd cygpath; then
         cygpath -m "$1"
     else
         printf '%s' "$1"
     fi
 }
 
-# Move a directory to the FRONT of PATH (dropping any earlier occurrence) when
-# it exists; a no-op for a missing dir. Shared so both callers agree: bashrc
-# asserts its PATH priorities with it at shell startup, and init.sh uses it to
-# surface a freshly-installed tool mid-run. Drop-then-prepend keeps re-sourcing
-# idempotent and lets the last call win.
+# Move a directory to the FRONT of PATH (dropping any earlier occurrence) if it
+# exists; a no-op for a missing dir, returning success so it's safe bare under
+# set -e. Drop-then-prepend keeps re-sourcing idempotent and lets the last call win.
 path_prepend() {
-    [ -d "$1" ] || return
+    [ -d "$1" ] || return 0
     local p=":${PATH}:"
     p="${p//:$1:/:}"        # drop any existing occurrence
     p="${p#:}"; p="${p%:}"  # trim the framing colons

@@ -15,7 +15,7 @@ rules and gotchas an agent needs on top of that documentation.
   the affected app (Neovim, WezTerm) — there is no suite to run. Don't claim
   something works unless you've checked it that way.
 - **Keep `bashrc`/`bash_aliases` cross-platform.** OS-specific shell code belongs
-  in the per-platform `bashrc_<os>` files, and OS-specific *install* logic in
+  in the per-platform `bashrc_<os>` files, and OS-specific *setup* logic in
   `init_<os>.sh` (see README → Shell).
 - **Commits:** one focused commit per logical unit, in Conventional Commits
   format (`type(scope): summary`). Diff your changes before committing so the

@@ -1,22 +1,24 @@
-# Linux-specific install logic, sourced by init.sh when SYSTEM_OS=Linux.
-# Overrides the default no-op setup_os; runs as a setup step below.
+# Linux-specific setup, sourced by init.sh when SYSTEM_OS=Linux. Overrides the
+# no-op setup_os hook with the WezTerm desktop entry + GNOME Ctrl+Alt+T shortcut.
+# (init.sh is config-only -- install tools yourself; see README.)
 
-# Install a user-level WezTerm desktop entry that launches the GUI via
-# `connect unix` so windows attach to the persistent mux server. WezTerm's
-# config sets default_gui_startup_args = {"connect","unix"}, but that only
-# applies when wezterm-gui is launched with NO subcommand. The distro entry
-# (/usr/share/applications/org.wezfurlong.wezterm.desktop) hardcodes
-# `Exec=wezterm start --cwd .`, whose explicit `start` overrides the default
-# args, so its windows open on the non-persistent local domain. A user entry of
-# the same name shadows the system one, restoring persistence the way the
-# no-subcommand launch already does on Windows.
+# Match a producer's output: `producer | pipe_match -x foo`. Plain grep, NOT
+# grep -q: under pipefail, -q exits on first match and SIGPIPEs the producer, a
+# false pipeline failure. Args pass straight to grep (e.g. -i, -x).
+pipe_match() {
+    grep "$@" >/dev/null 2>&1
+}
+
+# Install a user-level WezTerm desktop entry that launches via `connect unix` so
+# windows attach to the persistent mux. WezTerm's default_gui_startup_args only
+# apply with NO subcommand, but the distro entry hardcodes `wezterm start --cwd .`
+# -- the explicit `start` overrides them, opening on the non-persistent local
+# domain. A user entry of the same name shadows it, restoring persistence.
 setup_os() {
     local apps_dir="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 
     # A user entry shadows the system one only if it shares its basename. Match
-    # whatever the distro calls it (deb/rpm/Arch use org.wezfurlong.wezterm,
-    # but others may differ), falling back to the upstream name if none is
-    # installed yet.
+    # whatever the distro calls it, falling back to the upstream name.
     local name=org.wezfurlong.wezterm.desktop
     local f
     for f in /usr/share/applications/*wezterm*.desktop; do
@@ -26,62 +28,62 @@ setup_os() {
     setup_symlink "$DOTFILES_PATH/wezterm/org.wezfurlong.wezterm.desktop" \
         "$apps_dir/$name"
 
-    # Refresh the desktop-entry cache so launchers pick up the override. Not
-    # required for the entry to work and absent on minimal installs, so don't
-    # let its absence or failure abort the script (set -e is on).
-    if command -v update-desktop-database >/dev/null 2>&1; then
+    # Refresh the desktop-entry cache. Absent on minimal installs and not required
+    # for the entry to work, so don't let it abort the script (set -e).
+    if have_cmd update-desktop-database; then
         update-desktop-database "$apps_dir" >/dev/null 2>&1 || true
     fi
 
     bind_terminal_shortcut
 }
 
-# Point GNOME's Ctrl+Alt+T at the persistent mux. The .desktop override above
-# only fixes the applications-list launcher; the keyboard shortcut is GNOME's
-# media-keys "terminal" action, which launches x-terminal-emulator instead of
-# the .desktop entry. On Ubuntu that alternative is the package's
-# open-wezterm-here (`exec wezterm start --cwd ...`), whose explicit `start`
-# overrides default_gui_startup_args = {"connect","unix"}, so its window lands
-# on the non-persistent local domain -- the same failure the .desktop override
-# solved. Rather than fight the root-owned alternative, take over the shortcut
-# at the user level: a GNOME custom keybinding running the same
-# `wezterm-gui connect unix` the .desktop entry uses, plus unbinding the
-# built-in terminal action so it can't double-fire on the same chord.
-#
-# This is the one place init writes live user settings (dconf) rather than
-# symlinking a tracked file -- see AGENTS.md. All per-user, no root; silently
-# skips on non-GNOME desktops, where the schema is absent and the shortcut
-# would need that DE's own mechanism anyway.
+# Point GNOME's Ctrl+Alt+T at the persistent mux. The .desktop override fixes the
+# launcher, but the keyboard shortcut is GNOME's media-keys "terminal" action,
+# which launches x-terminal-emulator (`wezterm start ...` on Ubuntu) -- same
+# non-persistent failure. So take it over at the user level: a custom keybinding
+# running `wezterm-gui connect unix`, plus unbinding the built-in terminal action.
+# The one place init writes live dconf rather than a tracked file (see AGENTS.md);
+# all per-user, no root; skips on non-GNOME desktops.
 bind_terminal_shortcut() {
-    command -v gsettings >/dev/null 2>&1 || return 0
+    have_cmd gsettings || return 0
 
     local mk='org.gnome.settings-daemon.plugins.media-keys'
-    # Skip if the schema isn't installed (non-GNOME session). list-schemas
-    # omits relocatable schemas, so check the plain media-keys schema, which
-    # the custom-keybinding relocatable schema ships alongside.
-    gsettings list-schemas 2>/dev/null | grep -qx "$mk" || return 0
+    # Skip if the schema is absent (non-GNOME). list-schemas omits relocatable
+    # schemas, so check the plain media-keys schema that ships alongside ours.
+    gsettings list-schemas 2>/dev/null | pipe_match -x "$mk" || return 0
 
     local path='/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/wezterm-mux/'
     local ckb="${mk}.custom-keybinding:$path"
 
-    gsettings set "$ckb" name 'WezTerm (mux)'
-    gsettings set "$ckb" command 'wezterm-gui connect unix'
-    gsettings set "$ckb" binding '<Primary><Alt>t'
+    # The dconf writes are best-effort: any `gsettings set` can fail (schema
+    # absent, or no writable dconf here) and would abort under set -e. gset warns
+    # once, then the caller's `|| return` bails on the first failure.
+    gset() {
+        gsettings set "$@" && return 0
+        warn "could not configure the WezTerm GNOME shortcut (dconf" \
+             "write failed); leaving it unchanged."
+        return 1
+    }
 
-    # Register our keybinding path in the list if absent. The list is an `as`;
-    # append to whatever's there rather than clobbering other custom shortcuts.
+    gset "$ckb" name 'WezTerm (mux)'               || return 0
+    gset "$ckb" command 'wezterm-gui connect unix' || return 0
+    gset "$ckb" binding '<Primary><Alt>t'          || return 0
+
+    # Register our path in the keybinding list (an `as`) if absent, appending so
+    # we don't clobber other custom shortcuts.
     local list
-    list=$(gsettings get "$mk" custom-keybindings)
+    list=$(gsettings get "$mk" custom-keybindings) || return 0
     case "$list" in
         *"'$path'"*) ;;                                                       # already registered
-        '@as []'|'[]') gsettings set "$mk" custom-keybindings "['$path']";;
-        *) gsettings set "$mk" custom-keybindings "${list%]*}, '$path']";;
+        '@as []'|'[]') gset "$mk" custom-keybindings "['$path']" || return 0 ;;
+        *) gset "$mk" custom-keybindings "${list%]*}, '$path']" || return 0 ;;
     esac
 
     # Free Ctrl+Alt+T from the built-in terminal action so our binding owns it.
-    # Guarded: upstream (non-Ubuntu) GNOME may not ship the `terminal` key, and
-    # setting a missing key would abort under set -e.
-    if gsettings list-keys "$mk" 2>/dev/null | grep -qx terminal; then
-        gsettings set "$mk" terminal "@as []"
+    # Guarded: non-Ubuntu GNOME may lack the `terminal` key (setting it would
+    # abort under set -e); `|| warn` covers an unwritable dconf.
+    if gsettings list-keys "$mk" 2>/dev/null | pipe_match -x terminal; then
+        gsettings set "$mk" terminal "@as []" || \
+            warn "could not clear GNOME's built-in terminal shortcut."
     fi
 }
