@@ -3,9 +3,17 @@
 # for examples
 #
 
-# Detect OS (sets SYSTEM_OS). Shared with init.sh — see shellenv.
+# Detect OS (sets SYSTEM_OS) and load shared helpers (have_cmd, winpath,
+# path_prepend) — see shellenv. The rest of this file depends on those helpers,
+# so a missing ~/.shellenv (dotfiles not installed yet, or a broken symlink)
+# must fail loudly here rather than degrade into a pile of "command not found"
+# errors further down. bashrc is sourced, so `return` just stops this file.
 if [ -f "$HOME/.shellenv" ]; then
     . "$HOME/.shellenv"
+else
+    echo "bashrc: ~/.shellenv missing or broken; run the dotfiles init.sh." \
+         "Skipping shell config." >&2
+    return
 fi
 
 # Source platform-specific config so OS-only code stays out of this shared
@@ -68,7 +76,7 @@ fi
 
 # Set editor to the first one available, preferring nvim.
 for ed in nvim vim vi; do
-  if command -v "$ed" >/dev/null 2>&1; then
+  if have_cmd "$ed"; then
     export EDITOR="$ed" VISUAL="$ed"
     break
   fi
@@ -76,10 +84,9 @@ done
 unset ed  # don't leak the loop temporary (cf. os_rc above)
 
 # Use starship if available; otherwise fall back to a simple, portable prompt
-# (user@host:dir). starship is the real prompt — installed by init.sh — so this
-# branch only matters on a machine without it; keep it minimal. Color when $TERM
-# advertises it, plain otherwise.
-if command -v starship >/dev/null 2>&1; then
+# (user@host:dir). starship is the real prompt (you install it), so this branch
+# only matters on a machine without it. Color when $TERM advertises it.
+if have_cmd starship; then
     eval "$(starship init bash)"
 else
     case "$TERM" in
@@ -104,10 +111,8 @@ if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-# PATH priorities, asserted last so they win over whatever the tool-env scripts
-# above (uv's ~/.local/bin/env, ~/.cargo/env) already put on PATH. path_prepend
-# (defined in shellenv, sourced at the top) moves a directory to the FRONT of PATH
-# (dropping any earlier occurrence) when it exists, so the last call wins and
-# re-sourcing this file is idempotent.
+# PATH priorities, asserted last so they win over the tool-env scripts above
+# (uv's ~/.local/bin/env, ~/.cargo/env). path_prepend (from shellenv) moves a dir
+# to the front if it exists, so the last call wins and re-sourcing is idempotent.
 path_prepend "$HOME/.pixi/bin"
 path_prepend "$HOME/.local/bin"   # last call = highest priority
