@@ -41,7 +41,6 @@ auto-reloads its config on save.
 ```text
 .
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
-├── init_linux.sh       Linux setup hook (WezTerm .desktop + Ctrl+Alt+T shortcut)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -57,7 +56,6 @@ auto-reloads its config on save.
 │   └── lua/edlwang/        editor/ (built-in settings) + plugins/ (one per plugin)
 ├── wezterm/
 │   ├── wezterm.lua                     The entire WezTerm config
-│   ├── org.wezfurlong.wezterm.desktop  Linux launcher override (persistent mux)
 │   └── tmux-testing.md                 Manual test checklist for the command layer
 ├── claude/             Claude Code config → symlinked into ~/.claude
 │   ├── settings.json
@@ -271,38 +269,7 @@ how it's structured:
 - **Multiplexing + persistence are always on:** `config.unix_domains` plus
   `default_gui_startup_args = { "connect", "unix" }` run panes/tabs in a
   background mux server that reattaches on next launch — the `tmux detach`/`attach`
-  equivalent (survives closing the window, not a reboot). On Linux the distro
-  launchers don't use it without help (collapsed below).
-
-<details>
-<summary><b>Why the Linux launchers need extra handling</b> (the <code>.desktop</code> entry and <code>Ctrl+Alt+T</code>)</summary>
-
-`default_gui_startup_args` only applies when `wezterm-gui` is launched with **no
-subcommand**: on Windows the `default_prog`/shortcut flow does exactly that, but
-Linux's distro `.desktop` entry hardcodes `Exec=wezterm start --cwd .`, whose
-explicit `start` overrides it and opens non-persistent local-domain windows. So
-`init.sh`'s `setup_os` (in `init_linux.sh`) installs a user-level
-`org.wezfurlong.wezterm.desktop` (tracked at
-`wezterm/org.wezfurlong.wezterm.desktop`) that shadows the system one and
-launches `wezterm-gui connect unix`. It assumes a native install (binary on
-`PATH`); Flatpak/Snap would need a different `Exec`.
-
-**The `.desktop` override only fixes the applications-list launcher — not
-`Ctrl+Alt+T`.** That chord is GNOME's `media-keys` *terminal* action, which
-launches `x-terminal-emulator` (on Ubuntu, `update-alternatives`'d to the
-wezterm package's `open-wezterm-here`, i.e. `wezterm start --cwd …`) rather than
-the `.desktop` entry, so it hits the same non-persistent `start` path.
-`setup_os`'s `bind_terminal_shortcut` takes the shortcut over at the user level:
-a GNOME custom keybinding (`gsettings`, relocatable schema path
-`…/custom-keybindings/wezterm-mux/`) bound to `<Primary><Alt>t` → `wezterm-gui
-connect unix`, plus unbinding the built-in `terminal` key so the chord doesn't
-double-fire. This is **the one place init writes live user settings (dconf)
-instead of symlinking a tracked file**, so it's not reverted by removing a
-symlink. It's GNOME-gated (skips silently when the `media-keys` schema is absent
-— other DEs would each need their own mechanism), idempotent, root-free, and the
-`terminal` unbind is guarded for GNOME builds that lack that key.
-
-</details>
+  equivalent (survives closing the window, not a reboot).
 
 The config-dir symlinking and the Windows-only login-shell `default_prog` are
 driven by `init.sh`/`shellenv` and documented under [Shell](#shell-bashrc-bash_aliases)
@@ -346,10 +313,10 @@ layer.
   git/starship can't be found.
 - **`init.sh`'s OS-specific setup lives in per-OS files** (`init_<os>.sh`), sourced
   from the repo copy (init-time only, not symlinked). `init.sh` defines a no-op
-  `setup_os` hook that a present `init_<os>.sh` overrides (and can set env like
-  `MSYS`): `init_linux.sh` adds the WezTerm desktop entry + GNOME shortcut;
-  `init_windows.sh` only sets `MSYS`; macOS has no file. Small per-OS *values* (nvim
-  dir, pyenv path) stay as inline `SYSTEM_OS` branches; only *procedures* move out.
+  `setup_os` hook that a present `init_<os>.sh` can override (and can set env like
+  `MSYS`): `init_windows.sh` only sets `MSYS`; Linux and macOS have no file. Small
+  per-OS *values* (nvim dir, pyenv path) stay as inline `SYSTEM_OS` branches; only
+  *procedures* move out.
 - **The prompt comes from starship** (which you install). `bashrc` runs `starship
   init bash` when it's present, else falls back to a simple, portable `PS1`, so the
   shell stays usable without it.

@@ -181,8 +181,8 @@ setup_completions() {
     echo "Completions written to $dir"
 }
 
-# Per-OS extra setup hook. Default no-op; a per-OS init file may override it
-# (Linux installs the WezTerm desktop entry). Runs as a step below.
+# Per-OS extra setup hook. Default no-op; a present init_<os>.sh may override it.
+# Runs as a step below.
 setup_os() {
     :
 }
