@@ -94,14 +94,18 @@ config.keys = {
 -- ── WezTerm-as-tmux ─────────────────────────────────────────────────────────
 -- WezTerm does its own multiplexing on every machine. The command layer uses
 -- prefix Ctrl+Space, distinct from tmux's Ctrl+b, so the two never collide: you
--- can still run tmux inside a persistent WezTerm pane (its Ctrl+b passes straight
--- through, locally or over SSH) if you want.
+-- can still run tmux inside a WezTerm pane (its Ctrl+b passes straight through,
+-- locally or over SSH) if you want.
 --
--- Persistence: panes/tabs live in a background mux server, reattached on next
--- launch (the `tmux attach` equivalent). Survives closing the window, not a
--- reboot.
+-- Persistence is opt-in, like tmux. A plain `wezterm` launch is an independent,
+-- ephemeral terminal on the in-process local domain — close the window and its
+-- panes are gone. The `unix` domain below defines a background mux server but
+-- nothing auto-connects to it: run `wezterm connect unix` for a persistent
+-- session in a new window (the `tmux attach` equivalent), `wezterm connect
+-- --new-tab unix` to attach as a tab in the active window, or pick the `unix`
+-- domain from the leader launcher (Ctrl+Space s). The server is spawned on first
+-- connect and survives closing the window, but not a reboot.
 config.unix_domains = { { name = "unix" } }
-config.default_gui_startup_args = { "connect", "unix" }
 
 -- Prefix. Ctrl+Space avoids clobbering readline/Neovim Ctrl-letter binds and
 -- leaves Ctrl+b free for tmux on remote servers.

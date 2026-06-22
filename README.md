@@ -266,10 +266,14 @@ how it's structured:
   character (with `mapped:`, and both with and without `SHIFT`, since WezTerm
   versions disagree on whether the shift is reported). Add new symbol binds
   through it, not as plain `{ key = …, mods = L }` entries.
-- **Multiplexing + persistence are always on:** `config.unix_domains` plus
-  `default_gui_startup_args = { "connect", "unix" }` run panes/tabs in a
-  background mux server that reattaches on next launch — the `tmux detach`/`attach`
-  equivalent (survives closing the window, not a reboot).
+- **Multiplexing is always on; persistence is opt-in (tmux-style).** A plain
+  `wezterm` launch is an independent, ephemeral terminal on the in-process local
+  domain. `config.unix_domains` defines a background mux server but nothing
+  auto-connects to it — run `wezterm connect unix` (new window), `wezterm connect
+  --new-tab unix` (tab in the active window), or pick the `unix` domain from the
+  leader launcher (`Ctrl+Space s`) for persistent panes/tabs that reattach on the
+  next `connect` — the `tmux detach`/`attach` equivalent (survives closing the
+  window, not a reboot).
 
 The config-dir symlinking and the Windows-only login-shell `default_prog` are
 driven by `init.sh`/`shellenv` and documented under [Shell](#shell-bashrc-bash_aliases)
