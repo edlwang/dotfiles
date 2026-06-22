@@ -5,6 +5,23 @@
 alias sbrc="source ~/.bashrc"
 alias ebrc='$EDITOR ~/.bashrc'
 
+# Activate a Python virtualenv: `svenv` uses ./.venv, `svenv <path>` uses
+# <path>. Probes both the Unix (bin/activate) and Windows/MSYS
+# (Scripts/activate) layouts. Returns non-zero (without exiting the shell) when
+# neither exists.
+svenv() {
+    local venv="${1:-.venv}"
+    local activate
+    for activate in "$venv/bin/activate" "$venv/Scripts/activate"; do
+        if [[ -f "$activate" ]]; then
+            source "$activate"
+            return
+        fi
+    done
+    echo "svenv: no activate script under $venv (bin/ or Scripts/)" >&2
+    return 1
+}
+
 # cd using pushd, popd goes back, vdirs lists the stack. pushd always needs a
 # target, so default to $HOME when called with no args (plain `cd`).
 cd() {
