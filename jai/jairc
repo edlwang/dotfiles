@@ -1,0 +1,30 @@
+# -*- shell-script-mode -*-
+
+# You can use this file to define bash functions invocable from jai.
+#
+# To use the file, you will need the following in your .defaults file:
+#
+# command source "${JAI_SCRIPT:-/dev/null}"; "$0" "$@"
+
+# Here is an example of how to define a bash function:
+#
+#      lscolor() {
+#        ls --color "$@"
+#      }
+#
+# or
+#
+#      lscolor() { ls --color "$@"; }
+#
+# The special variable "$@" gets expanded to all the parameters.  Note
+# that one-liner functions require a semicolon before the closing
+# brace.
+
+# Here are some example functions for people who like to live
+# dangerously.  These modes are not recommended, but if you are going
+# to use them anyway, better to define the dangerous functions in your
+# .jairc so you can only invoke them in jai environments.
+
+# claudeyolo() { claude --dangerously-skip-permissions "$@"; }
+
+# codexyolo() { codex --dangerously-bypass-approvals-and-sandbox "$@"; }

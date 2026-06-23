@@ -88,6 +88,17 @@ setup_dotfiles() {
     setup_symlink "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
     setup_symlink "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
 
+    # jai(1) config all lives under ~/.jai/. Link each file in jai/ into ~/.jai/,
+    # except jairc which the tool reads as the dotted ~/.jai/.jairc.
+    for src in "$DOTFILES_PATH/jai/"*; do
+        [ -e "$src" ] || continue
+        if [ "$(basename "$src")" = "jairc" ]; then
+            setup_symlink "$src" "$HOME/.jai/.jairc"
+        else
+            setup_symlink "$src" "$HOME/.jai/$(basename "$src")"
+        fi
+    done
+
     echo "Successfully set up dotfiles"
 }
 

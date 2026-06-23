@@ -60,6 +60,12 @@ auto-reloads its config on save.
 ├── claude/             Claude Code config → symlinked into ~/.claude
 │   ├── settings.json
 │   └── CLAUDE.md
+├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
+│   ├── default.conf        }
+│   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
+│   ├── default.jail        }
+│   ├── claude.jail         }
+│   └── jairc               Bash functions for jai shells → ~/.jai/.jairc
 ├── AGENTS.md           Working rules for AI coding agents (points back here)
 ├── CLAUDE.md           Sources AGENTS.md for Claude Code
 └── README.md           You are here
