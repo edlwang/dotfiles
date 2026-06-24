@@ -4,6 +4,8 @@
 # bashrc
 alias sbrc="source ~/.bashrc"
 alias ebrc='$EDITOR ~/.bashrc'
+alias edfs='$EDITOR ~/dotfiles'
+alias jaic='jai claude'
 
 # Activate a Python virtualenv: `svenv` uses ./.venv, `svenv <path>` uses
 # <path>. Probes both the Unix (bin/activate) and Windows/MSYS
