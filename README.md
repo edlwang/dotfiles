@@ -56,6 +56,7 @@ auto-reloads its config on save.
 │   └── lua/edlwang/        editor/ (built-in settings) + plugins/ (one per plugin)
 ├── wezterm/
 │   ├── wezterm.lua                     The entire WezTerm config
+│   ├── shell-integration.sh            OSC 7 cwd reporting, vendored from upstream
 │   └── tmux-testing.md                 Manual test checklist for the command layer
 ├── claude/             Claude Code config → symlinked into ~/.claude
 │   ├── settings.json
@@ -266,6 +267,16 @@ how it's structured:
   `SplitHorizontal`). The binds map Terminator's `Ctrl+Shift+O` and tmux's `"` to
   `SplitVertical`, etc. — matching muscle memory, not the names. Don't "correct"
   the apparent mismatch.
+- **New splits/tabs open in the current pane's directory.** The split binds use
+  `domain = "CurrentPaneDomain"`, but WezTerm only inherits the cwd if the shell
+  reports it via the OSC 7 escape sequence each prompt. The distro emitters
+  (`vte.sh` / systemd) don't cover every platform and get dropped once starship
+  owns the prompt, so `bashrc` instead sources WezTerm's own
+  `wezterm/shell-integration.sh` (vendored verbatim from
+  [upstream](https://github.com/wezterm/wezterm/blob/main/assets/shell-integration/wezterm.sh) —
+  refresh with `curl` to that path; it also adds OSC 133 semantic zones and user
+  vars). It's sourced **before** starship so its bundled bash-preexec is in place
+  for starship to cooperate with (`precmd_functions`) instead of clobbering it.
 - **Leader symbol keys (`%` `"` `&` `:` `[` `]` `,`) go through the
   `leader_symbol()` helper.** A bare `{ key = "%" }` matches by physical key
   position and silently fails for shifted symbols; the helper binds by produced

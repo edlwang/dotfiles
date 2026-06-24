@@ -95,6 +95,21 @@ for ed in nvim vim vi; do
 done
 unset ed  # don't leak the loop temporary (cf. os_rc above)
 
+# WezTerm shell integration. Emits OSC 7 (the current working directory) on every
+# prompt -- plus OSC 133 semantic zones and user vars -- so WezTerm opens new
+# splits/tabs in the *current* pane's directory instead of $HOME. The splits
+# already spawn in CurrentPaneDomain, but that only inherits the cwd if the shell
+# reports it; the distro's own emitter (vte.sh / systemd) isn't present on every
+# platform and gets dropped once starship owns the prompt, so use WezTerm's own
+# script. Vendored verbatim under wezterm/ (see README -> WezTerm for how to
+# refresh it); its OSC sequences are terminal-agnostic and ignored elsewhere, so
+# sourcing it unconditionally is safe. Source it BEFORE starship: it pulls in
+# bash-preexec, which starship then cooperates with (precmd_functions) rather than
+# fighting over PROMPT_COMMAND.
+wezterm_integration="${XDG_CONFIG_HOME:-$HOME/.config}/wezterm/shell-integration.sh"
+[ -f "$wezterm_integration" ] && . "$wezterm_integration"
+unset wezterm_integration
+
 # Use starship if available; otherwise fall back to a simple, portable prompt
 # (user@host:dir). starship is the real prompt (you install it), so this branch
 # only matters on a machine without it. Color when $TERM advertises it.
