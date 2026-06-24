@@ -142,6 +142,25 @@ Provision per OS:
     brew install --cask font-fira-mono-nerd-font
     ```
 
+    For the optional Claude Code sandbox
+    ([jai](#sandboxing-claude-code-with-jai-jai)), build jai from source —
+    it's not packaged for Aurora. The trick on an atomic image is that
+    `/usr/local` is a writable, `/var`-backed path (`/var/usrlocal`), so it's
+    the right home for the setuid binary — it survives image updates with no
+    `rpm-ostree` layering. Point `./configure` at it explicitly with
+    `--prefix=/usr/local`; under the brew build environment the prefix won't
+    default there on its own. The base image already has a C++23 compiler
+    (`g++`), `make`, and `git`; brew supplies the autotools and pandoc the git
+    build needs:
+
+    ```bash
+    brew install autoconf automake pandoc
+    git clone https://github.com/stanford-scs/jai.git
+    cd jai && ./autogen.sh && ./configure --prefix=/usr/local && make
+    sudo make install        # installs the setuid-root binary into /usr/local
+    sudo systemd-sysusers    # creates the unprivileged `jai` user for strict mode
+    ```
+
 What each is for:
 
 - **starship** / **uv** — the prompt and Python tooling (uv builds `~/py313`).
@@ -393,9 +412,10 @@ runtime.
 
 ### Sandboxing Claude Code with jai (`jai/`)
 
-`jai(1)` is a lightweight sandbox for AI agents: `jai cmd` runs `cmd` with the
-current directory (and below) writable, the rest of the filesystem read-only, and
-sensitive files masked. The `jai/` dir holds the per-jail config that `init.sh`'s
+[jai](https://jai.scs.stanford.edu/) is a lightweight sandbox for AI agents:
+`jai cmd` runs `cmd` with the current directory (and below) writable, the rest of
+the filesystem read-only, and sensitive files masked. The `jai/` dir holds the
+per-jail config that `init.sh`'s
 `setup_dotfiles` symlinks into `~/.jai/` (each file as `~/.jai/<name>`, except
 `jairc` → `~/.jai/.jairc`).
 
@@ -412,8 +432,8 @@ well as outside — running `init.sh` in the jail recreates `~/.claude/CLAUDE.md
 `settings.json`, `~/.bashrc`, the `~/.config/{nvim,wezterm}` links, etc. in the
 jail's own home (all pointing back at the `dir dotfiles`-exposed repo), which is
 why `claude.conf` doesn't need to grant your real `~/.claude` or `~/.config`.
-First install jai itself (it must be setuid root or run via `sudo`; see
-`jai(1)`), then:
+First [install jai](#dependencies) itself (a setuid-root binary; on Aurora,
+build it from source per the [Aurora](#install-yourself) install block), then:
 
 1. **Install Claude Code into the `claude` jail** — pipe the official installer
    through jai so the binary lands in the jail's home (`~/.jai/claude.home/.local/bin`),
