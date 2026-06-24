@@ -9,6 +9,8 @@ Personal, cross-project preferences for every session. A repo's own
   readability, and performance last.
 - Don't claim a change works unless you verified it (ran it, or tests pass). If you
   didn't verify, say so plainly.
+- After implementing a fix, change, or feature, always check to make sure docs are
+  up to date. 
 - If you don't have access to modify or run certain tools, give me the command to
   run it.
 
