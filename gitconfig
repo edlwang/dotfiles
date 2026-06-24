@@ -2,7 +2,8 @@
 	name = Edward Wang
 	email = work@edlwang.com
 [alias]
-	submodpull = submodule update --init --recursive
+	submodinit = submodule update --init --recursive
+    submodpull = submodule update --remote --recursive
 [init]
 	defaultBranch = main
 [url "git@github.com:"]
