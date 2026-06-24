@@ -14,7 +14,7 @@ of the repository.
 - [Repository layout](#repository-layout)
 - [Common tasks](#common-tasks)
 - [Dependencies](#dependencies)
-- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Claude Code](#claude-code-config-claude)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Claude Code](#claude-code-config-claude) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
 - [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
@@ -390,6 +390,60 @@ repo). If a real `~/.claude/commands/` already exists, `setup_symlink` moves it
 to the backup dir and replaces it with the link — so only track directories whose
 contents you fully own in the repo, not ones Claude or plugins also write to at
 runtime.
+
+### Sandboxing Claude Code with jai (`jai/`)
+
+`jai(1)` is a lightweight sandbox for AI agents: `jai cmd` runs `cmd` with the
+current directory (and below) writable, the rest of the filesystem read-only, and
+sensitive files masked. The `jai/` dir holds the per-jail config that `init.sh`'s
+`setup_dotfiles` symlinks into `~/.jai/` (each file as `~/.jai/<name>`, except
+`jairc` → `~/.jai/.jairc`).
+
+The **`claude` jail** runs Claude Code in **strict mode** (`claude.jail`): under
+the unprivileged `jai` user, with an empty but *persistent* home at
+`~/.jai/claude.home`, the working directory mapped in read-write, and everything
+else read-only. `claude.conf` names the jail, exposes the dotfiles repo
+(`dir dotfiles`) so the symlinked configs resolve inside, and prepends the jail's
+`~/.local/bin` to `PATH` so the in-jail `claude` binary is found.
+
+**One-time setup.** Because a strict jail starts with an empty home, Claude Code
+has to be installed *into* the jail, and the dotfiles symlinked *inside* it as
+well as outside — running `init.sh` in the jail recreates `~/.claude/CLAUDE.md`,
+`settings.json`, `~/.bashrc`, the `~/.config/{nvim,wezterm}` links, etc. in the
+jail's own home (all pointing back at the `dir dotfiles`-exposed repo), which is
+why `claude.conf` doesn't need to grant your real `~/.claude` or `~/.config`.
+First install jai itself (it must be setuid root or run via `sudo`; see
+`jai(1)`), then:
+
+1. **Install Claude Code into the `claude` jail** — pipe the official installer
+   through jai so the binary lands in the jail's home (`~/.jai/claude.home/.local/bin`),
+   not your real one:
+
+   ```bash
+   curl -fsSL https://claude.ai/install.sh | jai -D -mstrict -j claude bash
+   ```
+
+   (`-D` withholds the current directory, `-mstrict` matches the jail's mode,
+   `-j claude` names the jail.)
+
+2. **Run `init.sh` outside the jail** — the normal [Quickstart](#quickstart)
+   step. This creates the `~/.jai/*.conf`/`*.jail` symlinks so `jai claude`
+   resolves this config, and links your real `~/.claude`, `~/.bashrc`, etc.:
+
+   ```bash
+   bash ~/dotfiles/init.sh
+   ```
+
+3. **Run `init.sh` again inside the jail**, so the jail's empty home gets the
+   same symlinks and Claude sees your config:
+
+   ```bash
+   cd ~/dotfiles && jai -C claude ./init.sh
+   ```
+
+Then launch Claude in the sandbox with `jai claude` (alias `jaic`) from any
+project directory; `jai -C claude` opens a shell with the same permissions, handy
+for inspecting exactly what Claude can see.
 
 ## Optional per-machine git identity
 
