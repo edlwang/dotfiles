@@ -143,3 +143,7 @@ fi
 # to the front if it exists, so the last call wins and re-sourcing is idempotent.
 path_prepend "$HOME/.pixi/bin"
 path_prepend "$HOME/.local/bin"   # last call = highest priority
+
+if [ -f "$HOME/.bashrc_local" ]; then 
+    source "$HOME/.bashrc_local"
+fi
