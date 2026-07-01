@@ -9,6 +9,9 @@
 [url "git@github.com:"]
 	pushInsteadOf = https://github.com/
 	pushInsteadOf = https://www.github.com/
+[url "git@gitlab.com:"]
+    pushInsteadOf = https://gitlab.com/
+    pushInsteadOf = https://www.gitlab.com/
 ; Per-machine overrides (identity, etc.) — untracked, optional. Must come
 ; last so it wins over the default [user] above when present.
 [include]
