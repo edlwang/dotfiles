@@ -8,7 +8,7 @@
   },
   "model": "opus",
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "theme": "auto",
-  "editorMode": "normal",
-  "effortLevel": "xhigh"
+  "editorMode": "normal"
 }
