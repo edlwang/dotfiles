@@ -2,8 +2,20 @@
 	name = Edward Wang
 	email = work@edlwang.com
 [alias]
-	submodinit = submodule update --init --recursive
-    submodpull = submodule update --remote --recursive
+	sminit = submodule update --init --recursive
+    smpull = submodule update --remote --recursive
+    smfetch = fetch --recurse-submodules
+    st = status -sb
+    co = checkout
+    br = branch
+    ci = commit
+    di = diff
+    lg = log --oneline --graph --all
+    last = log -1 HEAD --stat
+    cob = checkout -b
+    cane = commit --amend --no-edit
+    unstage = reset HEAD --
+    undo = reset --soft HEAD
 [init]
 	defaultBranch = main
 [url "git@github.com:"]
