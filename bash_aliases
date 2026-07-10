@@ -1,4 +1,4 @@
-# OS-specific aliases (e.g. ls, pyenv) live in the per-platform
+# OS-specific aliases (e.g. ls) live in the per-platform
 # ~/.bashrc_<os> files, sourced by bashrc.
 
 # bashrc
@@ -42,6 +42,9 @@ svenv() {
     echo "svenv: no activate script under $venv (bin/ or Scripts/)" >&2
     return 1
 }
+
+# Activate the ~/py313 uv venv created by init.sh (svenv probes bin/ and Scripts/).
+alias pyenv='svenv ~/py313'
 
 # cd using pushd, popd goes back, vdirs lists the stack. pushd always needs a
 # target, so default to $HOME when called with no args (plain `cd`).

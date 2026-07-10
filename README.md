@@ -382,10 +382,10 @@ layer.
 - `cd` is overridden to use `pushd` (a directory stack); `vdirs` lists it
   newest-first, capped to the top 10 so a long-lived stack stays readable
   (`vdirs N` for the top N, `vdirs all` for the whole stack).
-- `pyenv` alias activates the `~/py313` uv venv created by `init.sh`. It's
-  OS-gated (lives in the `bashrc_<os>` files, not `bash_aliases`, since those are
-  sourced after the platform files): `bin/activate` on Unix, `Scripts/activate`
-  on Windows. `setup_pyenv` resolves the same path via `SYSTEM_OS`.
+- `pyenv` alias activates the `~/py313` uv venv created by `init.sh`. It's a
+  cross-platform single alias in `bash_aliases` that delegates to `svenv`, which
+  probes both the `bin/activate` (Unix) and `Scripts/activate` (Windows) layouts;
+  `setup_pyenv` still resolves the same path via `SYSTEM_OS`.
 - **Tool completions are generated at install time, not eval'd at startup.**
   `init.sh`'s `setup_completions` writes each tool's bash completion (uv, uvx,
   pixi, rustup, cargo) to `~/.local/share/bash-completion/completions/<cmd>`,
