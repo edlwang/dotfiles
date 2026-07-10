@@ -71,6 +71,7 @@ auto-reloads its config on save.
 │   └── skills/         Antigravity skills (like scope, scopenext, and dispatch)
 ├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
 │   ├── default.conf        }
+│   ├── agents.common       }  Shared agent directives, included by each agent .conf
 │   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
 │   ├── claude.jail         }  (claude, codex, and agy jails run in strict mode)
 │   ├── codex.conf          }
@@ -516,11 +517,13 @@ no `init.sh` edit.
 The **`claude` jail** runs Claude Code in **strict mode** (`claude.jail`): under
 the unprivileged `jai` user, with an empty but *persistent* home at
 `~/.jai/claude.home`, the working directory mapped in read-write, and everything
-else read-only. `claude.conf` names the jail, exposes the dotfiles repo
-**read-only** (`rdir dotfiles`) so the symlinked configs resolve inside, and
-prepends the jail's `~/.local/bin` to `PATH` so the in-jail `claude` binary is
-found. Read-only is deliberate: `dir` would grant read-**write**, letting a
-jailed agent launched from any directory rewrite `bashrc`, `init.sh`,
+else read-only. `claude.conf` names the jail and includes `agents.common` — the
+shared file (factored out because all three agent `.conf`s carried it verbatim)
+that exposes the dotfiles repo **read-only** (`rdir dotfiles`) so the symlinked
+configs resolve inside, and prepends the jail's `~/.local/bin` to `PATH` so the
+in-jail `claude` binary is found. Read-only is deliberate: `dir` would grant
+read-**write**, letting a jailed agent launched from any directory rewrite
+`bashrc`, `init.sh`,
 `claude/settings.json`, or `shared/agent-instructions.md` — files that run
 *unjailed* in your next session, a persistence/escape path that defeats strict
 mode. When you actually want to edit the dotfiles from inside a jail, launch it
@@ -533,7 +536,8 @@ unaffected.
 
 The **`codex` jail** (`codex.jail`) applies the same strict-mode recipe to
 OpenAI Codex, with a persistent home at `~/.jai/codex.home`. `codex.conf` mirrors
-`claude.conf` — `rdir dotfiles` plus `~/.local/bin` on `PATH` — since Codex's
+`claude.conf` — the same `agents.common` include (`rdir dotfiles` plus
+`~/.local/bin` on `PATH`) — since Codex's
 standalone installer lands the binary in `~/.local/bin` and keeps its package and
 state under `~/.codex`, both inside the jail's own home. Its config comes from the
 version-controlled [`codex/`](#codex-config-codex) dir, symlinked into the jail's
@@ -544,8 +548,8 @@ writable (inherited from the read-write cwd, not downgraded), so Codex can commi
 
 The **`agy` jail** (`agy.jail`) applies the strict-mode recipe to Google
 Antigravity, with a persistent home at `~/.jai/agy.home`. `agy.conf` mirrors the
-others, pointing `rdir dotfiles` and adding `~/.local/bin` to `PATH` (where the CLI
-installer puts `agy`).
+others, including the same `agents.common` (`rdir dotfiles` plus `~/.local/bin` on
+`PATH`, where the CLI installer puts `agy`).
 
 The git push deny rules in `claude/settings.json`, `codex/rules/no-push.rules`,
 and `gemini/antigravity-cli/settings.json` are convenience guardrails (they don't
