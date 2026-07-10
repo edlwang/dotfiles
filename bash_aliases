@@ -5,9 +5,26 @@
 alias sbrc="source ~/.bashrc"
 alias ebrc='$EDITOR ~/.bashrc'
 alias edfs='$EDITOR ~/dotfiles'
-alias jaicl='jai claude'
-alias jaico='jai codex'
-alias jaiag='jai agy'
+# Sandbox launchers. Options before `--` go to jai (e.g. `jaicl -x dotfiles` to
+# make the read-only dotfiles repo writable in-jail); args after `--` go to the
+# agent (e.g. `jaicl -- --resume`). Bare `jaicl`/`jaico`/`jaiag` just launch.
+_jai() {
+    local jail="$1"; shift
+    local opts=()
+    while [[ $# -gt 0 && "$1" != "--" ]]; do
+        opts+=("$1")
+        shift
+    done
+    [[ "$1" == "--" ]] && shift
+    # `--` terminates jai's own options so the jail name can never be swallowed
+    # as the argument of a value-taking flag (a bare `jaicl -x` would otherwise
+    # make jai read `claude` as `-x`'s DIR, drop the command, and launch the
+    # default *casual* jail's shell instead of the claude jail).
+    jai "${opts[@]}" -- "$jail" "$@"
+}
+jaicl() { _jai claude "$@"; }
+jaico() { _jai codex "$@"; }
+jaiag() { _jai agy "$@"; }
 
 # Activate a Python virtualenv: `svenv` uses ./.venv, `svenv <path>` uses
 # <path>. Probes both the Unix (bin/activate) and Windows/MSYS
