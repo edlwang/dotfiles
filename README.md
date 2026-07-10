@@ -68,7 +68,7 @@ auto-reloads its config on save.
 │   └── rules/              Starlark command rules (forbids git push) → ~/.codex/rules/
 ├── gemini/antigravity-cli/  Antigravity config → symlinked into ~/.gemini/antigravity-cli/
 │   ├── settings.json
-│   └── skills/         Antigravity skills (like scope and scopenext)
+│   └── skills/         Antigravity skills (like scope, scopenext, and dispatch)
 ├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
 │   ├── default.conf        }
 │   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
@@ -486,8 +486,8 @@ so there is **no `$ARGUMENTS` substitution** to receive a typed target. Write th
 `description` to be trigger-oriented (include example phrases — it's the router's
 only signal), give the body an H1 title, and have the instructions derive the
 target from the user's request rather than a placeholder. Keep each under ~500
-words. The bundled `scope`/`scopenext` skills mirror the Claude/Codex commands of
-the same name, adapted to this model. Note the CLI reads global skills from
+words. The bundled `scope`/`scopenext`/`dispatch` skills mirror the Claude/Codex
+commands of the same name, adapted to this model. Note the CLI reads global skills from
 `~/.gemini/antigravity-cli/skills/`, which is distinct from the Antigravity IDE's
 `~/.gemini/config/skills/` — if a future release unifies them, revisit this path.
 
