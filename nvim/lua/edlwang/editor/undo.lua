@@ -4,5 +4,8 @@ vim.opt.swapfile = false
 -- "Edit with Neovim"), and os.getenv would return nil -> the concat errors out
 -- and aborts the whole init. expand("~") resolves the home dir on every platform
 -- (falling back to USERPROFILE on Windows), keeping the same ~/.vim/undodir path.
+-- Neovim doesn't create undodir itself, so undofile silently no-ops on a fresh
+-- machine unless we create it first.
+vim.fn.mkdir(vim.fn.expand("~/.vim/undodir"), "p")
 vim.opt.undodir = vim.fn.expand("~/.vim/undodir")
 vim.opt.undofile = true

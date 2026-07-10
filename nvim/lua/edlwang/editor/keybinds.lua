@@ -141,8 +141,8 @@ end, { desc = "[H]arpoon [N]ext" })
 -- neo-tree
 vim.keymap.set("n", "<leader>tn", "<cmd>Neotree filesystem toggle reveal left<cr>", { desc = "[T]oggle [N]eo-tree" })
 
--- conform (format buffer; "" => normal, visual, operator-pending, select)
-vim.keymap.set("", "<leader>cf", function()
+-- conform (format buffer; { "n", "x" } => normal, visual)
+vim.keymap.set({ "n", "x" }, "<leader>cf", function()
 	require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "[C]ode [F]ormat buffer" })
 
