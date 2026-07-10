@@ -14,7 +14,7 @@ of the repository.
 - [Repository layout](#repository-layout)
 - [Common tasks](#common-tasks)
 - [Dependencies](#dependencies)
-- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
 - [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
@@ -62,6 +62,10 @@ auto-reloads its config on save.
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md + each agent's AGENTS.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
 │   └── settings.json
+├── codex/              Codex config → symlinked into ~/.codex
+│   ├── config.toml
+│   ├── prompts/            Custom /prompts:<name> files → ~/.codex/prompts/
+│   └── rules/              Starlark command rules (forbids git push) → ~/.codex/rules/
 ├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
 │   ├── default.conf        }
 │   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
@@ -425,6 +429,30 @@ repo). If a real `~/.claude/commands/` already exists, `setup_symlink` moves it
 to the backup dir and replaces it with the link — so only track directories whose
 contents you fully own in the repo, not ones Claude or plugins also write to at
 runtime.
+
+### Codex config (`codex/`)
+
+Codex config lives in `codex/` and works exactly like [`claude/`](#claude-code-config-claude):
+`init.sh`'s `setup_codex` step globs each top-level entry into `~/.codex/` and
+leaves runtime state (`auth.json`, history, sessions) untouched, and `.gitignore`
+whitelists only config kinds. The tracked pieces mirror the Claude ones:
+`config.toml` (settings — `model_reasoning_effort` stands in for `effortLevel`;
+Codex has no `config.toml` command-deny setting, so the "never push" rule lives
+in `AGENTS.md`) and `prompts/` (custom `/prompts:<name>` commands, the
+`commands/` analog). Its `AGENTS.md` is the shared
+[`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in,
+not a Codex-specific file. Since Codex has no `config.toml` command-deny, `git push` is blocked in
+layers: `config.toml`'s read-only sandbox stops in-sandbox pushes (network write),
+`rules/no-push.rules` marks `git push` `forbidden` if Codex escalates it outside
+the sandbox (the analog to Claude's `permissions.deny`), and `AGENTS.md` keeps the
+"never push" instruction. These are agent-scoped; add a git hook if you also want
+your own pushes blocked locally.
+
+Because config is shared but auth is per-home, the `codex` jail sees this same
+config once `init.sh` runs inside it, yet keeps its own login — see the jail's
+note below on why we deliberately don't expose the real `~/.codex`. On a host
+with an existing `~/.codex/config.toml`, the first setup backs it up and replaces
+it with the tracked configuration.
 
 ### Sandboxing Claude Code with jai (`jai/`)
 

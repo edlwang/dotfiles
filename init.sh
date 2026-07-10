@@ -119,6 +119,22 @@ setup_claude() {
     echo "Successfully set up Claude config"
 }
 
+setup_codex() {
+    echo "Setting up Codex config"
+
+    # Symlink each tracked entry from codex/ into ~/.codex/. Only config lives
+    # in codex/; ~/.codex runtime state (auth.json, history, sessions) is left alone.
+    for src in "$DOTFILES_PATH/codex/"*; do
+        [ -e "$src" ] || continue
+        setup_symlink "$src" "$HOME/.codex/$(basename "$src")"
+    done
+
+    # Shared global instructions (see setup_claude); Codex reads them from AGENTS.md.
+    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.codex/AGENTS.md"
+
+    echo "Successfully set up Codex config"
+}
+
 # Warn to stderr with a uniform prefix. Used by setup_pyenv, setup_completions,
 # and the sourced init_<os>.sh hooks (defined before they're sourced below).
 warn() {
@@ -211,6 +227,7 @@ fi
 
 setup_dotfiles
 setup_claude
+setup_codex
 setup_os
 ensure_tools_on_path
 setup_pyenv

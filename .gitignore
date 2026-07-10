@@ -14,5 +14,13 @@ claude/*
 !claude/agents/
 !claude/agents/**
 
+# Codex: deny-by-default — track only config, never secrets/runtime state
+codex/*
+!codex/config.toml
+!codex/prompts/
+!codex/prompts/**
+!codex/rules/
+!codex/rules/no-push.rules
+
 # Temporary Files
 tmp/

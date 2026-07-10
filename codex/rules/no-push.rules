@@ -1,0 +1,20 @@
+# Codex user rules -> symlinked to ~/.codex/rules/no-push.rules by init.sh.
+# Codex scans every *.rules file under ~/.codex/rules/ at startup, so this loads
+# without being named default.rules. It is deliberately NOT default.rules: Codex
+# auto-writes rules you approve in the TUI to default.rules, so hand-authored
+# rules there get clobbered -- the docs say don't customize that file.
+#
+# Rules govern commands Codex escalates to run OUTSIDE the sandbox. The
+# read-only sandbox already blocks git push in-sandbox (network write); this is
+# the analog to claude/settings.json's permissions.deny for the escalation path.
+#
+# Prefix matching is literal, so this catches `git push ...` but not
+# flag-separated forms like `git -C dir push`; the read-only sandbox and the
+# "never push" rule in AGENTS.md back-stop those. Verify with:
+#   codex execpolicy check --pretty --rules ~/.codex/rules/no-push.rules -- git push
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "forbidden",
+    justification = "Never push to a remote; leave pushing to the user (see AGENTS.md).",
+)
