@@ -518,12 +518,22 @@ The **`claude` jail** runs Claude Code in **strict mode** (`claude.jail`): under
 the unprivileged `jai` user, with an empty but *persistent* home at
 `~/.jai/claude.home`, the working directory mapped in read-write, and everything
 else read-only. `claude.conf` names the jail, exposes the dotfiles repo
-(`dir dotfiles`) so the symlinked configs resolve inside, and prepends the jail's
-`~/.local/bin` to `PATH` so the in-jail `claude` binary is found.
+**read-only** (`rdir dotfiles`) so the symlinked configs resolve inside, and
+prepends the jail's `~/.local/bin` to `PATH` so the in-jail `claude` binary is
+found. Read-only is deliberate: `dir` would grant read-**write**, letting a
+jailed agent launched from any directory rewrite `bashrc`, `init.sh`,
+`claude/settings.json`, or `shared/agent-instructions.md` — files that run
+*unjailed* in your next session, a persistence/escape path that defeats strict
+mode. When you actually want to edit the dotfiles from inside a jail, launch it
+writable with `jaicl -x dotfiles` (reverses the `rdir` grant so the read-write
+cwd grant applies — run it from `~/dotfiles`) or `jaicl -d dotfiles` (grants
+write regardless of cwd). Config that Claude itself persists (model, effort)
+lands in the jail-home `~/.claude.json`, not the repo, so routine use is
+unaffected.
 
 The **`codex` jail** (`codex.jail`) applies the same strict-mode recipe to
 OpenAI Codex, with a persistent home at `~/.jai/codex.home`. `codex.conf` mirrors
-`claude.conf` — `dir dotfiles` plus `~/.local/bin` on `PATH` — since Codex's
+`claude.conf` — `rdir dotfiles` plus `~/.local/bin` on `PATH` — since Codex's
 standalone installer lands the binary in `~/.local/bin` and keeps its package and
 state under `~/.codex`, both inside the jail's own home. Its config comes from the
 version-controlled [`codex/`](#codex-config-codex) dir, symlinked into the jail's
@@ -534,14 +544,14 @@ writable (inherited from the read-write cwd, not downgraded), so Codex can commi
 
 The **`agy` jail** (`agy.jail`) applies the strict-mode recipe to Google
 Antigravity, with a persistent home at `~/.jai/agy.home`. `agy.conf` mirrors the
-others, pointing `dir dotfiles` and adding `~/.local/bin` to `PATH` (where the CLI
+others, pointing `rdir dotfiles` and adding `~/.local/bin` to `PATH` (where the CLI
 installer puts `agy`).
 
 **One-time setup.** Because a strict jail starts with an empty home, the agent
 has to be installed *into* the jail, and the dotfiles symlinked *inside* it as
 well as outside — running `init.sh` in the jail recreates `~/.claude/CLAUDE.md`,
 `settings.json`, `~/.bashrc`, the `~/.config/{nvim,wezterm}` links, etc. in the
-jail's own home (all pointing back at the `dir dotfiles`-exposed repo), which is
+jail's own home (all pointing back at the `rdir dotfiles`-exposed repo), which is
 why the `.conf` files don't need to grant your real `~/.claude` or `~/.config`.
 First [install jai](#dependencies) itself (a setuid-root binary; on Aurora,
 build it from source per the [Aurora](#install-yourself) install block), then,
