@@ -46,7 +46,11 @@ svenv() {
 # cd using pushd, popd goes back, vdirs lists the stack. pushd always needs a
 # target, so default to $HOME when called with no args (plain `cd`).
 cd() {
-    builtin pushd "${@:-$HOME}" > /dev/null
+    if [[ "$1" == -* ]]; then
+        builtin cd "$@"
+    else
+        builtin pushd "${@:-$HOME}" > /dev/null
+    fi
 }
 
 # List the directory stack newest-first (like `dirs -v`), but capped so a
