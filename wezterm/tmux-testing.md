@@ -1,14 +1,17 @@
 # WezTerm tmux-layer test plan
 
 A checklist for exercising the tmux-style multiplexing added to `wezterm.lua`.
-WezTerm's own multiplexer (prefix `Ctrl+Space`) and persistence run on every
-machine; a real `tmux` (prefix `Ctrl+b`) can coexist alongside it.
+WezTerm's own multiplexer (prefix `Ctrl+Space`) runs on every machine; a real
+`tmux` (prefix `Ctrl+b`) can coexist alongside it. Persistence is opt-in, like
+tmux: a plain `wezterm` launch is ephemeral, and you connect to the `unix`
+domain (`wezterm connect unix`) for panes that survive closing the window.
 
 - **Prefix (leader):** `Ctrl+Space`. Press and release it, then press the
   command key (a 2 s window). Notation below: `<prefix> %` means
   `Ctrl+Space` then `%`.
-- The leader, **all** command keys, and persistence are active on **every**
-  machine.
+- The leader and **all** command keys are active on **every** machine,
+  regardless of domain. Persistence only applies once you're attached to the
+  `unix` domain — see §6.
 - `tmux`'s own prefix `Ctrl+b` is **never** bound by WezTerm, so it always passes
   straight through to a real tmux (local or over SSH).
 
@@ -17,10 +20,18 @@ machine; a real `tmux` (prefix `Ctrl+b`) can coexist alongside it.
 
 ---
 
-## 0. Verify the mux is running
+## 0. Verify the mux domain
 
-Persistence runs on every machine, so WezTerm should always be attached to its
-background mux server. Confirm with:
+A plain `wezterm` launch runs on the in-process **local** domain — no
+background mux server involved, so there's nothing for `wezterm cli` to see
+until you opt in. To exercise persistence, first connect to the `unix`
+domain:
+
+```sh
+wezterm connect unix   # spawns the mux server on first connect, opens a new window
+```
+
+Then confirm you're attached to it:
 
 ```sh
 # Panes the WezTerm mux knows about; they report the "unix" domain.
@@ -30,8 +41,9 @@ wezterm cli list
 wezterm cli list-clients
 ```
 
-Definitive check: the persistence test in §6 — close the window and reopen; your
-panes, layout, and running programs should reattach.
+Definitive check: the persistence test in §6 — close that window, then
+`wezterm connect unix` again; your panes, layout, and running programs should
+reattach.
 
 ---
 
@@ -117,13 +129,30 @@ printf 'copy-me-%s\n' "$RANDOM"   # select it in copy mode (y), then <prefix> ]
 
 ---
 
-## 6. Persistence — the headline feature
+## 6. Persistence — opt-in, via the `unix` domain
 
 > Behaves like `tmux detach` / `tmux attach`. Survives closing the window, **not**
-> a reboot. Active on every machine.
+> a reboot. Only applies to windows connected to the `unix` domain — a plain
+> `wezterm` launch is ephemeral and does **not** persist.
 
-1. Launch WezTerm. Split a couple of panes (`<prefix> %`, `<prefix> "`).
-2. Leave durable, observable state in them:
+### 6a. Confirm a plain launch does *not* persist
+
+1. Launch WezTerm normally (`wezterm`, or however you usually open it). Split
+   a couple of panes (`<prefix> %`, `<prefix> "`) and leave some state running
+   (e.g. `top`).
+2. **Close the GUI window** (window close / `Alt+F4`), then relaunch WezTerm.
+
+| After reopening | Expected |
+| --- | --- |
+| Layout & panes | **Gone** — a fresh, empty window on the local domain |
+
+### 6b. Get persistence by connecting to `unix`
+
+1. `wezterm connect unix` — opens a new window attached to the `unix` domain,
+   spawning the mux server on first connect. (`wezterm connect --new-tab unix`
+   attaches as a tab in the active window instead.)
+2. Split a couple of panes (`<prefix> %`, `<prefix> "`) and leave durable,
+   observable state in them:
    ```sh
    # pane A: a running process you can recognize on reattach
    top            # (or: watch -n1 date  /  sleep 99999)
@@ -131,9 +160,9 @@ printf 'copy-me-%s\n' "$RANDOM"   # select it in copy mode (y), then <prefix> ]
    cd /tmp && export PERSIST_TEST="set-at-$(date +%H%M%S)"
    ```
 3. Note the layout, then **close the GUI window** (window close / `Alt+F4`).
-4. Relaunch WezTerm.
+4. Reattach: `wezterm connect unix`.
 
-| After reopening | Expected |
+| After reconnecting | Expected |
 | --- | --- |
 | Layout & panes | Reattach exactly as left |
 | `top` in pane A | Still running |
@@ -143,7 +172,7 @@ Detach explicitly instead of closing the window:
 
 | Steps | Expected |
 | --- | --- |
-| `<prefix> d` | Detaches the `unix` domain; the window closes but the mux server keeps the panes alive for the next launch |
+| `<prefix> d` | Detaches the `unix` domain; the window closes but the mux server keeps the panes alive for the next `connect` |
 | `<prefix> s` | Domain/session launcher lists the **`unix`** domain (attached) alongside `local` |
 
 While detached, confirm the server is still alive from any shell:
@@ -173,22 +202,19 @@ tmux new -s test
 Over SSH this is the whole point: `Ctrl+b` reaches the **remote** tmux untouched,
 while `Ctrl+Space` continues to drive your **local** WezTerm.
 
----
-
-## WezTerm and tmux side by side
-
 Both multiplexers are always available and never collide, because they use
 different prefixes:
 
 | | WezTerm layer | tmux (if you run it) |
 | --- | --- | --- |
 | Prefix | `Ctrl+Space` | `Ctrl+b` (untouched by WezTerm) |
-| Persistence | Always on (`unix` domain) | Its own sessions |
+| Persistence | Opt-in — only windows connected to the `unix` domain (`wezterm connect unix`, §6) | Its own sessions, always persistent while its server runs |
 | Scope | The local WezTerm GUI | The shell it runs in — local, or the remote end of an SSH session |
 
 Running tmux inside a WezTerm pane just nests them: `Ctrl+b` drives tmux,
-`Ctrl+Space` drives WezTerm, and each persists independently. Over SSH, `Ctrl+b`
-reaches the **remote** tmux while `Ctrl+Space` stays with your **local** WezTerm.
+`Ctrl+Space` drives WezTerm's command layer, and each domain persists (or not)
+independently of the other. Over SSH, `Ctrl+b` reaches the **remote** tmux
+while `Ctrl+Space` stays with your **local** WezTerm.
 
 ---
 
@@ -214,6 +240,7 @@ reaches the **remote** tmux while `Ctrl+Space` stays with your **local** WezTerm
 - [ ] `<prefix> c` / `n` / `p` / `1-9,0` / `w` / `,` / `&` tab ops
 - [ ] `<prefix> [` copy, `<prefix> ]` paste, `<prefix> :` palette
 - [ ] `<prefix> <prefix>` sends literal `Ctrl+Space`
-- [ ] Persistence: close window → reopen → panes + `top` + `$PERSIST_TEST` survive
+- [ ] Plain launch does **not** persist: close window → reopen → panes gone
+- [ ] Persistence: `wezterm connect unix` → close window → `wezterm connect unix` → panes + `top` + `$PERSIST_TEST` survive
 - [ ] `<prefix> d` detaches / `<prefix> s` shows `unix`
 - [ ] `Ctrl+b` reaches real tmux untouched (local or SSH)
