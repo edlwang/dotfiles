@@ -14,7 +14,7 @@ of the repository.
 - [Repository layout](#repository-layout)
 - [Common tasks](#common-tasks)
 - [Dependencies](#dependencies)
-- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [Antigravity](#antigravity-config-geminiantigravity-cli) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [Antigravity](#antigravity-config-geminiantigravity-cli) · [jai sandbox](#sandboxing-ai-agents-with-jai-jai)
 - [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
@@ -72,8 +72,12 @@ auto-reloads its config on save.
 ├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
 │   ├── default.conf        }
 │   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
+│   ├── claude.jail         }  (claude, codex, and agy jails run in strict mode)
+│   ├── codex.conf          }
+│   ├── codex.jail          }
+│   ├── agy.conf            }
+│   ├── agy.jail            }
 │   ├── default.jail        }
-│   ├── claude.jail         }
 │   └── jairc               Bash functions for jai shells → ~/.jai/.jairc
 ├── AGENTS.md           Working rules for AI coding agents (points back here)
 ├── CLAUDE.md           Sources AGENTS.md for Claude Code
@@ -150,8 +154,8 @@ Provision per OS:
     brew install --cask font-fira-mono-nerd-font
     ```
 
-    For the optional Claude Code sandbox
-    ([jai](#sandboxing-claude-code-with-jai-jai)), build jai from source —
+    For the optional agent sandbox
+    ([jai](#sandboxing-ai-agents-with-jai-jai)), build jai from source —
     it's not packaged for Aurora. The trick on an atomic image is that
     `/usr/local` is a writable, `/var`-backed path (`/var/usrlocal`), so it's
     the right home for the setuid binary — it survives image updates with no
@@ -499,14 +503,16 @@ the same name, adapted to this model. Note the CLI reads global skills from
 `~/.gemini/antigravity-cli/skills/`, which is distinct from the Antigravity IDE's
 `~/.gemini/config/skills/` — if a future release unifies them, revisit this path.
 
-### Sandboxing Claude Code with jai (`jai/`)
+### Sandboxing AI agents with jai (`jai/`)
 
 [jai](https://jai.scs.stanford.edu/) is a lightweight sandbox for AI agents:
 `jai cmd` runs `cmd` with the current directory (and below) writable, the rest of
 the filesystem read-only, and sensitive files masked. The `jai/` dir holds the
 per-jail config that `init.sh`'s
 `setup_dotfiles` symlinks into `~/.jai/` (each file as `~/.jai/<name>`, except
-`jairc` → `~/.jai/.jairc`).
+`jairc` → `~/.jai/.jairc`). Adding a new jail is drop-in: a new
+`<name>.conf`/`<name>.jail` pair in `jai/` is picked up by that symlink loop with
+no `init.sh` edit.
 
 The **`claude` jail** runs Claude Code in **strict mode** (`claude.jail`): under
 the unprivileged `jai` user, with an empty but *persistent* home at
@@ -515,44 +521,73 @@ else read-only. `claude.conf` names the jail, exposes the dotfiles repo
 (`dir dotfiles`) so the symlinked configs resolve inside, and prepends the jail's
 `~/.local/bin` to `PATH` so the in-jail `claude` binary is found.
 
-**One-time setup.** Because a strict jail starts with an empty home, Claude Code
+The **`codex` jail** (`codex.jail`) applies the same strict-mode recipe to
+OpenAI Codex, with a persistent home at `~/.jai/codex.home`. `codex.conf` mirrors
+`claude.conf` — `dir dotfiles` plus `~/.local/bin` on `PATH` — since Codex's
+standalone installer lands the binary in `~/.local/bin` and keeps its package and
+state under `~/.codex`, both inside the jail's own home. Its config comes from the
+version-controlled [`codex/`](#codex-config-codex) dir, symlinked into the jail's
+`~/.codex` when you run `init.sh` inside the jail — so we deliberately do **not**
+`dir .codex`; the real `~/.codex` (and its credentials) is never exposed, and the
+jailed Codex logs in with its own auth. The working directory's `.git` stays
+writable (inherited from the read-write cwd, not downgraded), so Codex can commit.
+
+The **`agy` jail** (`agy.jail`) applies the strict-mode recipe to Google
+Antigravity, with a persistent home at `~/.jai/agy.home`. `agy.conf` mirrors the
+others, pointing `dir dotfiles` and adding `~/.local/bin` to `PATH` (where the CLI
+installer puts `agy`).
+
+**One-time setup.** Because a strict jail starts with an empty home, the agent
 has to be installed *into* the jail, and the dotfiles symlinked *inside* it as
 well as outside — running `init.sh` in the jail recreates `~/.claude/CLAUDE.md`,
 `settings.json`, `~/.bashrc`, the `~/.config/{nvim,wezterm}` links, etc. in the
 jail's own home (all pointing back at the `dir dotfiles`-exposed repo), which is
-why `claude.conf` doesn't need to grant your real `~/.claude` or `~/.config`.
+why the `.conf` files don't need to grant your real `~/.claude` or `~/.config`.
 First [install jai](#dependencies) itself (a setuid-root binary; on Aurora,
-build it from source per the [Aurora](#install-yourself) install block), then:
+build it from source per the [Aurora](#install-yourself) install block), then,
+for each agent you want to sandbox:
 
-1. **Install Claude Code into the `claude` jail** — pipe the official installer
-   through jai so the binary lands in the jail's home (`~/.jai/claude.home/.local/bin`),
-   not your real one:
+1. **Install the agent into its jail** — pipe the official installer through jai
+   so the binary lands in the jail's home, not your real one. Both installers
+   default to `~/.local/bin`, which each `.conf` puts on `PATH`:
 
    ```bash
+   # Claude Code → ~/.jai/claude.home/.local/bin
    curl -fsSL https://claude.ai/install.sh | jai -D -mstrict -j claude bash
+
+   # Codex → ~/.jai/codex.home/.local/bin (package + state under ~/.codex)
+   curl -fsSL https://chatgpt.com/codex/install.sh | jai -D -mstrict -j codex sh
+
+   # Antigravity → ~/.jai/agy.home/.local/bin
+   curl -fsSL https://antigravity.google/cli/install.sh | jai -D -mstrict -j agy bash
    ```
 
    (`-D` withholds the current directory, `-mstrict` matches the jail's mode,
-   `-j claude` names the jail.)
+   `-j <name>` names the jail. The install targets the jail home even without
+   `-C <name>`, because `-j`/`-mstrict` alone select it.)
 
 2. **Run `init.sh` outside the jail** — the normal [Quickstart](#quickstart)
-   step. This creates the `~/.jai/*.conf`/`*.jail` symlinks so `jai claude`
-   resolves this config, and links your real `~/.claude`, `~/.bashrc`, etc.:
+   step. This creates the `~/.jai/*.conf`/`*.jail` symlinks so `jai claude` /
+   `jai codex` / `jai agy` resolve this config, and links your configurations,
+   `~/.bashrc`, etc.:
 
    ```bash
    bash ~/dotfiles/init.sh
    ```
 
-3. **Run `init.sh` again inside the jail**, so the jail's empty home gets the
-   same symlinks and Claude sees your config:
+3. **Run `init.sh` again inside each jail**, so the jail's empty home gets the
+   same symlinks and the agent sees your config:
 
    ```bash
    cd ~/dotfiles && jai -C claude ./init.sh
+   cd ~/dotfiles && jai -C codex ./init.sh
+   cd ~/dotfiles && jai -C agy ./init.sh
    ```
 
-Then launch Claude in the sandbox with `jai claude` (alias `jaic`) from any
-project directory; `jai -C claude` opens a shell with the same permissions, handy
-for inspecting exactly what Claude can see.
+Then launch an agent in the sandbox with `jai claude` (alias `jaicl`),
+`jai codex` (alias `jaico`), or `jai agy` (alias `jaiag`) from any project
+directory; `jai -C <name>` opens a shell with the same permissions, handy for
+inspecting exactly what the agent can see.
 
 ## Optional per-machine git identity
 
