@@ -463,33 +463,21 @@ it with the tracked configuration.
 
 ### Antigravity config (`gemini/antigravity-cli/`)
 
-Default Antigravity CLI config lives in `gemini/antigravity-cli/` (e.g. `settings.json`). `init.sh`'s
-`setup_agy` step symlinks **each top-level entry** of `gemini/antigravity-cli/` into
-`~/.gemini/antigravity-cli/` — it globs the directory, so nothing to edit on the symlink side —
-and leaves the rest of `~/.gemini/antigravity-cli/` (credentials, history, sessions, jobs — all
-runtime state) untouched. Because everything in `gemini/antigravity-cli/` is symlinked, **only
-put config files here**, never runtime state or secrets.
+Antigravity CLI config lives in `gemini/antigravity-cli/` and works exactly like
+[`claude/`](#claude-code-config-claude): `init.sh`'s `setup_agent` step globs each
+top-level entry into `~/.gemini/antigravity-cli/` and leaves runtime state
+(credentials, history, sessions, jobs) untouched, and `.gitignore` whitelists only
+config kinds — here `settings.json` and `skills/` (the same two-step gotcha
+applies to adding a new kind: whitelist it with `!gemini/antigravity-cli/<name>`,
+plus `!gemini/antigravity-cli/<name>/**` for a directory, or git silently ignores
+it). Its `AGENTS.md` is the shared
+[`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in,
+not an Antigravity-specific file.
 
 `settings.json` carries the theme, default model, and a `permissions.deny` rule
 for `command(git push)` — the direct analog to Claude's `permissions.deny`, since
 Antigravity uses the same allow/deny command-permission model (deny wins over
 allow). `AGENTS.md` keeps the "never push" instruction as a back-stop.
-
-**Git tracking uses a whitelist, decoupled from that glob.** `.gitignore` ignores
-all of `gemini/antigravity-cli/` and re-includes only `settings.json` and `skills/` —
-a fail-safe so credentials or runtime state can never be committed even if copied in.
-(Its `AGENTS.md` is the shared
-[`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in.) The catch:
-`setup_agy` will symlink *anything* you drop in `gemini/antigravity-cli/`, but git **silently ignores**
-a new config type until you whitelist it in `.gitignore` (e.g. `!gemini/antigravity-cli/<name>`, plus
-`!gemini/antigravity-cli/<name>/**` for a directory).
-
-`setup_agy` symlinks each **top-level** entry, so a subdirectory like
-`gemini/antigravity-cli/skills/` becomes a whole-directory symlink (`~/.gemini/antigravity-cli/skills` →
-repo). If a real `~/.gemini/antigravity-cli/skills/` already exists, `setup_symlink`
-moves it to the backup dir and replaces it with the link — so only track directories
-whose contents you fully own in the repo, not ones Antigravity or plugins also write
-to at runtime.
 
 **Authoring skills.** Antigravity skills work differently from Claude's
 `commands/` and Codex's `prompts/`: the CLI auto-loads a `skills/<name>/SKILL.md`
