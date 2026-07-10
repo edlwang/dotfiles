@@ -413,6 +413,14 @@ genuinely tool-specific config (settings, prompts/skills, rules). `shared/` sits
 outside the per-tool `.gitignore` deny blocks, so files there are tracked
 normally.
 
+One rule here has a subtlety worth flagging: the Git section requires commit
+attribution to **name the model that actually did the work**, read from the
+agent's own system prompt. A *dispatched* subagent can't always identify its own
+model that way (gemini flash under Antigravity guessed wrong), so the
+`dispatch` command/skill (in all three tools) tells the dispatcher to hand the
+subagent the model it was dispatched at — otherwise the attribution in its
+commits is a guess.
+
 ### Claude Code config (`claude/`)
 
 Default Claude Code config lives in `claude/` (e.g. `settings.json`). `init.sh`'s

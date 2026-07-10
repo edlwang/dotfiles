@@ -28,8 +28,10 @@ ambiguous.
 
 ### 2. Do the work
 Delegate to a subagent if your harness can spawn one; otherwise carry the work out
-yourself at the chosen effort. Work to the repo's conventions (`AGENTS.md`); keep
-each logical unit of work a focused commit.
+yourself at the chosen effort. When you delegate, tell the subagent explicitly which
+model it's running as (the model you dispatched it at) so any commit attribution it
+writes names that model instead of guessing. Work to the repo's conventions
+(`AGENTS.md`); keep each logical unit of work a focused commit.
 
 ### 3. Check the work
 Give the result a **distinct** review pass yourself. If you delegated, you didn't

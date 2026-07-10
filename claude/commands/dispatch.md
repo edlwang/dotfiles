@@ -29,7 +29,9 @@ unless the task is genuinely ambiguous.
 ### 2. Dispatch an implementation agent
 Launch a subagent (Task/Agent tool) at that model — and effort, where the harness
 supports it — to do the work. Hand it the concrete goal, the relevant paths, and
-the repo's conventions (`AGENTS.md`/`CLAUDE.md`). Prefer one focused subagent per
+the repo's conventions (`AGENTS.md`/`CLAUDE.md`). Also tell it explicitly which
+model it's running as (the model you dispatched it at) so any commit attribution it
+writes names that model instead of guessing. Prefer one focused subagent per
 coherent unit of work; run independent units in parallel.
 
 ### 3. Check its work
