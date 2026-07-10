@@ -1,5 +1,3 @@
-vim.opt.termguicolors = true
-
 -- On Windows, Neovim picks up $SHELL (Git Bash exports it as bash.exe) for
 -- 'shell' but keeps the cmd.exe defaults for the rest of the shell* options.
 -- The mismatch means every shell-out (toggleterm, :terminal, :!, :make) runs

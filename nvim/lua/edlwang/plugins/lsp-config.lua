@@ -131,7 +131,7 @@ return {
 		-- Run :Mason to view/install tools manually (press g? for help).
 
 		-- Have Mason install the servers above, plus any extra tools listed here.
-		local ensure_installed = vim.tbl_keys(servers or {})
+		local ensure_installed = vim.tbl_keys(servers)
 		vim.list_extend(ensure_installed, {
 			"stylua", -- Lua formatter, run by conform
 		})

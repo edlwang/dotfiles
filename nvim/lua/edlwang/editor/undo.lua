@@ -1,5 +1,4 @@
 vim.opt.swapfile = false
-vim.opt.backup = false
 -- Use expand("~") rather than os.getenv("HOME"): on Windows $HOME is unset when
 -- nvim is launched outside the Git Bash login shell (PowerShell, cmd, a GUI/IDE,
 -- "Edit with Neovim"), and os.getenv would return nil -> the concat errors out

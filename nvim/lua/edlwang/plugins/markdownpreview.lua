@@ -11,9 +11,4 @@ return {
 			vim.fn["mkdp#util#install"]()
 		end
 	end,
-	init = function()
-		if vim.fn.executable("npx") == 1 then
-			vim.g.mkdp_filetypes = { "markdown" }
-		end
-	end,
 }
