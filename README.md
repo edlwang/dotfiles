@@ -20,7 +20,7 @@ of the repository.
 ## Quickstart
 
 ```bash
-git clone https://www.github.com/edlwang/dotfiles.git "$HOME/dotfiles/"
+git clone https://github.com/edlwang/dotfiles.git "$HOME/dotfiles/"
 bash "$HOME/dotfiles/init.sh"
 source ~/.bashrc   # or open a new shell
 ```
