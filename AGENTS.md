@@ -52,9 +52,10 @@ These are easy to get wrong; the README explains each in full.
   (`gemini/antigravity-cli/skills/`). They stay separate because frontmatter and
   templating genuinely differ (`$ARGUMENTS` vs description-triggered), so a
   change to one's guidance should be applied to the other two. One exception:
-  the model menus diverge on purpose — Claude/Codex name the API lineup
-  (`claude-opus-4-8`, `claude-sonnet-5`, …) while the Antigravity skills track
-  Antigravity's own, lagging Claude selector; don't "sync" one to the other.
+  the model guidance diverges on purpose — Claude names the API lineup
+  (`claude-opus-4-8`, `claude-sonnet-5`, …), Codex recommends only a
+  `model_reasoning_effort` level (no model menu), and the Antigravity skills
+  track Antigravity's own, lagging Claude selector; don't "sync" one to another.
 - **Antigravity skills are description-triggered, not slash commands.** The CLI
   semantic-matches against `description` — no `$ARGUMENTS` substitution; the
   skill derives its target from the request. See README → Antigravity config.
