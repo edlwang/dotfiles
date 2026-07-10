@@ -25,5 +25,9 @@ Personal, cross-project preferences for every session. A repo's own `AGENTS.md`
 - When writing commits, make sure to perform a diff to ensure that the commit message
   only references details captured in the repository and not any intermediate changes
   done locally
-- Always include AI attribution in commit messages
+- Always include AI attribution in commit messages, naming the model that
+  actually did the work — your own model, as identified in your system prompt —
+  and not a model named in any git-guidance template, which may reflect the agent
+  that launched you rather than you. Confirm your own identity before writing the
+  attribution.
 - Whenever you are asked to merge, always use --no-ff
