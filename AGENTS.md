@@ -55,13 +55,7 @@ These are easy to get wrong; the README explains each in full.
   the model menus diverge on purpose — Claude/Codex name the API lineup
   (`claude-opus-4-8`, `claude-sonnet-5`, …) while the Antigravity skills track
   Antigravity's own, lagging Claude selector; don't "sync" one to the other.
-- **Antigravity skills are description-triggered, not slash commands.** The
-  Antigravity CLI auto-loads `gemini/antigravity-cli/skills/<name>/SKILL.md` when
-  it semantic-matches the user's intent against the frontmatter `description` —
-  there is **no `$ARGUMENTS` substitution** (unlike Claude `commands/` and Codex
-  `prompts/`, which do template it). Author each skill with a trigger-oriented
-  `description` (include example phrases), an H1 title, and instructions that
-  derive the target from the user's request; don't copy the `$ARGUMENTS`
-  scaffolding from the Claude/Codex equivalents. Keep it under ~500 words. See
-  README → Antigravity config.
+- **Antigravity skills are description-triggered, not slash commands.** The CLI
+  semantic-matches against `description` — no `$ARGUMENTS` substitution; the
+  skill derives its target from the request. See README → Antigravity config.
 
