@@ -1,0 +1,3 @@
+# Shared directives included by each per-agent .conf (claude, codex, agy).
+rdir dotfiles
+setenv PATH=${HOME}/.local/bin:${PATH}
