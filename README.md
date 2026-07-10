@@ -59,7 +59,7 @@ auto-reloads its config on save.
 │   ├── shell-integration.sh            OSC 7 cwd reporting, vendored from upstream
 │   └── tmux-testing.md                 Manual test checklist for the command layer
 ├── shared/             Config shared across every agent → symlinked per-agent
-│   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md + each agent's AGENTS.md
+│   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
 │   └── settings.json
 ├── codex/              Codex config → symlinked into ~/.codex
@@ -405,11 +405,13 @@ verify-before-claiming, the Git rules) that Claude Code, Codex, and Antigravity
 all read. They were byte-identical across the three tools, so rather than keep
 three copies in sync, `init.sh` symlinks this one file into each agent's home
 under the name that tool expects — `~/.claude/CLAUDE.md` for Claude,
-`~/.codex/AGENTS.md` for Codex, `~/.gemini/antigravity-cli/AGENTS.md` for
-Antigravity. **Edit working preferences here** and every agent picks up the
-change on its next run; the per-tool dirs below hold only genuinely tool-specific
-config (settings, prompts/skills, rules). `shared/` sits outside the per-tool
-`.gitignore` deny blocks, so files there are tracked normally.
+`~/.codex/AGENTS.md` for Codex, `~/.gemini/GEMINI.md` for Antigravity (note:
+Antigravity reads global rules from `~/.gemini/GEMINI.md`, *not* from
+`AGENTS.md` inside its app-data dir). **Edit working preferences here** and every
+agent picks up the change on its next run; the per-tool dirs below hold only
+genuinely tool-specific config (settings, prompts/skills, rules). `shared/` sits
+outside the per-tool `.gitignore` deny blocks, so files there are tracked
+normally.
 
 ### Claude Code config (`claude/`)
 
@@ -470,14 +472,15 @@ top-level entry into `~/.gemini/antigravity-cli/` and leaves runtime state
 config kinds — here `settings.json` and `skills/` (the same two-step gotcha
 applies to adding a new kind: whitelist it with `!gemini/antigravity-cli/<name>`,
 plus `!gemini/antigravity-cli/<name>/**` for a directory, or git silently ignores
-it). Its `AGENTS.md` is the shared
-[`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in,
-not an Antigravity-specific file.
+it). Global instructions live at `~/.gemini/GEMINI.md` (a symlink to
+[`shared/agent-instructions.md`](#shared-agent-instructions-shared)), which is
+where Antigravity reads global rules — not the `AGENTS.md` that `setup_agent`
+also creates inside `~/.gemini/antigravity-cli/` (that copy is vestigial).
 
 `settings.json` carries the theme, default model, and a `permissions.deny` rule
 for `command(git push)` — the direct analog to Claude's `permissions.deny`, since
 Antigravity uses the same allow/deny command-permission model (deny wins over
-allow). `AGENTS.md` keeps the "never push" instruction as a back-stop.
+allow). `GEMINI.md` keeps the "never push" instruction as a back-stop.
 
 **Authoring skills.** Antigravity skills work differently from Claude's
 `commands/` and Codex's `prompts/`: the CLI auto-loads a `skills/<name>/SKILL.md`

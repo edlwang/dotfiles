@@ -218,6 +218,12 @@ setup_dotfiles
 setup_agent "Claude" claude                  "$HOME/.claude"                 CLAUDE.md
 setup_agent "Codex"  codex                   "$HOME/.codex"                  AGENTS.md
 setup_agent "Agy"    gemini/antigravity-cli  "$HOME/.gemini/antigravity-cli" AGENTS.md
+# Antigravity reads global rules from ~/.gemini/GEMINI.md, not from AGENTS.md
+# inside its app-data dir. The setup_agent call above still symlinks config files
+# (settings.json, skills/) into ~/.gemini/antigravity-cli/ and creates an AGENTS.md
+# there too (vestigial but harmless); this separate symlink is what Antigravity
+# actually loads.
+setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.gemini/GEMINI.md"
 setup_os
 ensure_tools_on_path
 setup_pyenv
