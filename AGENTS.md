@@ -40,7 +40,19 @@ These are easy to get wrong; the README explains each in full.
   there — don't re-fork per-tool copies. Keep it byte-identical-friendly: no
   tool-specific wording, since all three consume the same text. See README →
   Shared agent instructions.
-- **Adding a new *kind* of Claude config** under `claude/` is a two-step: drop
-  the file, then whitelist it in `.gitignore` (`!claude/<name>`, plus
-  `!claude/<name>/**` for a directory) or git silently ignores it. See README →
-  Claude Code config.
+- **Adding a new *kind* of Claude or Antigravity config** under `claude/` or
+  `gemini/antigravity-cli/` is a two-step: drop the file, then whitelist it in
+  `.gitignore` (`!claude/<name>` / `!gemini/antigravity-cli/<name>`, plus
+  `!claude/<name>/**` / `!gemini/antigravity-cli/<name>/**` for a directory) or git
+  silently ignores it. See README → Claude Code config and README → Antigravity
+  config.
+- **Antigravity skills are description-triggered, not slash commands.** The
+  Antigravity CLI auto-loads `gemini/antigravity-cli/skills/<name>/SKILL.md` when
+  it semantic-matches the user's intent against the frontmatter `description` —
+  there is **no `$ARGUMENTS` substitution** (unlike Claude `commands/` and Codex
+  `prompts/`, which do template it). Author each skill with a trigger-oriented
+  `description` (include example phrases), an H1 title, and instructions that
+  derive the target from the user's request; don't copy the `$ARGUMENTS`
+  scaffolding from the Claude/Codex equivalents. Keep it under ~500 words. See
+  README → Antigravity config.
+

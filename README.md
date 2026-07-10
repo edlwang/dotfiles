@@ -14,7 +14,7 @@ of the repository.
 - [Repository layout](#repository-layout)
 - [Common tasks](#common-tasks)
 - [Dependencies](#dependencies)
-- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [Antigravity](#antigravity-config-geminiantigravity-cli) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
 - [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
@@ -66,6 +66,9 @@ auto-reloads its config on save.
 │   ├── config.toml
 │   ├── prompts/            Custom /prompts:<name> files → ~/.codex/prompts/
 │   └── rules/              Starlark command rules (forbids git push) → ~/.codex/rules/
+├── gemini/antigravity-cli/  Antigravity config → symlinked into ~/.gemini/antigravity-cli/
+│   ├── settings.json
+│   └── skills/         Antigravity skills (like scope and scopenext)
 ├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
 │   ├── default.conf        }
 │   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
@@ -453,6 +456,48 @@ config once `init.sh` runs inside it, yet keeps its own login — see the jail's
 note below on why we deliberately don't expose the real `~/.codex`. On a host
 with an existing `~/.codex/config.toml`, the first setup backs it up and replaces
 it with the tracked configuration.
+
+### Antigravity config (`gemini/antigravity-cli/`)
+
+Default Antigravity CLI config lives in `gemini/antigravity-cli/` (e.g. `settings.json`). `init.sh`'s
+`setup_agy` step symlinks **each top-level entry** of `gemini/antigravity-cli/` into
+`~/.gemini/antigravity-cli/` — it globs the directory, so nothing to edit on the symlink side —
+and leaves the rest of `~/.gemini/antigravity-cli/` (credentials, history, sessions, jobs — all
+runtime state) untouched. Because everything in `gemini/antigravity-cli/` is symlinked, **only
+put config files here**, never runtime state or secrets.
+
+`settings.json` carries the theme, default model, and a `permissions.deny` rule
+for `command(git push)` — the direct analog to Claude's `permissions.deny`, since
+Antigravity uses the same allow/deny command-permission model (deny wins over
+allow). `AGENTS.md` keeps the "never push" instruction as a back-stop.
+
+**Git tracking uses a whitelist, decoupled from that glob.** `.gitignore` ignores
+all of `gemini/antigravity-cli/` and re-includes only `settings.json` and `skills/` —
+a fail-safe so credentials or runtime state can never be committed even if copied in.
+(Its `AGENTS.md` is the shared
+[`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in.) The catch:
+`setup_agy` will symlink *anything* you drop in `gemini/antigravity-cli/`, but git **silently ignores**
+a new config type until you whitelist it in `.gitignore` (e.g. `!gemini/antigravity-cli/<name>`, plus
+`!gemini/antigravity-cli/<name>/**` for a directory).
+
+`setup_agy` symlinks each **top-level** entry, so a subdirectory like
+`gemini/antigravity-cli/skills/` becomes a whole-directory symlink (`~/.gemini/antigravity-cli/skills` →
+repo). If a real `~/.gemini/antigravity-cli/skills/` already exists, `setup_symlink`
+moves it to the backup dir and replaces it with the link — so only track directories
+whose contents you fully own in the repo, not ones Antigravity or plugins also write
+to at runtime.
+
+**Authoring skills.** Antigravity skills work differently from Claude's
+`commands/` and Codex's `prompts/`: the CLI auto-loads a `skills/<name>/SKILL.md`
+when it semantic-matches the user's intent against the frontmatter `description`,
+so there is **no `$ARGUMENTS` substitution** to receive a typed target. Write the
+`description` to be trigger-oriented (include example phrases — it's the router's
+only signal), give the body an H1 title, and have the instructions derive the
+target from the user's request rather than a placeholder. Keep each under ~500
+words. The bundled `scope`/`scopenext` skills mirror the Claude/Codex commands of
+the same name, adapted to this model. Note the CLI reads global skills from
+`~/.gemini/antigravity-cli/skills/`, which is distinct from the Antigravity IDE's
+`~/.gemini/config/skills/` — if a future release unifies them, revisit this path.
 
 ### Sandboxing Claude Code with jai (`jai/`)
 

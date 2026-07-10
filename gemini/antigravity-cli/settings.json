@@ -1,0 +1,9 @@
+{
+  "theme": "auto",
+  "model": "Gemini 3.5 Flash (High)",
+  "permissions": {
+    "deny": [
+      "command(git push)"
+    ]
+  }
+}

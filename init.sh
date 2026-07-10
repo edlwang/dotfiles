@@ -135,6 +135,22 @@ setup_codex() {
     echo "Successfully set up Codex config"
 }
 
+setup_agy() {
+    echo "Setting up Agy config"
+
+    # Symlink each tracked entry from gemini/antigravity-cli/ into ~/.gemini/antigravity-cli/. Only config lives
+    # in gemini/antigravity-cli/; ~/.gemini/antigravity-cli runtime state (credentials, history) is left alone.
+    for src in "$DOTFILES_PATH/gemini/antigravity-cli/"*; do
+        [ -e "$src" ] || continue
+        setup_symlink "$src" "$HOME/.gemini/antigravity-cli/$(basename "$src")"
+    done
+
+    # Shared global instructions (see setup_claude); Antigravity reads AGENTS.md.
+    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.gemini/antigravity-cli/AGENTS.md"
+
+    echo "Successfully set up Agy config"
+}
+
 # Warn to stderr with a uniform prefix. Used by setup_pyenv, setup_completions,
 # and the sourced init_<os>.sh hooks (defined before they're sourced below).
 warn() {
@@ -228,6 +244,7 @@ fi
 setup_dotfiles
 setup_claude
 setup_codex
+setup_agy
 setup_os
 ensure_tools_on_path
 setup_pyenv
