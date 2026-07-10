@@ -20,7 +20,7 @@ vim.keymap.set("n", "n", "nzzzv", { desc = "[n] next search match (centered)" })
 vim.keymap.set("n", "N", "Nzzzv", { desc = "[N] previous search match (centered)" })
 
 -- paste over keeping register same
-vim.keymap.set("x", "<leader>p", '"_dp', { desc = "[P]aste over selection (keep register)" })
+vim.keymap.set("x", "<leader>p", '"_dP', { desc = "[P]aste over selection (keep register)" })
 
 -- copy to clipboard
 vim.keymap.set("n", "<leader>y", '"+y', { desc = "[Y]ank to system clipboard" })
