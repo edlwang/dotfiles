@@ -5,7 +5,7 @@
 alias sbrc="source ~/.bashrc"
 alias ebrc='$EDITOR ~/.bashrc'
 alias edfs='$EDITOR ~/dotfiles'
-# Sandbox launchers. Options before `--` go to jai (e.g. `jaicl -x dotfiles` to
+# Sandbox launchers. Options before `--` go to jai (e.g. `jaicl -d dotfiles` to
 # make the read-only dotfiles repo writable in-jail); args after `--` go to the
 # agent (e.g. `jaicl -- --resume`). Bare `jaicl`/`jaico`/`jaiag` just launch.
 _jai() {

@@ -525,9 +525,10 @@ jailed agent launched from any directory rewrite `bashrc`, `init.sh`,
 `claude/settings.json`, or `shared/agent-instructions.md` — files that run
 *unjailed* in your next session, a persistence/escape path that defeats strict
 mode. When you actually want to edit the dotfiles from inside a jail, launch it
-writable with `jaicl -x dotfiles` (reverses the `rdir` grant so the read-write
-cwd grant applies — run it from `~/dotfiles`) or `jaicl -d dotfiles` (grants
-write regardless of cwd). Config that Claude itself persists (model, effort)
+writable with `jaicl -d dotfiles` (grants read-write regardless of cwd). Note
+both `-d` and `-x` take a mandatory directory argument — omitting it (bare
+`jaicl -d`/`jaicl -x`) is a usage error, not a shortcut. Config that Claude
+itself persists (model, effort)
 lands in the jail-home `~/.claude.json`, not the repo, so routine use is
 unaffected.
 
