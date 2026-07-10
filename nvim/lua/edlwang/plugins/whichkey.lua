@@ -6,6 +6,7 @@ return {
 		-- Group labels for the leader prefixes used in editor/keybinds.lua
 		spec = {
 			{ "<leader>c", group = "code" },
+			{ "<leader>e", group = "explore" },
 			{ "<leader>f", group = "find" },
 			{ "<leader>g", group = "git" },
 			{ "<leader>h", group = "harpoon" },

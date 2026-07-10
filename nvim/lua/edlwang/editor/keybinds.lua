@@ -72,6 +72,8 @@ vim.keymap.set("n", "J", "mzJ`z", { desc = "[J]oin line below (keep cursor)" })
 --     in plugins/cmp.lua
 --   * toggleterm's open mapping (<leader>tt) is a plugin option, set in
 --     plugins/toggleterm.lua
+--   * which-key's <leader>? buffer-local-keymaps popup is a plugin option, set
+--     in plugins/whichkey.lua
 
 -- telescope
 vim.keymap.set("n", "<leader>ff", function()
