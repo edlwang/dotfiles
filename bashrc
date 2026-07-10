@@ -64,7 +64,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+have_cmd lesspipe && eval "$(SHELL=/bin/sh lesspipe)"
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -144,6 +144,7 @@ fi
 path_prepend "$HOME/.pixi/bin"
 path_prepend "$HOME/.local/bin"   # last call = highest priority
 
-if [ -f "$HOME/.bashrc_local" ]; then 
-    source "$HOME/.bashrc_local"
+# Source local bashrc override (mirrors ~/.gitconfig.local pattern)
+if [ -f "$HOME/.bashrc_local" ]; then
+    . "$HOME/.bashrc_local"
 fi
