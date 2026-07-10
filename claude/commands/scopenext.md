@@ -28,7 +28,7 @@ A concrete, file-level list of the edits you'd make — paths, functions/section
 ### 3. Recommended model & effort
 Recommend one model and one effort level for the *implementation* step, with a one-line justification tied to the task's complexity and risk.
 
-- **Models:** `claude-opus-4-8` (hardest reasoning/architecture), `claude-sonnet-4-6` (balanced default), `claude-haiku-4-5` (fast, mechanical/low-risk edits).
+- **Models:** `claude-opus-4-8` (hardest reasoning/architecture), `claude-sonnet-5` (balanced default), `claude-haiku-4-5` (fast, mechanical/low-risk edits).
 - **Effort:** `low` (mechanical), `medium` (standard), `high` (multi-file or subtle logic), `xhigh`/`max` (deep reasoning, high blast radius).
 
-Give the recommendation as a copy-pasteable line, e.g. `→ claude-sonnet-4-6 @ high`.
+Give the recommendation as a copy-pasteable line, e.g. `→ claude-sonnet-5 @ high`.
