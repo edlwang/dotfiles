@@ -102,53 +102,26 @@ setup_dotfiles() {
     echo "Successfully set up dotfiles"
 }
 
-setup_claude() {
-    echo "Setting up Claude config"
+# Set up one agent's home: <label> <repo-subdir> <dest-dir> <instructions-name>.
+# Symlinks each tracked entry from <repo-subdir>/ into <dest-dir>/. Only config
+# lives in <repo-subdir>/; the rest of <dest-dir> (credentials, history,
+# sessions, jobs -- all runtime state) is left alone. Then links the shared
+# global instructions in under the name that agent expects.
+setup_agent() {
+    local label="$1" repo_subdir="$2" dest_dir="$3" instructions_name="$4"
 
-    # Symlink each tracked entry from claude/ into ~/.claude/. Only config lives
-    # in claude/; ~/.claude runtime state (credentials, history) is left alone.
-    for src in "$DOTFILES_PATH/claude/"*; do
+    echo "Setting up $label config"
+
+    for src in "$DOTFILES_PATH/$repo_subdir/"*; do
         [ -e "$src" ] || continue
-        setup_symlink "$src" "$HOME/.claude/$(basename "$src")"
+        setup_symlink "$src" "$dest_dir/$(basename "$src")"
     done
 
     # Global instructions are shared across all agents (one source of truth in
-    # shared/); Claude Code reads them from ~/.claude/CLAUDE.md.
-    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.claude/CLAUDE.md"
+    # shared/); each agent reads them under the name it expects.
+    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$dest_dir/$instructions_name"
 
-    echo "Successfully set up Claude config"
-}
-
-setup_codex() {
-    echo "Setting up Codex config"
-
-    # Symlink each tracked entry from codex/ into ~/.codex/. Only config lives
-    # in codex/; ~/.codex runtime state (auth.json, history, sessions) is left alone.
-    for src in "$DOTFILES_PATH/codex/"*; do
-        [ -e "$src" ] || continue
-        setup_symlink "$src" "$HOME/.codex/$(basename "$src")"
-    done
-
-    # Shared global instructions (see setup_claude); Codex reads them from AGENTS.md.
-    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.codex/AGENTS.md"
-
-    echo "Successfully set up Codex config"
-}
-
-setup_agy() {
-    echo "Setting up Agy config"
-
-    # Symlink each tracked entry from gemini/antigravity-cli/ into ~/.gemini/antigravity-cli/. Only config lives
-    # in gemini/antigravity-cli/; ~/.gemini/antigravity-cli runtime state (credentials, history) is left alone.
-    for src in "$DOTFILES_PATH/gemini/antigravity-cli/"*; do
-        [ -e "$src" ] || continue
-        setup_symlink "$src" "$HOME/.gemini/antigravity-cli/$(basename "$src")"
-    done
-
-    # Shared global instructions (see setup_claude); Antigravity reads AGENTS.md.
-    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.gemini/antigravity-cli/AGENTS.md"
-
-    echo "Successfully set up Agy config"
+    echo "Successfully set up $label config"
 }
 
 # Warn to stderr with a uniform prefix. Used by setup_pyenv, setup_completions,
@@ -242,9 +215,9 @@ if [ -f "$os_init" ]; then
 fi
 
 setup_dotfiles
-setup_claude
-setup_codex
-setup_agy
+setup_agent "Claude" claude                  "$HOME/.claude"                 CLAUDE.md
+setup_agent "Codex"  codex                   "$HOME/.codex"                  AGENTS.md
+setup_agent "Agy"    gemini/antigravity-cli  "$HOME/.gemini/antigravity-cli" AGENTS.md
 setup_os
 ensure_tools_on_path
 setup_pyenv

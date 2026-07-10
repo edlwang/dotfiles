@@ -414,7 +414,7 @@ config (settings, prompts/skills, rules). `shared/` sits outside the per-tool
 ### Claude Code config (`claude/`)
 
 Default Claude Code config lives in `claude/` (e.g. `settings.json`). `init.sh`'s
-`setup_claude` step symlinks **each top-level entry** of `claude/` into
+`setup_agent` step symlinks **each top-level entry** of `claude/` into
 `~/.claude/` — it globs the directory, so nothing to edit on the symlink side —
 and leaves the rest of `~/.claude/` (credentials, history, sessions, jobs — all
 runtime state) untouched. Because everything in `claude/` is symlinked, **only
@@ -424,13 +424,13 @@ put config files here**, never runtime state or secrets.
 all of `claude/` and re-includes only `settings.json`, `commands/`, and
 `agents/` — a fail-safe so credentials or runtime state can never be
 committed even if copied in. (Global instructions are shared, not tracked here —
-see [Shared agent instructions](#shared-agent-instructions-shared).) The catch: `setup_claude` will symlink *anything*
+see [Shared agent instructions](#shared-agent-instructions-shared).) The catch: `setup_agent` will symlink *anything*
 you drop in `claude/`, but git **silently ignores** a new config type (e.g.
 `output-styles/`, a `statusline.sh`) until you add a matching `!claude/<name>`
 line — plus `!claude/<name>/**` for a directory — to `.gitignore`. So adding a
 new *kind* of config is a two-step: drop the file, then whitelist it.
 
-`setup_claude` symlinks each **top-level** entry, so a subdirectory like
+`setup_agent` symlinks each **top-level** entry, so a subdirectory like
 `claude/commands/` becomes a whole-directory symlink (`~/.claude/commands` →
 repo). If a real `~/.claude/commands/` already exists, `setup_symlink` moves it
 to the backup dir and replaces it with the link — so only track directories whose
@@ -440,7 +440,7 @@ runtime.
 ### Codex config (`codex/`)
 
 Codex config lives in `codex/` and works exactly like [`claude/`](#claude-code-config-claude):
-`init.sh`'s `setup_codex` step globs each top-level entry into `~/.codex/` and
+`init.sh`'s `setup_agent` step globs each top-level entry into `~/.codex/` and
 leaves runtime state (`auth.json`, history, sessions) untouched, and `.gitignore`
 whitelists only config kinds. The tracked pieces mirror the Claude ones:
 `config.toml` (settings — `model_reasoning_effort` stands in for `effortLevel`;
