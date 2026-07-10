@@ -536,7 +536,10 @@ Antigravity, with a persistent home at `~/.jai/agy.home`. `agy.conf` mirrors the
 others, pointing `rdir dotfiles` and adding `~/.local/bin` to `PATH` (where the CLI
 installer puts `agy`).
 
-The git push deny rules in `claude/settings.json`, `codex/rules/no-push.rules`, and `gemini/antigravity-cli/settings.json` are convenience guardrails (they don't catch aliases, `sh -c "git push"`, or flag-separated variants); the actual security boundary is the jail itself — no push credentials in the jail home.
+The git push deny rules in `claude/settings.json`, `codex/rules/no-push.rules`,
+and `gemini/antigravity-cli/settings.json` are convenience guardrails (they don't
+catch aliases, `sh -c "git push"`, or flag-separated variants); the actual
+security boundary is the jail itself — no push credentials in the jail home.
 
 **One-time setup.** Because a strict jail starts with an empty home, the agent
 has to be installed *into* the jail, and the dotfiles symlinked *inside* it as
