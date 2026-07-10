@@ -42,7 +42,7 @@ winpath() {
 path_prepend() {
     [ -d "$1" ] || return 0
     local p=":${PATH}:"
-    p="${p//:$1:/:}"        # drop any existing occurrence
+    p="${p//":$1:"/:}"        # drop any existing occurrence
     p="${p#:}"; p="${p%:}"  # trim the framing colons
     export PATH="$1${p:+:$p}"
 }
