@@ -60,8 +60,12 @@ cd() {
 # long-lived stack stays readable: `vdirs` shows the top 10, `vdirs N` the top
 # N, `vdirs all` the whole stack.
 vdirs() {
-    case "$1" in
-        all|-a) dirs -v ;;
-        *)      dirs -v | head -n "${1:-10}" ;;
-    esac
+    if [[ "$1" == "all" || "$1" == "-a" ]]; then
+        dirs -v
+    elif [[ -z "$1" || "$1" =~ ^[0-9]+$ ]]; then
+        dirs -v | head -n "${1:-10}"
+    else
+        echo "vdirs: invalid argument '$1'" >&2
+        return 1
+    fi
 }
