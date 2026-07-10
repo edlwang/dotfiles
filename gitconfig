@@ -17,7 +17,7 @@
     swc = switch -c
     cane = commit --amend --no-edit
     unstage = reset HEAD --
-    undo = reset --soft HEAD
+    undo = reset --soft HEAD~1
 [init]
 	defaultBranch = main
 [url "git@github.com:"]
