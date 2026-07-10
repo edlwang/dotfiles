@@ -5,8 +5,9 @@
 .DS_Store
 
 # Claude Code: deny-by-default — track only config, never secrets/runtime state
+# (Global instructions are shared, not per-tool: see shared/agent-instructions.md,
+# which init.sh links to ~/.claude/CLAUDE.md and each agent's AGENTS.md.)
 claude/*
-!claude/CLAUDE.md
 !claude/settings.json
 !claude/commands/
 !claude/commands/**

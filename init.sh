@@ -112,6 +112,10 @@ setup_claude() {
         setup_symlink "$src" "$HOME/.claude/$(basename "$src")"
     done
 
+    # Global instructions are shared across all agents (one source of truth in
+    # shared/); Claude Code reads them from ~/.claude/CLAUDE.md.
+    setup_symlink "$DOTFILES_PATH/shared/agent-instructions.md" "$HOME/.claude/CLAUDE.md"
+
     echo "Successfully set up Claude config"
 }
 

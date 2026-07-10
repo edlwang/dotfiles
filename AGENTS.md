@@ -33,6 +33,13 @@ These are easy to get wrong; the README explains each in full.
 - **WezTerm split names are intentionally inverted** vs. Terminator/tmux — don't
   "correct" them. Add leader symbol binds through the `leader_symbol()` helper,
   not as plain `config.keys` entries. See README → WezTerm.
+- **Global agent instructions are one shared file.** The working preferences
+  every agent reads live in `shared/agent-instructions.md`; `init.sh` symlinks it
+  into each home as the name that tool expects (`~/.claude/CLAUDE.md`,
+  `~/.codex/AGENTS.md`, `~/.gemini/antigravity-cli/AGENTS.md`). Edit preferences
+  there — don't re-fork per-tool copies. Keep it byte-identical-friendly: no
+  tool-specific wording, since all three consume the same text. See README →
+  Shared agent instructions.
 - **Adding a new *kind* of Claude config** under `claude/` is a two-step: drop
   the file, then whitelist it in `.gitignore` (`!claude/<name>`, plus
   `!claude/<name>/**` for a directory) or git silently ignores it. See README →

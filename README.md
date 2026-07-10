@@ -14,7 +14,7 @@ of the repository.
 - [Repository layout](#repository-layout)
 - [Common tasks](#common-tasks)
 - [Dependencies](#dependencies)
-- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Claude Code](#claude-code-config-claude) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [jai sandbox](#sandboxing-claude-code-with-jai-jai)
 - [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
@@ -58,9 +58,10 @@ auto-reloads its config on save.
 │   ├── wezterm.lua                     The entire WezTerm config
 │   ├── shell-integration.sh            OSC 7 cwd reporting, vendored from upstream
 │   └── tmux-testing.md                 Manual test checklist for the command layer
+├── shared/             Config shared across every agent → symlinked per-agent
+│   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md + each agent's AGENTS.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
-│   ├── settings.json
-│   └── CLAUDE.md
+│   └── settings.json
 ├── jai/                jai(1) sandbox config → symlinked into ~/.jai/
 │   ├── default.conf        }
 │   ├── claude.conf         }  Per-jail .conf (defaults) + .jail (mode) → ~/.jai/
@@ -385,6 +386,20 @@ layer.
 - `gitconfig` rewrites `https://github.com/` push URLs to SSH
   (`git@github.com:`).
 
+### Shared agent instructions (`shared/`)
+
+The global instructions are **one source of truth** for every agent:
+`shared/agent-instructions.md` holds the working preferences (correctness-first,
+verify-before-claiming, the Git rules) that Claude Code, Codex, and Antigravity
+all read. They were byte-identical across the three tools, so rather than keep
+three copies in sync, `init.sh` symlinks this one file into each agent's home
+under the name that tool expects — `~/.claude/CLAUDE.md` for Claude,
+`~/.codex/AGENTS.md` for Codex, `~/.gemini/antigravity-cli/AGENTS.md` for
+Antigravity. **Edit working preferences here** and every agent picks up the
+change on its next run; the per-tool dirs below hold only genuinely tool-specific
+config (settings, prompts/skills, rules). `shared/` sits outside the per-tool
+`.gitignore` deny blocks, so files there are tracked normally.
+
 ### Claude Code config (`claude/`)
 
 Default Claude Code config lives in `claude/` (e.g. `settings.json`). `init.sh`'s
@@ -395,9 +410,10 @@ runtime state) untouched. Because everything in `claude/` is symlinked, **only
 put config files here**, never runtime state or secrets.
 
 **Git tracking uses a whitelist, decoupled from that glob.** `.gitignore` ignores
-all of `claude/` and re-includes only `CLAUDE.md`, `settings.json`, `commands/`,
-and `agents/` — a fail-safe so credentials or runtime state can never be
-committed even if copied in. The catch: `setup_claude` will symlink *anything*
+all of `claude/` and re-includes only `settings.json`, `commands/`, and
+`agents/` — a fail-safe so credentials or runtime state can never be
+committed even if copied in. (Global instructions are shared, not tracked here —
+see [Shared agent instructions](#shared-agent-instructions-shared).) The catch: `setup_claude` will symlink *anything*
 you drop in `claude/`, but git **silently ignores** a new config type (e.g.
 `output-styles/`, a `statusline.sh`) until you add a matching `!claude/<name>`
 line — plus `!claude/<name>/**` for a directory — to `.gitignore`. So adding a

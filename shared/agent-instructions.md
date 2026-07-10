@@ -1,7 +1,7 @@
-# Global instructions for Claude Code
+# Global instructions for AI coding agents
 
-Personal, cross-project preferences for every session. A repo's own
-`CLAUDE.md` / `AGENTS.md` is more specific and overrides this file.
+Personal, cross-project preferences for every session. A repo's own `AGENTS.md`
+(or `CLAUDE.md`) is more specific and overrides this file.
 
 ## Working preferences
 
@@ -10,7 +10,7 @@ Personal, cross-project preferences for every session. A repo's own
 - Don't claim a change works unless you verified it (ran it, or tests pass). If you
   didn't verify, say so plainly.
 - After implementing a fix, change, or feature, always check to make sure docs are
-  up to date. 
+  up to date.
 - If you don't have access to modify or run certain tools, give me the command to
   run it.
 
