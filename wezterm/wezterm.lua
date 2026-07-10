@@ -33,6 +33,9 @@ config.launch_menu = launch_menu
 -- pane *below* — that's WezTerm's SplitVertical; "split vertically"
 -- (Ctrl+Shift+E) puts it to the *right* — that's WezTerm's SplitHorizontal.
 config.keys = {
+	-- Only custom/overriding binds; WezTerm defaults (copy, paste, tabs, font
+	-- size, search, fullscreen) are assumed.
+
 	-- Splits
 	{ key = "o", mods = "CTRL|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 	{ key = "e", mods = "CTRL|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
@@ -56,13 +59,6 @@ config.keys = {
 	{ key = "q", mods = "CTRL|SHIFT", action = act.QuitApplication },
 	{ key = "x", mods = "CTRL|SHIFT", action = act.TogglePaneZoomState },
 
-	-- Tabs
-	{ key = "t", mods = "CTRL|SHIFT", action = act.SpawnTab("CurrentPaneDomain") },
-	{ key = "PageUp", mods = "CTRL", action = act.ActivateTabRelative(-1) },
-	{ key = "PageDown", mods = "CTRL", action = act.ActivateTabRelative(1) },
-	{ key = "PageUp", mods = "CTRL|SHIFT", action = act.MoveTabRelative(-1) },
-	{ key = "PageDown", mods = "CTRL|SHIFT", action = act.MoveTabRelative(1) },
-
 	-- Rotate panes. Terminator uses Super+R, but Windows reserves the Win key at
 	-- the OS level, so use Ctrl+Shift+R instead (this overrides WezTerm's manual
 	-- reload, which is redundant: automatically_reload_config reloads on save).
@@ -70,25 +66,11 @@ config.keys = {
 	{ key = "r", mods = "CTRL|SHIFT", action = act.RotatePanes("Clockwise") },
 	{ key = "r", mods = "CTRL|SHIFT|ALT", action = act.RotatePanes("CounterClockwise") },
 
-	-- Copy / paste
-	{ key = "c", mods = "CTRL|SHIFT", action = act.CopyTo("Clipboard") },
-	{ key = "v", mods = "CTRL|SHIFT", action = act.PasteFrom("Clipboard") },
-
-	-- Search scrollback
-	{ key = "f", mods = "CTRL|SHIFT", action = act.Search("CurrentSelectionOrEmptyString") },
-
-	-- Font size
-	{ key = "=", mods = "CTRL", action = act.IncreaseFontSize },
 	-- `+` is Shift+`=`; bind it by produced character (mapped:) and both with and
-	-- without SHIFT, for the same reason leader_symbol() does with its symbols —
-	-- a plain `key = "+"` matches by physical position and silently fails.
+	-- without SHIFT — a plain `key = "+"` matches by physical position and silently
+	-- fails. WezTerm's default Ctrl+= handles the base increase.
 	{ key = "mapped:+", mods = "CTRL", action = act.IncreaseFontSize },
 	{ key = "mapped:+", mods = "CTRL|SHIFT", action = act.IncreaseFontSize },
-	{ key = "-", mods = "CTRL", action = act.DecreaseFontSize },
-	{ key = "0", mods = "CTRL", action = act.ResetFontSize },
-
-	-- Fullscreen
-	{ key = "F11", mods = "NONE", action = act.ToggleFullScreen },
 }
 
 -- ── WezTerm-as-tmux ─────────────────────────────────────────────────────────
