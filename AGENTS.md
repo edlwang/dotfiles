@@ -46,6 +46,15 @@ These are easy to get wrong; the README explains each in full.
   `!claude/<name>/**` / `!gemini/antigravity-cli/<name>/**` for a directory) or git
   silently ignores it. See README → Claude Code config and README → Antigravity
   config.
+- **The `scope`/`scopenext`/`dispatch` prompts are per-tool copies — mirror
+  edits across all three.** Each lives as a Claude command (`claude/commands/`),
+  a Codex prompt (`codex/prompts/`), and an Antigravity skill
+  (`gemini/antigravity-cli/skills/`). They stay separate because frontmatter and
+  templating genuinely differ (`$ARGUMENTS` vs description-triggered), so a
+  change to one's guidance should be applied to the other two. One exception:
+  the model menus diverge on purpose — Claude/Codex name the API lineup
+  (`claude-opus-4-8`, `claude-sonnet-5`, …) while the Antigravity skills track
+  Antigravity's own, lagging Claude selector; don't "sync" one to the other.
 - **Antigravity skills are description-triggered, not slash commands.** The
   Antigravity CLI auto-loads `gemini/antigravity-cli/skills/<name>/SKILL.md` when
   it semantic-matches the user's intent against the frontmatter `description` —
