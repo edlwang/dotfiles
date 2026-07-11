@@ -66,7 +66,7 @@ auto-reloads its config on save.
 ├── claude/             Claude Code config → symlinked into ~/.claude
 │   └── settings.json
 ├── codex/              Codex config → symlinked into ~/.codex
-│   ├── config.toml
+│   ├── dotfiles.config.toml  Tracked defaults selected as the `dotfiles` profile
 │   ├── prompts/            Custom /prompts:<name> files → ~/.codex/prompts/
 │   └── rules/              Starlark command rules (forbids git push) → ~/.codex/rules/
 ├── gemini/antigravity-cli/  Antigravity config → symlinked into ~/.gemini/antigravity-cli/
@@ -479,11 +479,13 @@ runtime.
 
 Codex config lives in `codex/` and works exactly like [`claude/`](#claude-code-config-claude):
 `init.sh`'s `setup_agent` step globs each top-level entry into `~/.codex/` and
-leaves runtime state (`auth.json`, history, sessions) untouched, and `.gitignore`
-whitelists only config kinds. The tracked pieces mirror the Claude ones:
-`config.toml` (settings — `model` selects the exact model and
-`model_reasoning_effort` stands in for `effortLevel`; Codex has no `config.toml`
-command-deny setting, so the "never push" rule lives in `AGENTS.md`) and
+leaves runtime state (`config.toml`, `auth.json`, history, sessions) untouched,
+and `.gitignore` whitelists only config kinds. Codex writes project trust and
+other local state into its base `~/.codex/config.toml`, so that file is a regular,
+untracked per-home file rather than a repo symlink. Durable settings live in the
+tracked `dotfiles.config.toml` named profile (`model` selects the exact model and
+`model_reasoning_effort` stands in for `effortLevel`; Codex has no config-file
+command-deny setting, so the "never push" rule lives in `AGENTS.md`) alongside
 `prompts/` (custom `/prompts:<name>` commands, the `commands/` analog). The
 `scope` and `scopenext` prompts recommend both an available exact model ID and a
 reasoning effort; unlike the Claude and Antigravity copies, they intentionally
@@ -491,17 +493,28 @@ avoid a hard-coded model menu that can become stale or differ by account. Its
 `AGENTS.md` is the shared
 [`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in,
 not a Codex-specific file. Since Codex has no `config.toml` command-deny, `git push` is blocked in
-layers: `config.toml`'s read-only sandbox stops in-sandbox pushes (network write),
+layers: the profile's read-only sandbox stops in-sandbox pushes (network write),
 `rules/no-push.rules` marks `git push` `forbidden` if Codex escalates it outside
 the sandbox (the analog to Claude's `permissions.deny`), and `AGENTS.md` keeps the
 "never push" instruction. These are agent-scoped; add a git hook if you also want
 your own pushes blocked locally.
 
-Because config is shared but auth is per-home, the `codex` jail sees this same
-config once `init.sh` runs inside it, yet keeps its own login — see the jail's
-note below on why we deliberately don't expose the real `~/.codex`. On a host
-with an existing `~/.codex/config.toml`, the first setup backs it up and replaces
-it with the tracked configuration.
+Codex has no config-file selector for a default named profile. The `codex` shell
+function and jailed `jaico` launcher in `bash_aliases` therefore add `--profile
+dotfiles` unless the invocation already contains `-p`, `--profile`, or
+`--profile=<name>`. They also leave administrative commands such as `doctor`,
+`login`, and `update` unmodified because the CLI rejects profiles for commands
+that do not start a supported runtime. Use `command codex` to bypass the host
+wrapper, or pass an explicit profile to either launcher. Programs that invoke
+the executable without loading `bash_aliases` must also pass `--profile
+dotfiles` themselves when starting a runtime.
+
+Because profile config is shared but base state and auth are per-home, the
+`codex` jail sees the same tracked defaults once `init.sh` runs inside it while
+keeping its own writable `~/.codex/config.toml` and login. See the jail's note
+below on why we deliberately don't expose the real `~/.codex`. During migration,
+`init.sh` removes only the old `~/.codex/config.toml` symlink that targeted the
+retired tracked file; Codex can then create a regular local base config.
 
 ### Antigravity config (`gemini/antigravity-cli/`)
 
@@ -634,10 +647,11 @@ for each agent you want to sandbox:
    cd ~/dotfiles && jai -C agy ./init.sh
    ```
 
-Then launch an agent in the sandbox with `jai claude` (alias `jaicl`),
-`jai codex` (alias `jaico`), or `jai agy` (alias `jaiag`) from any project
-directory; `jai -C <name>` opens a shell with the same permissions, handy for
-inspecting exactly what the agent can see.
+Then launch an agent in the sandbox with `jai claude` (alias `jaicl`), `jaico`
+(equivalent to `jai codex --profile dotfiles`), or `jai agy` (alias `jaiag`) from
+any project directory. Unlike `jaico`, a direct `jai codex` invocation does not
+inject the profile. `jai -C <name>` opens a shell with the same permissions,
+handy for inspecting exactly what the agent can see.
 
 ## Optional per-machine git identity
 

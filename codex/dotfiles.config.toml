@@ -1,5 +1,5 @@
-# Codex CLI config -> symlinked to ~/.codex/config.toml by init.sh.
-# Mirrors the intent of claude/settings.json where Codex has an equivalent.
+# Codex CLI profile -> symlinked to ~/.codex/dotfiles.config.toml by init.sh.
+# Codex loads it by default through the shell launchers in bash_aliases.
 
 # Default model settings, high verbosity to have it explain more
 model = "gpt-5.6-sol"
@@ -17,6 +17,10 @@ commit_attribution = "Codex <noreply@openai.com>"
 [features]
 memories = true
 codex_git_commit = true
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "reasoning", "project-name", "git-branch", "run-state", "permissions", "approval-mode", "context-remaining", "context-used", "five-hour-limit", "weekly-limit", "task-progress"]
+status_line_use_colors = true
 
 [tui.keymap.composer]
 queue = []

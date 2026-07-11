@@ -16,7 +16,7 @@ claude/*
 
 # Codex: deny-by-default — track only config, never secrets/runtime state
 codex/*
-!codex/config.toml
+!codex/dotfiles.config.toml
 !codex/prompts/
 !codex/prompts/**
 !codex/rules/

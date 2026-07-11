@@ -124,6 +124,21 @@ setup_agent() {
     echo "Successfully set up $label config"
 }
 
+# Older installs linked the tracked codex/config.toml directly over Codex's
+# writable user config. After the tracked defaults moved to a named profile,
+# remove only that legacy link (including a dangling one after a git update) so
+# Codex can create a regular local config.toml for trust and other runtime state.
+migrate_codex_base_config() {
+    local config="$HOME/.codex/config.toml"
+    local legacy="$DOTFILES_PATH/codex/config.toml"
+
+    if [ -L "$config" ] && \
+       [ "$(winpath "$(readlink "$config")")" = "$(winpath "$legacy")" ]; then
+        echo "Removing legacy Codex config symlink $config"
+        rm -f "$config"
+    fi
+}
+
 # Warn to stderr with a uniform prefix. Used by setup_pyenv, setup_completions,
 # and the sourced init_<os>.sh hooks (defined before they're sourced below).
 warn() {
@@ -216,6 +231,7 @@ fi
 
 setup_dotfiles
 setup_agent "Claude" claude                  "$HOME/.claude"                 CLAUDE.md
+migrate_codex_base_config
 setup_agent "Codex"  codex                   "$HOME/.codex"                  AGENTS.md
 setup_agent "Agy"    gemini/antigravity-cli  "$HOME/.gemini/antigravity-cli" AGENTS.md
 # Antigravity reads global rules from ~/.gemini/GEMINI.md, not from AGENTS.md
