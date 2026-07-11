@@ -19,6 +19,7 @@ memories = true
 codex_git_commit = true
 
 [tui]
+notifications = false
 status_line = ["model-with-reasoning", "current-dir", "reasoning", "project-name", "git-branch", "run-state", "permissions", "approval-mode", "context-remaining", "context-used", "five-hour-limit", "weekly-limit", "task-progress"]
 status_line_use_colors = true
 
