@@ -11,6 +11,10 @@ Personal, cross-project preferences for every session. A repo's own `AGENTS.md`
   didn't verify, say so plainly.
 - After implementing a fix, change, or feature, always check to make sure docs are
   up to date.
+- When working through a multi-step plan, record progress on disk — either as a
+  checklist in the plan file itself or in a separate progress document alongside it —
+  and mark each step done as you complete it. Persist it as you go, not just at the
+  end, so another agent (or a later session) can pick up exactly where you left off.
 - If you don't have access to modify or run certain tools, give me the command to
   run it.
 
