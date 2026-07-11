@@ -9,11 +9,11 @@ rules and gotchas an agent needs on top of that documentation.
 
 ## How to work here
 
-- **No build or test step.** The "product" is configuration; `init.sh` symlinks
+- **Run the smoke checks.** The "product" is configuration; `init.sh` symlinks
   tracked files into `$HOME`, so editing a file here changes the live config
-  immediately. Verify a change by sourcing it (`source ~/.bashrc`) or relaunching
-  the affected app (Neovim, WezTerm) — there is no suite to run. Don't claim
-  something works unless you've checked it that way.
+  immediately. Run `./check.sh` after changes, then verify affected live behavior
+  by sourcing it (`source ~/.bashrc`) or relaunching Neovim or WezTerm when
+  appropriate. Don't claim something works unless you've checked it.
 - **Keep `bashrc`/`bash_aliases` cross-platform.** OS-specific shell code belongs
   in the per-platform `bashrc_<os>` files, and OS-specific *setup* logic in
   `init_<os>.sh` (see README → Shell).

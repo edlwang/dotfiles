@@ -4,9 +4,9 @@
 
 Personal dotfiles for bash, Neovim, and WezTerm. `init.sh` symlinks the tracked
 files in this repo into `$HOME`, so **editing a file here immediately changes the
-live config** (the symlinks point back into this repo). There is no build or test
-step — the "product" is the configuration itself. The Neovim config is the bulk
-of the repository.
+live config** (the symlinks point back into this repo). There is no build step —
+the "product" is the configuration itself — but `check.sh` provides repeatable
+repository smoke checks. The Neovim config is the bulk of the repository.
 
 ## Contents
 
@@ -43,6 +43,7 @@ auto-reloads its config on save.
 .
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
+├── check.sh            Read-only repository configuration smoke checks
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -96,6 +97,7 @@ Quick map of "I want to change X" → where to do it. See
 | --- | --- |
 | Apply shell edits | `source ~/.bashrc` (alias `sbrc`) |
 | Diagnose the environment | `./doctor.sh` (read-only; checks dependencies and exact symlink targets) |
+| Check repository configuration | `./check.sh` (read-only; syntax, prompt parity, whitelists, and isolated app loading) |
 | Add a shell alias | edit `bash_aliases`, then `sbrc` |
 | Add OS-specific shell behavior | edit `bashrc_<os>` (keep `bashrc`/`bash_aliases` cross-platform) |
 | Add a Neovim plugin | drop `nvim/lua/edlwang/plugins/<name>.lua` returning a lazy.nvim spec |
@@ -107,6 +109,14 @@ Quick map of "I want to change X" → where to do it. See
 | Update plugins | `:Lazy` in Neovim, then commit `nvim/lazy-lock.json` |
 | Update treesitter parsers | `:TSUpdate` in Neovim |
 | Per-machine git name/email | create `~/.gitconfig.local` (see below) |
+
+`doctor.sh` diagnoses the installed environment: commands, versions, optional
+features, and symlinks. `check.sh` instead validates the repository files being
+edited. Its application checks use temporary home and XDG directories; the
+Neovim check loads the core editor modules under `--clean` so lazy.nvim cannot
+bootstrap or update plugins. The checks do not update plugins or tracked files.
+An unavailable optional parser or application is reported as `SKIP`, never as a
+pass; failures still make the command exit nonzero.
 
 ## Dependencies
 
