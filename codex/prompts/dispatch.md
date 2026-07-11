@@ -15,16 +15,17 @@ this skill just splits it into *do* and *check* so the work gets a second set of
 eyes. It also picks up cleanly after `/scope` or `/scopenext` when one has already
 sized the work.
 
-### 1. Settle the task and the effort
+### 1. Settle the task, model, and effort
 - Take the task from **Task** above. Blank = infer it from the latest `/scope` or
   `/scopenext` summary in the conversation, or failing that the project's backlog
   (an open plan doc, `TODO.md`, `git status`/recent commits).
-- Pick the effort: if a `/scope`/`/scopenext` summary already recommended one, use
-  it; otherwise choose one to fit the task's complexity and risk.
+- Pick the model and effort: if a `/scope`/`/scopenext` summary already recommended
+  them, use both; otherwise choose an available model and
+  `model_reasoning_effort` to fit the task's complexity, risk, latency, and cost.
 
-State in one line what you're doing and at what effort; raise
-`model_reasoning_effort` to match, then proceed unless the task is genuinely
-ambiguous.
+State in one line what you're doing, with which model, and at what effort; select
+that model and set `model_reasoning_effort` to match, then proceed unless the task
+is genuinely ambiguous.
 
 ### 2. Do the work
 Delegate to a subagent if your harness can spawn one; otherwise carry the work out

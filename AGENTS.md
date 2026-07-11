@@ -53,10 +53,10 @@ These are easy to get wrong; the README explains each in full.
   templating genuinely differ (`$ARGUMENTS` vs description-triggered), so a
   change to one's guidance should be applied to the other two. One exception:
   the model guidance diverges on purpose — Claude names the API lineup
-  (`claude-opus-4-8`, `claude-sonnet-5`, …), Codex recommends only a
-  `model_reasoning_effort` level (no model menu), and the Antigravity skills
-  track Antigravity's own, lagging Claude selector; don't "sync" one to another.
+  (`claude-opus-4-8`, `claude-sonnet-5`, …), Codex recommends an available exact
+  model ID plus `model_reasoning_effort` without a hard-coded menu, and the
+  Antigravity skills track Antigravity's own, lagging Claude selector; don't
+  "sync" one to another.
 - **Antigravity skills are description-triggered, not slash commands.** The CLI
   semantic-matches against `description` — no `$ARGUMENTS` substitution; the
   skill derives its target from the request. See README → Antigravity config.
-

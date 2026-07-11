@@ -1,5 +1,5 @@
 ---
-description: Summarize the next task and proposed changes, then recommend a reasoning effort for the implementation
+description: Summarize the next task and proposed changes, then recommend a model and reasoning effort for the implementation
 argument-hint: [task description | plan file | files/dirs | (blank = infer next task)]
 ---
 
@@ -24,10 +24,15 @@ One or two sentences: what is being done and why.
 ### 2. Proposed changes
 A concrete, file-level list of the edits you'd make — paths, functions/sections touched, and the nature of each change. Note anything you'd verify or any open questions that block a clean implementation.
 
-### 3. Recommended reasoning effort
-Recommend one `model_reasoning_effort` level for the *implementation* step, with a one-line justification tied to the task's complexity and risk.
+### 3. Recommended model & reasoning effort
+Recommend one exact Codex model ID and one `model_reasoning_effort` level for the *implementation* step, with a one-line justification tied to the task's complexity and risk.
 
+- **Model:** choose from the models available to the current Codex installation/account. Prefer the configured default when it fits; recommend a different available model only when the task's difficulty, latency, or cost tradeoff warrants it. Do not invent a model ID or rely on a hard-coded model menu that may become stale.
 - **Effort:** `minimal`/`low` (mechanical), `medium` (standard), `high` (multi-file or subtle logic), `xhigh` (deep reasoning, high blast radius).
-- Optionally note if the work warrants a heavier model than the configured default.
 
-Give the recommendation as a copy-pasteable line, e.g. `→ model_reasoning_effort: high`.
+Give the recommendation as copy-pasteable config lines, e.g.:
+
+```toml
+model = "<exact-model-id>"
+model_reasoning_effort = "high"
+```

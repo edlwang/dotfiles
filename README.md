@@ -454,10 +454,14 @@ Codex config lives in `codex/` and works exactly like [`claude/`](#claude-code-c
 `init.sh`'s `setup_agent` step globs each top-level entry into `~/.codex/` and
 leaves runtime state (`auth.json`, history, sessions) untouched, and `.gitignore`
 whitelists only config kinds. The tracked pieces mirror the Claude ones:
-`config.toml` (settings — `model_reasoning_effort` stands in for `effortLevel`;
-Codex has no `config.toml` command-deny setting, so the "never push" rule lives
-in `AGENTS.md`) and `prompts/` (custom `/prompts:<name>` commands, the
-`commands/` analog). Its `AGENTS.md` is the shared
+`config.toml` (settings — `model` selects the exact model and
+`model_reasoning_effort` stands in for `effortLevel`; Codex has no `config.toml`
+command-deny setting, so the "never push" rule lives in `AGENTS.md`) and
+`prompts/` (custom `/prompts:<name>` commands, the `commands/` analog). The
+`scope` and `scopenext` prompts recommend both an available exact model ID and a
+reasoning effort; unlike the Claude and Antigravity copies, they intentionally
+avoid a hard-coded model menu that can become stale or differ by account. Its
+`AGENTS.md` is the shared
 [`shared/agent-instructions.md`](#shared-agent-instructions-shared) symlinked in,
 not a Codex-specific file. Since Codex has no `config.toml` command-deny, `git push` is blocked in
 layers: `config.toml`'s read-only sandbox stops in-sandbox pushes (network write),
