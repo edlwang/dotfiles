@@ -124,6 +124,26 @@ else
     esac
 fi
 
+# Flush this shell's history to $HISTFILE after every prompt, not just at exit
+# (histappend above still covers a clean exit) -- so history survives a crash
+# and is available to freshly-opened panes. Deliberately `history -a` (append
+# only), not `history -n` (merge in other panes' history): re-reading other
+# panes' commands into a *live* pane's history would interleave unrelated
+# sessions into `history`/up-arrow recall, which is worse than losing a few
+# commands to a crash. Requires bash-preexec's precmd_functions array (set up
+# by the WezTerm integration block above); silently a no-op if that's not
+# available (e.g. no WezTerm on this machine and starship falls back to plain
+# PROMPT_COMMAND). Guarded against re-registering on a re-source.
+_persist_history() { history -a; }
+if declare -p precmd_functions &>/dev/null; then
+    already_registered=0
+    for precmd_fn in "${precmd_functions[@]}"; do
+        [ "$precmd_fn" = "_persist_history" ] && already_registered=1 && break
+    done
+    [ "$already_registered" -eq 0 ] && precmd_functions+=(_persist_history)
+    unset already_registered precmd_fn
+fi
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.

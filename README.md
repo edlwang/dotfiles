@@ -398,6 +398,18 @@ layer.
 - **The prompt comes from starship** (which you install). `bashrc` runs `starship
   init bash` when it's present, else falls back to a simple, portable `PS1`, so the
   shell stays usable without it.
+- **History is flushed to `$HISTFILE` on every prompt, not just at shell exit.**
+  Right after the starship block, `bashrc` registers a `_persist_history`
+  function (`history -a`) in `precmd_functions` — the same bash-preexec array
+  the WezTerm integration and starship share — so history is durable across a
+  crash and picked up by newly-opened panes on their next prompt. This is
+  deliberately `history -a` only, **not** `history -n`: already-open panes are
+  *not* cross-synced, since merging other panes' commands into a live pane's
+  history would interleave unrelated sessions into `history`/up-arrow recall.
+  Registration is idempotent (guarded against duplicate entries on a
+  re-source) and silently skipped if `precmd_functions` isn't available (e.g.
+  no WezTerm integration on this machine and starship falls back to plain
+  `PROMPT_COMMAND`).
 - **`PATH` additions go through `path_prepend`** (from `shellenv`): it moves an
   existing dir to the front, dropping any earlier occurrence. `bashrc` calls it
   last — after the tool-env scripts (`~/.local/bin/env`, `~/.cargo/env`) — so the
