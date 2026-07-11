@@ -17,3 +17,6 @@ commit_attribution = "Codex <noreply@openai.com>"
 [features]
 memories = true
 codex_git_commit = true
+
+[tui.keymap.composer]
+queue = []
