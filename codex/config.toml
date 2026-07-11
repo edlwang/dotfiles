@@ -1,14 +1,13 @@
 # Codex CLI config -> symlinked to ~/.codex/config.toml by init.sh.
 # Mirrors the intent of claude/settings.json where Codex has an equivalent.
 
-# Strong reasoning by default (claude effortLevel: high / alwaysThinkingEnabled).
+# Medium reasoning by default.
 # It applies when the selected model supports configurable reasoning effort.
-model_reasoning_effort = "high"
-model_verbosity = "low"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
 
-# Codex uses OpenAI model ids (not `opus`), so no model is pinned here; Codex
-# uses its configured default. Uncomment and set to pin one, e.g.:
-# model = "gpt-5.5"
+# Codex uses OpenAI model ids (not `opus`).
+model = "gpt-5.6-sol"
 
 # Codex has no config.toml command-deny setting. Push blocking is layered:
 # sandbox_mode below blocks in-sandbox pushes (network write), rules/no-push.rules

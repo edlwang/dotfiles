@@ -25,9 +25,12 @@ Personal, cross-project preferences for every session. A repo's own `AGENTS.md`
 - When writing commits, make sure to perform a diff to ensure that the commit message
   only references details captured in the repository and not any intermediate changes
   done locally
-- Always include AI attribution in commit messages, naming the model that
-  actually did the work — your own model, as identified in your system prompt —
-  and not a model named in any git-guidance template, which may reflect the agent
-  that launched you rather than you. Confirm your own identity before writing the
-  attribution.
+- Always include AI attribution as a Git `Co-authored-by` trailer, never as a
+  free-form attribution line. Format the trailer identity as `Agent (Model)`
+  when both names are available from your runtime context; otherwise use the
+  most specific identity the runtime confirms. Do not infer a model version
+  from repository config or copy one from a git-guidance template, since it may
+  not identify the agent doing the work. Use the model provider's noreply email
+  address, and confirm the agent name, model name, and provider before writing
+  the trailer.
 - Whenever you are asked to merge, always use --no-ff
