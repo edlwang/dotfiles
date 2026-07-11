@@ -3,7 +3,7 @@
 
 # Default model settings, high verbosity to have it explain more
 model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 model_verbosity = "high"
 
 # If you want Codex to ask before edits/writes, the supported setup is a
@@ -27,4 +27,4 @@ status_line_use_colors = true
 queue = []
 
 [tui.model_availability_nux]
-"gpt-5.6-sol" = 3
+"gpt-5.6-sol" = 4
