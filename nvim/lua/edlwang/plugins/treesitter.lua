@@ -22,6 +22,7 @@ return {
 			"bash",
 			"vim",
 			"vimdoc",
+			"toml",
 		})
 
 		-- Enable treesitter highlighting + indentation per buffer. We deliberately
