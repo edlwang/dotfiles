@@ -17,7 +17,12 @@ cleanup() {
 		rm -rf -- "$tmp_dir"
 	fi
 }
-trap cleanup EXIT HUP INT TERM
+# Clean up exactly once, from the EXIT trap. On a signal, exit (rather than
+# running cleanup directly and letting the script resume with tmp_dir deleted)
+# so the EXIT handler fires and removes the directory a single time.
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' HUP TERM
 
 pass() {
 	printf 'PASS  %s\n' "$1"
@@ -118,7 +123,7 @@ check_toml() {
 }
 
 check_prompt_parity() {
-	local name failed=0
+	local name file failed=0
 	local names
 	names=$({
 		tracked_files 'claude/commands/*.md' | sed -n 's#^claude/commands/\([^/]*\)\.md$#\1#p'
@@ -151,9 +156,12 @@ check_whitelists() {
 					failed=1
 				fi
 			else
-				line="!$root/$kind/"
-				if ! grep -Fqx -- "$line" .gitignore; then
-					printf '      missing .gitignore whitelist: %s\n' "$line"
+				# Git re-includes a directory with or without a trailing slash;
+				# accept either so a valid, working .gitignore never fails here.
+				if ! grep -Fqx -- "!$root/$kind/" .gitignore &&
+					! grep -Fqx -- "!$root/$kind" .gitignore; then
+					printf '      missing .gitignore whitelist: !%s/ (or !%s)\n' \
+						"$root/$kind" "$root/$kind"
 					failed=1
 				fi
 				if ! grep -Fqx -- "!$root/$kind/**" .gitignore; then
