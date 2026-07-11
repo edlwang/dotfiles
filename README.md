@@ -433,8 +433,11 @@ under the name that tool expects — `~/.claude/CLAUDE.md` for Claude,
 `~/.codex/AGENTS.md` for Codex, `~/.gemini/GEMINI.md` for Antigravity (note:
 Antigravity reads global rules from `~/.gemini/GEMINI.md`, *not* from
 `AGENTS.md` inside its app-data dir). **Edit working preferences here** and every
-agent picks up the change on its next run; the per-tool dirs below hold only
-genuinely tool-specific config (settings, prompts/skills, rules). `shared/` sits
+agent picks up the change on its next run. Because the one file is read verbatim
+by all three tools, keep its wording tool-agnostic — no
+"Claude"/"Codex"/"Antigravity"-specific phrasing. The per-tool dirs below hold
+only genuinely tool-specific config (settings, prompts/skills, rules). `shared/`
+sits
 outside the per-tool `.gitignore` deny blocks, so files there are tracked
 normally.
 
