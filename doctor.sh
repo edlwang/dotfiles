@@ -98,7 +98,6 @@ optional_command "TeX" "install a TeX distribution for VimTeX/texlab" latex pdfl
 optional_command "PDF viewer" "install a viewer for VimTeX PDF preview" zathura skim okular evince
 optional_command "jai" "install it to use the configured agent sandbox" jai
 optional_command "Rust toolchain" "install rustup/cargo to work on Rust projects" rustup cargo rustc
-optional_command "Stylua" "Mason normally installs it for Lua formatting" stylua
 
 nvim_config_dir() {
     if [ -n "${XDG_CONFIG_HOME:-}" ]; then
@@ -115,14 +114,37 @@ wezterm_config_dir() {
     else printf '%s/wezterm' "$HOME/.config"; fi
 }
 
+# Neovim's data dir (vim.fn.stdpath("data")), where Mason installs tools.
+nvim_data_dir() {
+    if [ -n "${XDG_DATA_HOME:-}" ]; then
+        printf '%s/nvim' "$(printf '%s' "$XDG_DATA_HOME" | tr '\134' '/')"
+    elif [ "$SYSTEM_OS" = Windows ]; then
+        local base="${LOCALAPPDATA:-$HOME/AppData/Local}"
+        printf '%s/nvim-data' "$(printf '%s' "$base" | tr '\134' '/')"
+    else printf '%s/nvim' "$HOME/.local/share"; fi
+}
+
+# Mason installs Stylua into Neovim's data dir, which is usually not on PATH, so
+# check the Mason bin dir as well before warning.
+mason_bin="$(nvim_data_dir)/mason/bin"
+if stylua_cmd="$(first_cmd stylua "$mason_bin/stylua" "$mason_bin/stylua.exe")"; then
+    pass "Stylua (optional): $(command_version "$stylua_cmd")"
+else
+    warn "Stylua is optional; Mason installs it for Lua formatting on first Neovim launch"
+fi
+
+# Absolutize a path. A relative path is resolved against $2 (default: cwd); when
+# $1 is a symlink target, pass the link's own directory so relative targets --
+# which are relative to the link, not the caller's cwd -- resolve correctly.
 normalized_path() {
-    local path dir base
+    local path dir base anchor
     path="$(winpath "$1")"
+    anchor="${2:-$PWD}"
     case "$path" in
         /*|[A-Za-z]:/*) ;;
         *)
             dir="$(dirname "$path")"; base="$(basename "$path")"
-            path="$(cd "$dir" 2>/dev/null && printf '%s/%s' "$PWD" "$base")" || : ;;
+            path="$(cd "$anchor" 2>/dev/null && cd "$dir" 2>/dev/null && printf '%s/%s' "$PWD" "$base")" || : ;;
     esac
     printf '%s' "$path"
 }
@@ -135,7 +157,7 @@ check_link() {
         else fail "$destination is missing. Run: bash \"$DOTFILES_PATH/init.sh\""; fi
         return
     fi
-    actual="$(normalized_path "$(readlink "$destination")")"
+    actual="$(normalized_path "$(readlink "$destination")" "$(dirname "$destination")")"
     if [ "$actual" != "$expected" ]; then
         fail "$destination points to $actual, expected $expected. Re-run init.sh after resolving the existing link."
     elif [ ! -e "$destination" ]; then
