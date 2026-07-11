@@ -98,6 +98,7 @@ optional_command "TeX" "install a TeX distribution for VimTeX/texlab" latex pdfl
 optional_command "PDF viewer" "install a viewer for VimTeX PDF preview" zathura skim okular evince
 optional_command "jai" "install it to use the configured agent sandbox" jai
 optional_command "Rust toolchain" "install rustup/cargo to work on Rust projects" rustup cargo rustc
+optional_command "fzf" "install it for bashrc's Ctrl-R/Ctrl-T fuzzy search" fzf
 
 nvim_config_dir() {
     if [ -n "${XDG_CONFIG_HOME:-}" ]; then

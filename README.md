@@ -132,15 +132,16 @@ present, creates the `~/py313` venv — but it installs **no** tools. Run
 required commands, the Neovim 0.11 minimum, the platform clipboard provider,
 and every exact symlink installed by `init.sh`. It makes no changes and exits
 nonzero only for missing hard requirements or broken required links. Optional
-features such as bash-completion, TeX/PDF support, jai, Rust, Stylua, the py313
-activation script, and eligible generated completions are reported as warnings.
+features such as bash-completion, TeX/PDF support, jai, Rust, fzf, Stylua, the
+py313 activation script, and eligible generated completions are reported as
+warnings.
 
 Provision per OS:
 
 - **macOS** — Homebrew:
 
   ```bash
-  brew install starship uv node ripgrep fd tree-sitter neovim
+  brew install starship uv node ripgrep fd fzf tree-sitter neovim
   brew install --cask wezterm font-fira-mono-nerd-font
   ```
 
@@ -148,7 +149,7 @@ Provision per OS:
 
   ```bash
   winget install Starship.Starship astral-sh.uv OpenJS.NodeJS \
-      BurntSushi.ripgrep.MSVC sharkdp.fd Neovim.Neovim wez.wezterm
+      BurntSushi.ripgrep.MSVC sharkdp.fd junegunn.fzf Neovim.Neovim wez.wezterm
   scoop install tree-sitter                          # no winget package
   scoop bucket add nerd-fonts && scoop install FiraMono-NF
   ```
@@ -157,7 +158,7 @@ Provision per OS:
   running `init.sh`** — otherwise it won't see `uv` and will skip the `~/py313`
   venv (re-run it in a fresh shell to create it).
 
-- **Linux** — your package manager for `nodejs npm`, `ripgrep`, `fd`,
+- **Linux** — your package manager for `nodejs npm`, `ripgrep`, `fd`, `fzf`,
   `tree-sitter`, and a clipboard tool (`xclip`/`xsel` on X11, `wl-clipboard` on
   Wayland — see the rationale below); **starship** and **uv** via their official
   `curl | sh` installers (starship.rs / astral.sh); **Neovim ≥ 0.11** from a
@@ -168,7 +169,7 @@ Provision per OS:
   - **Aurora** — Homebrew (the standard path on this atomic Fedora image):
 
     ```bash
-    brew install starship uv npm ripgrep fd tree-sitter-cli neovim wl-clipboard
+    brew install starship uv npm ripgrep fd fzf tree-sitter-cli neovim wl-clipboard
     brew tap wezterm/wezterm-linuxbrew
     brew install --HEAD wezterm/wezterm-linuxbrew/wezterm
     brew install --cask font-fira-mono-nerd-font
@@ -203,6 +204,9 @@ What each is for:
 - **fd** — speeds up Telescope `find_files`; the package is `fd-find` on both
   Debian/Ubuntu (binary `fdfind`, which Telescope handles) and Fedora (binary
   `fd`).
+- **fzf** *(optional)* — powers `bashrc`'s Ctrl-R/Ctrl-T fuzzy shell search (see
+  [Shell](#shell-bashrc-bash_aliases)); absent, the shell falls back to plain
+  history recall with no startup errors.
 - **FiraMono Nerd Font** — Neovim's icons (neo-tree, lualine, which-key, fidget)
   and WezTerm glyphs.
 - **Neovim ≥ 0.11** — the config uses the `vim.lsp.config` API introduced in 0.11.
@@ -410,6 +414,20 @@ layer.
   re-source) and silently skipped if `precmd_functions` isn't available (e.g.
   no WezTerm integration on this machine and starship falls back to plain
   `PROMPT_COMMAND`).
+- **fzf's Bash integration is enabled only when `fzf` is installed** (an
+  optional, user-installed dependency — see [Dependencies](#dependencies)):
+  `Ctrl-R` fuzzy-searches this shell's own history (consistent with the
+  `history -a`-only design above — it is *not* the cross-pane synchronized
+  history) and `Ctrl-T` inserts a selected file path, using `fd`/`fdfind` for
+  candidates when present. `bashrc` prefers the modern `fzf --bash` (>= 0.48)
+  and falls back to sourcing the platform's `key-bindings.bash`/
+  `completion.bash` otherwise, probing common install locations (no
+  hard-coded Homebrew prefix). **Alt-C is deliberately left unbound**: fzf's
+  default Alt-C binding `cd`s with a bare `builtin cd`, which would bypass the
+  pushd-backed `cd()` wrapper below and silently break the directory stack —
+  so `bashrc` sets `FZF_ALT_C_COMMAND=""`, fzf's own documented switch for
+  skipping that binding. The whole block is a no-op, and startup stays quiet,
+  when `fzf` isn't installed.
 - **`PATH` additions go through `path_prepend`** (from `shellenv`): it moves an
   existing dir to the front, dropping any earlier occurrence. `bashrc` calls it
   last — after the tool-env scripts (`~/.local/bin/env`, `~/.cargo/env`) — so the

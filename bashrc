@@ -144,6 +144,65 @@ if declare -p precmd_functions &>/dev/null; then
     unset already_registered precmd_fn
 fi
 
+# Enable fzf's Bash integration -- fuzzy Ctrl-R history search and Ctrl-T file
+# insertion -- only when fzf is installed. fzf is an optional, user-installed
+# dependency (see README -> Dependencies), so this entire block is a no-op,
+# and startup stays quiet, when it's absent.
+if have_cmd fzf; then
+    # Prefer fd/fdfind for the candidate list fed to Ctrl-T (and to plain `fzf`
+    # invocations via FZF_DEFAULT_COMMAND): faster than fzf's default find-based
+    # walk and it honors .gitignore. Same fd/fdfind binary-name split used
+    # elsewhere for this tool (Debian/Ubuntu package it as fdfind; Fedora and
+    # Homebrew as fd) -- falls back to fzf's own built-in walker when neither is
+    # on PATH.
+    for fzf_fd_cmd in fd fdfind; do
+        if have_cmd "$fzf_fd_cmd"; then
+            export FZF_DEFAULT_COMMAND="$fzf_fd_cmd --type f --hidden --exclude .git"
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+            break
+        fi
+    done
+    unset fzf_fd_cmd
+
+    # Do NOT bind Alt-C. fzf's default Alt-C binding cd's into the selected
+    # directory with a bare `builtin cd`, which would bypass the pushd-backed
+    # cd() wrapper in bash_aliases and silently break the directory stack
+    # (vdirs/popd). Setting this to the empty string is fzf's own documented
+    # switch for skipping that binding entirely; Ctrl-R and Ctrl-T (which don't
+    # touch the cwd) are unaffected.
+    export FZF_ALT_C_COMMAND=""
+
+    # Modern fzf (>= 0.48) generates its own key-bindings/completion via a
+    # single `fzf --bash` call. Older builds (and some distro/doc packages)
+    # only ship the two shell snippets on disk, so fall back to sourcing the
+    # first copy found. This file is shared across platforms, so no
+    # hard-coded Homebrew prefix: probe the common package locations, then
+    # `brew --prefix` when brew itself is on PATH (covers macOS and
+    # Linuxbrew/Aurora). `fzf --bash` prints nothing on a version too old to
+    # support the flag, so check for output rather than trusting eval's own
+    # exit status (eval of an empty string is trivially successful).
+    fzf_bash_snippet="$(fzf --bash 2>/dev/null)"
+    if [ -n "$fzf_bash_snippet" ]; then
+        eval "$fzf_bash_snippet"
+    else
+        fzf_shell_dir=""
+        for fzf_candidate in /usr/share/fzf/shell /usr/share/fzf \
+            /usr/share/doc/fzf/examples; do
+            [ -f "$fzf_candidate/key-bindings.bash" ] && fzf_shell_dir="$fzf_candidate" && break
+        done
+        if [ -z "$fzf_shell_dir" ] && have_cmd brew; then
+            fzf_candidate="$(brew --prefix 2>/dev/null)/opt/fzf/shell"
+            [ -f "$fzf_candidate/key-bindings.bash" ] && fzf_shell_dir="$fzf_candidate"
+        fi
+        if [ -n "$fzf_shell_dir" ]; then
+            . "$fzf_shell_dir/key-bindings.bash"
+            [ -f "$fzf_shell_dir/completion.bash" ] && . "$fzf_shell_dir/completion.bash"
+        fi
+        unset fzf_shell_dir fzf_candidate
+    fi
+    unset fzf_bash_snippet
+fi
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
