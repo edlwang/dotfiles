@@ -23,6 +23,7 @@ of the repository.
 git clone https://github.com/edlwang/dotfiles.git "$HOME/dotfiles/"
 bash "$HOME/dotfiles/init.sh"
 source ~/.bashrc   # or open a new shell
+"$HOME/dotfiles/doctor.sh"
 ```
 
 `init.sh` is idempotent — safe to re-run. It backs up any pre-existing real files
@@ -41,6 +42,7 @@ auto-reloads its config on save.
 ```text
 .
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
+├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -93,6 +95,7 @@ Quick map of "I want to change X" → where to do it. See
 | Goal | Where |
 | --- | --- |
 | Apply shell edits | `source ~/.bashrc` (alias `sbrc`) |
+| Diagnose the environment | `./doctor.sh` (read-only; checks dependencies and exact symlink targets) |
 | Add a shell alias | edit `bash_aliases`, then `sbrc` |
 | Add OS-specific shell behavior | edit `bashrc_<os>` (keep `bashrc`/`bash_aliases` cross-platform) |
 | Add a Neovim plugin | drop `nvim/lua/edlwang/plugins/<name>.lua` returning a lazy.nvim spec |
@@ -113,8 +116,13 @@ as the known set, not a guarantee.
 ### Install yourself
 
 `init.sh` is **config-only**: it symlinks the configs and, if `uv` is already
-present, creates the `~/py313` venv — but it installs **no** tools. Nothing checks
-for them, so a missing one fails quietly or only when you hit the feature.
+present, creates the `~/py313` venv — but it installs **no** tools. Run
+`./doctor.sh` afterward (and whenever the environment seems incomplete) to check
+required commands, the Neovim 0.11 minimum, the platform clipboard provider,
+and every exact symlink installed by `init.sh`. It makes no changes and exits
+nonzero only for missing hard requirements or broken required links. Optional
+features such as bash-completion, TeX/PDF support, jai, Rust, Stylua, the py313
+activation script, and eligible generated completions are reported as warnings.
 
 Provision per OS:
 
