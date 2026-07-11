@@ -491,9 +491,13 @@ current dir, project name, git branch, context used/remaining, and the 5-hour an
 weekly rate limits. Codex renders those from a built-in declarative segment list;
 Claude Code has no equivalent and only runs a script, so the Codex segments Claude
 does not expose on stdin (the live `reasoning` summary, `run-state`,
-`permissions`, `approval-mode`, `task-progress`) are simply omitted. Because it is
-a script rather than a shared segment vocabulary, the two are kept in sync by hand,
-not byte-identical.
+`permissions`, `approval-mode`, `task-progress`) are simply omitted. The 5-hour
+and weekly segments go one step further than Codex: Claude's JSON includes each
+window's `resets_at`, so they append a reset countdown and clock time (e.g.
+`5h 24% ↻ 2h14m (2:58pm)`) — something Codex holds internally but does not render
+([openai/codex#24080](https://github.com/openai/codex/issues/24080)). Because it
+is a script rather than a shared segment vocabulary, the two are kept in sync by
+hand, not byte-identical.
 
 [statusline]: https://code.claude.com/docs/en/statusline
 
