@@ -64,7 +64,8 @@ auto-reloads its config on save.
 ├── shared/             Config shared across every agent → symlinked per-agent
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
-│   └── settings.json
+│   ├── settings.json
+│   └── statusline.sh   Status line script (mirrors the Codex status_line segments)
 ├── codex/              Codex config → symlinked into ~/.codex
 │   ├── dotfiles.config.toml  Tracked defaults selected as the `dotfiles` profile
 │   ├── prompts/            Custom /prompts:<name> files → ~/.codex/prompts/
@@ -464,9 +465,25 @@ all of `claude/` and re-includes only `settings.json`, `commands/`, and
 committed even if copied in. (Global instructions are shared, not tracked here —
 see [Shared agent instructions](#shared-agent-instructions-shared).) The catch: `setup_agent` will symlink *anything*
 you drop in `claude/`, but git **silently ignores** a new config type (e.g.
-`output-styles/`, a `statusline.sh`) until you add a matching `!claude/<name>`
-line — plus `!claude/<name>/**` for a directory — to `.gitignore`. So adding a
-new *kind* of config is a two-step: drop the file, then whitelist it.
+an `output-styles/` directory) until you add a matching `!claude/<name>` line —
+plus `!claude/<name>/**` for a directory — to `.gitignore`. So adding a new
+*kind* of config is a two-step: drop the file, then whitelist it. `statusline.sh`
+(below) is one such addition.
+
+**Status line.** `claude/settings.json` points `statusLine` at
+`~/.claude/statusline.sh`, a script that reads the [status-line JSON][statusline]
+on stdin and prints a colored single-line bar. It deliberately mirrors the
+segment layout of the Codex `status_line` array in
+[`codex/dotfiles.config.toml`](#codex-config-codex): model-with-reasoning,
+current dir, project name, git branch, context used/remaining, and the 5-hour and
+weekly rate limits. Codex renders those from a built-in declarative segment list;
+Claude Code has no equivalent and only runs a script, so the Codex segments Claude
+does not expose on stdin (the live `reasoning` summary, `run-state`,
+`permissions`, `approval-mode`, `task-progress`) are simply omitted. Because it is
+a script rather than a shared segment vocabulary, the two are kept in sync by hand,
+not byte-identical.
+
+[statusline]: https://code.claude.com/docs/en/statusline
 
 `setup_agent` symlinks each **top-level** entry, so a subdirectory like
 `claude/commands/` becomes a whole-directory symlink (`~/.claude/commands` →

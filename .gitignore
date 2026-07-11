@@ -9,6 +9,7 @@
 # which init.sh links to ~/.claude/CLAUDE.md and each agent's AGENTS.md.)
 claude/*
 !claude/settings.json
+!claude/statusline.sh
 !claude/commands/
 !claude/commands/**
 !claude/agents/
