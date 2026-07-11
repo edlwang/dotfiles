@@ -21,7 +21,12 @@ Personal, cross-project preferences for every session. A repo's own `AGENTS.md`
   group related changes into focused commits with clear messages.
 - Write commit messages in Conventional Commits format: `type(scope): summary`
   (`feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `build`, `ci`). Pick the type
-  by the change's intent, not the file touched; scope is optional.
+  by the change's intent, not the file touched; scope is optional. Keep the subject
+  to a concise single-line summary, then use the commit body to explain the material
+  changes, important design or safety constraints, and verification performed. A
+  body may be omitted only for a genuinely small, mechanical change where it would
+  merely repeat the subject. Wrap body text at 80 characters, except for trailers
+  and content whose meaning or usability requires an unbroken line.
 - When writing commits, make sure to perform a diff to ensure that the commit message
   only references details captured in the repository and not any intermediate changes
   done locally
