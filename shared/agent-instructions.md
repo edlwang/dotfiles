@@ -7,6 +7,10 @@ Personal, cross-project preferences for every session. A repo's own `AGENTS.md`
 
 - When writing or refactoring code, prioritize correctness, then elegance and
   readability, and performance last.
+- Match the style and conventions of the codebase you're working in — its naming,
+  formatting, structure, comment density, and idioms — over personal or default
+  preferences. Read the surrounding code first so new code blends in as if written
+  by the same author.
 - Don't claim a change works unless you verified it (ran it, or tests pass). If you
   didn't verify, say so plainly.
 - After implementing a fix, change, or feature, always check to make sure docs are
