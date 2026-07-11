@@ -256,6 +256,12 @@ namespace `lua/edlwang/`:
   Just dropping a new `plugins/<name>.lua` that returns a spec is enough to
   register it; no central list to edit.
 
+On first launch, the bootstrap clones lazy.nvim's stable branch into Neovim's
+data directory. If Git is unavailable, the network cannot reach GitHub, or the
+clone does not create its destination, startup stops with a direct bootstrap
+error that includes the target path and available Git output. Fix the Git or
+network problem and launch Neovim again to retry.
+
 Plugins and tools are managed from inside Neovim:
 
 - `:Lazy` — plugin manager UI (install/update/sync). `nvim/lazy-lock.json` is the
