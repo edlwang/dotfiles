@@ -288,6 +288,13 @@ plugin files. Two rules the existing code follows:
    callback** so the file can load before plugins and lazy-loading still triggers
    on first press.
 
+`[x`/`]x` bracket pairs give consistent next/prev navigation: `[d`/`]d`
+(diagnostics), `[c`/`]c` (git hunks, gitsigns), `[q`/`]q` (quickfix list),
+`[l`/`]l` (location list), and `[t`/`]t` (todo-comments). The quickfix and
+location-list pairs jump only (they don't open the list window) and wrap
+around at the ends via `pcall` instead of erroring. `<leader>ft` opens a
+Telescope picker over TODO comments (`:TodoTelescope`).
+
 Deliberate exceptions (documented in `keybinds.lua`'s header comment) live with
 their plugin instead:
 

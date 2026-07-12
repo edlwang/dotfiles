@@ -106,6 +106,7 @@ end, { desc = "[F]ind [H]elp tags (Telescope)" })
 vim.keymap.set("n", "<leader>fk", function()
 	require("telescope.builtin").keymaps()
 end, { desc = "[F]ind [K]eymaps (Telescope)" })
+vim.keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "[F]ind [T]odo comments (Telescope)" })
 vim.keymap.set("n", "<leader>/", function()
 	require("telescope.builtin").current_buffer_fuzzy_find()
 end, { desc = "Fuzzy find in current buffer ([/])" })
@@ -158,6 +159,39 @@ vim.keymap.set("n", "]d", function()
 	vim.diagnostic.jump({ count = 1, float = true })
 	vim.cmd("normal! zz")
 end, { desc = "Next [d]iagnostic (centered)" })
+
+-- quickfix list (jump only; wrap around instead of erroring at the ends).
+-- The fallback is pcall'd too so an empty list is a quiet no-op, not an E42.
+vim.keymap.set("n", "]q", function()
+	if not pcall(vim.cmd.cnext) then
+		pcall(vim.cmd.cfirst)
+	end
+end, { desc = "Next [q]uickfix item" })
+vim.keymap.set("n", "[q", function()
+	if not pcall(vim.cmd.cprev) then
+		pcall(vim.cmd.clast)
+	end
+end, { desc = "Previous [q]uickfix item" })
+
+-- location list (jump only; wrap around instead of erroring at the ends)
+vim.keymap.set("n", "]l", function()
+	if not pcall(vim.cmd.lnext) then
+		pcall(vim.cmd.lfirst)
+	end
+end, { desc = "Next [l]ocation-list item" })
+vim.keymap.set("n", "[l", function()
+	if not pcall(vim.cmd.lprev) then
+		pcall(vim.cmd.llast)
+	end
+end, { desc = "Previous [l]ocation-list item" })
+
+-- todo-comments (plugin loads on BufReadPost/BufNewFile in plugins/todocomments.lua)
+vim.keymap.set("n", "]t", function()
+	require("todo-comments").jump_next()
+end, { desc = "Next [t]odo comment" })
+vim.keymap.set("n", "[t", function()
+	require("todo-comments").jump_prev()
+end, { desc = "Previous [t]odo comment" })
 
 -- toggleterm: exit terminal-insert mode
 vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], { desc = "Terminal: exit insert mode ([Esc])" })
