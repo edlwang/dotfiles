@@ -10,8 +10,8 @@ config.window_close_confirmation = "NeverPrompt"
 -- WezTerm's subtle defaults (saturation 0.9, brightness 0.8) so the focused
 -- pane is obvious at a glance when several are open.
 config.inactive_pane_hsb = {
-	saturation = 0.8,
-	brightness = 0.6,
+	saturation = 0.9,
+	brightness = 0.7,
 }
 local launch_menu = {}
 
