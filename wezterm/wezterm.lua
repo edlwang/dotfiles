@@ -10,8 +10,8 @@ config.window_close_confirmation = "NeverPrompt"
 -- WezTerm's subtle defaults (saturation 0.9, brightness 0.8) so the focused
 -- pane is obvious at a glance when several are open.
 config.inactive_pane_hsb = {
-	saturation = 0.7,
-	brightness = 0.5,
+	saturation = 0.8,
+	brightness = 0.6,
 }
 local launch_menu = {}
 
@@ -28,17 +28,13 @@ end
 
 config.launch_menu = launch_menu
 
--- Terminator-style keybindings. WezTerm's split naming is the inverse of
--- Terminator's: Terminator's "split horizontally" (Ctrl+Shift+O) puts the new
--- pane *below* — that's WezTerm's SplitVertical; "split vertically"
--- (Ctrl+Shift+E) puts it to the *right* — that's WezTerm's SplitHorizontal.
 config.keys = {
 	-- Only custom/overriding binds; WezTerm defaults (copy, paste, tabs, font
 	-- size, search, fullscreen) are assumed.
 
 	-- Splits
-	{ key = "o", mods = "CTRL|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-	{ key = "e", mods = "CTRL|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	{ key = "e", mods = "CTRL|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "o", mods = "CTRL|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 
 	-- Focus panes (vim hjkl instead of Terminator's Alt+arrows)
 	{ key = "h", mods = "ALT", action = act.ActivatePaneDirection("Left") },
