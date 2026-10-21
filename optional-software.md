@@ -1,0 +1,3 @@
+- litexl (gui text editor)
+- magic-wormhole (file transfer)
+- tailscale (local networking)
