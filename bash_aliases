@@ -5,6 +5,7 @@
 alias sbrc="source ~/.bashrc"
 alias ebrc='$EDITOR ~/.bashrc'
 alias edfs='$EDITOR ~/dotfiles'
+
 # Sandbox launchers. Options before `--` go to jai (e.g. `jaicl -d dotfiles` to
 # make the read-only dotfiles repo writable in-jail); args after `--` go to the
 # agent (e.g. `jaicl -- --resume`). Bare `jaicl`/`jaico`/`jaiag` just launch.
@@ -127,3 +128,40 @@ vdirs() {
         return 1
     fi
 }
+
+# Move a directory's contents into its parent, then remove the directory.
+flatten() (
+    if [[ $# -ne 1 || ! -d "$1" || -L "$1" ]]; then
+        echo "Usage: flatten <directory>" >&2
+        return 1
+    fi
+
+    local dir parent item
+    dir=$(cd -P -- "$1" && pwd -P) || return 1
+
+    if [[ "$dir" == "/" ]]; then
+        echo "Cannot flatten the root directory." >&2
+        return 1
+    fi
+
+    parent=$(dirname -- "$dir")
+
+    # Include hidden files and handle empty directories.
+    shopt -s dotglob nullglob
+    local items=("$dir"/*)
+
+    # Refuse to overwrite existing files or directories.
+    for item in "${items[@]}"; do
+        if [[ -e "$parent/${item##*/}" || -L "$parent/${item##*/}" ]]; then
+            echo "Conflict: $parent/${item##*/} already exists." >&2
+            return 1
+        fi
+    done
+
+    # Move contents and remove the empty directory.
+    for item in "${items[@]}"; do
+        mv -- "$item" "$parent/" || return 1
+    done
+
+    rmdir -- "$dir"
+)
