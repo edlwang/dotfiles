@@ -18,6 +18,7 @@
 	cane = commit --amend --no-edit
 	unstage = reset HEAD --
 	undo = reset --soft HEAD~1
+    targz = "!f() { root=$(git rev-parse --show-toplevel) || return; name=${root##*/}; hash=$(git rev-parse --short HEAD) || return; out=\"$root/../$name-$hash.tar.gz\"; if [ -e \"$out\" ] || [ -L \"$out\" ]; then echo \"Already exists: $out\" >&2; return 1; fi; git archive --format=tar.gz --prefix=\"$name/\" --output=\"$out\" HEAD && echo \"Created: $out\"; }; f"
 [init]
 	defaultBranch = main
 [url "git@github.com:"]
