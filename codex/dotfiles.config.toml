@@ -2,7 +2,7 @@
 # Codex loads it by default through the shell launchers in bash_aliases.
 
 # Default model settings, high verbosity to have it explain more
-model = "gpt-6.1-sol"
+model = "gpt-6.2-sol"
 model_reasoning_effort = "high"
 model_verbosity = "high"
 
@@ -27,5 +27,4 @@ status_line_use_colors = true
 queue = []
 
 [tui.model_availability_nux]
-"gpt-5.6-sol" = 4
-"gpt-6.1-sol" = 4
+"gpt-6.2-sol" = 4
