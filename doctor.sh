@@ -174,6 +174,9 @@ check_link "$DOTFILES_PATH/bashrc_windows" "$HOME/.bashrc_windows"
 check_link "$DOTFILES_PATH/bash_profile" "$HOME/.bash_profile"
 check_link "$DOTFILES_PATH/nvim" "$(nvim_config_dir)"
 check_link "$DOTFILES_PATH/wezterm" "$(wezterm_config_dir)"
+if [ "$SYSTEM_OS" = Linux ]; then
+    check_link "$DOTFILES_PATH/sway/config" "${XDG_CONFIG_HOME:-$HOME/.config}/sway/config"
+fi
 check_link "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
 check_link "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
 

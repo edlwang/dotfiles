@@ -2,9 +2,9 @@
 
 > Runs on **Linux**, **macOS**, and **Windows** (via Git Bash).
 
-Personal dotfiles for bash, Neovim, and WezTerm. `init.sh` symlinks the tracked
-files in this repo into `$HOME`, so **editing a file here immediately changes the
-live config** (the symlinks point back into this repo). There is no build step —
+Personal dotfiles for bash, Neovim, WezTerm, and Sway (Linux). `init.sh` symlinks
+the tracked files in this repo into `$HOME`, so **editing a file here immediately
+changes the live config** (the symlinks point back into this repo). There is no build step —
 the "product" is the configuration itself — but `check.sh` provides repeatable
 repository smoke checks. The Neovim config is the bulk of the repository.
 
@@ -14,7 +14,7 @@ repository smoke checks. The Neovim config is the bulk of the repository.
 - [Repository layout](#repository-layout)
 - [Common tasks](#common-tasks)
 - [Dependencies](#dependencies)
-- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [Antigravity](#antigravity-config-geminiantigravity-cli) · [jai sandbox](#sandboxing-ai-agents-with-jai-jai)
+- [Architecture](#architecture) — [Neovim](#neovim-nvim) · [WezTerm](#wezterm-wezterm) · [Sway](#sway-sway) · [Shell](#shell-bashrc-bash_aliases) · [Shared agent instructions](#shared-agent-instructions-shared) · [Claude Code](#claude-code-config-claude) · [Codex](#codex-config-codex) · [Antigravity](#antigravity-config-geminiantigravity-cli) · [jai sandbox](#sandboxing-ai-agents-with-jai-jai)
 - [Optional per-machine git identity](#optional-per-machine-git-identity)
 
 ## Quickstart
@@ -44,6 +44,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── check.sh            Read-only repository configuration smoke checks
+├── init_linux.sh       Linux setup hook (symlinks the Sway config)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -61,6 +62,7 @@ auto-reloads its config on save.
 │   ├── wezterm.lua                     The entire WezTerm config
 │   ├── shell-integration.sh            OSC 7 cwd reporting, vendored from upstream
 │   └── tmux-testing.md                 Manual test checklist for the command layer
+├── sway/config         Linux Sway config → ~/.config/sway/config (or $XDG_CONFIG_HOME/sway/config)
 ├── shared/             Config shared across every agent → symlinked per-agent
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
@@ -364,6 +366,17 @@ The config-dir symlinking and the Windows-only login-shell `default_prog` are
 driven by `init.sh`/`shellenv` and documented under [Shell](#shell-bashrc-bash_aliases)
 below. `wezterm/tmux-testing.md` is a manual test checklist for the command
 layer.
+
+### Sway (`sway/`)
+
+On Linux, `init.sh` loads `init_linux.sh` to symlink `sway/config` into
+`${XDG_CONFIG_HOME:-$HOME/.config}/sway/config`. It uses the existing backup and
+idempotent symlink setup, linking only the config file so other files in the
+destination Sway directory stay in place. macOS and Windows skip this setup.
+
+`doctor.sh` checks the exact Sway config symlink on Linux. Setup remains
+config-only; install Sway separately. Apply config edits from an active Sway
+session with `Mod4+Shift+c` (the configured reload binding).
 
 ### Shell (`bashrc`, `bash_aliases`)
 
