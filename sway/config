@@ -8,13 +8,16 @@
 #
 # Logo key. Use Mod1 for Alt.
 set $mod Mod4
+
 # Home row direction keys, like vim
 set $left h
 set $down j
 set $up k
 set $right l
+
 # Your preferred terminal emulator
 set $term wezterm
+
 # Your preferred application launcher
 set $menu wmenu-run
 
@@ -94,22 +97,30 @@ output * bg ~/.config/sway/wallpaper fill
     bindsym $mod+$down focus down
     bindsym $mod+$up focus up
     bindsym $mod+$right focus right
-    # Or use $mod+[up|down|left|right]
-    bindsym $mod+Left focus left
-    bindsym $mod+Down focus down
-    bindsym $mod+Up focus up
-    bindsym $mod+Right focus right
 
     # Move the focused window with the same, but add Shift
     bindsym $mod+Shift+$left move left
     bindsym $mod+Shift+$down move down
     bindsym $mod+Shift+$up move up
     bindsym $mod+Shift+$right move right
-    # Ditto, with arrow keys
-    bindsym $mod+Shift+Left move left
-    bindsym $mod+Shift+Down move down
-    bindsym $mod+Shift+Up move up
-    bindsym $mod+Shift+Right move right
+
+    # Focus monitor
+    bindsym $mod+Ctrl+$left focus output left
+    bindsym $mod+Ctrl+$down focus output down
+    bindsym $mod+Ctrl+$up focus output up
+    bindsym $mod+Ctrl+$right focus output right
+
+    # Move window to monitor and follow focus
+    bindsym $mod+Ctrl+Shift+$left [con_id=__focused__] move container to output left, focus
+    bindsym $mod+Ctrl+Shift+$down [con_id=__focused__] move container to output down, focus
+    bindsym $mod+Ctrl+Shift+$up [con_id=__focused__] move container to output up, focus
+    bindsym $mod+Ctrl+Shift+$right [con_id=__focused__] move container to output right, focus
+
+    # Move entire workspace to monitor
+    bindsym $mod+Alt+Shift+$left move workspace to output left
+    bindsym $mod+Alt+Shift+$down move workspace to output down
+    bindsym $mod+Alt+Shift+$up move workspace to output up
+    bindsym $mod+Alt+Shift+$right move workspace to output right
 #
 # Workspaces:
 #
