@@ -1,8 +1,6 @@
-# Default config for sway
-#
-# Copy this to ~/.config/sway/config and edit it to your liking.
-#
 # Read `man 5 sway` for a complete reference.
+# packages: wezterm, wmenu-run, swayidle, swaylock, swaynag, playerctl, pactl, 
+# brightnessctl, grim, wlsunset, systemctl
 
 ### Variables
 #
@@ -255,6 +253,22 @@ input type:pointer {
     accel_profile flat
     pointer_accel 0.2
 }
+
+# System mode
+set $mode_system System: [l]ock [n]ight light [s]uspend [r]eboot [p]ower off
+
+mode "$mode_system" {
+    bindsym l exec swaylock -f, mode default
+    bindsym n exec pkill -USR1 -x wlsunset, mode default
+    bindsym s exec systemctl suspend, mode default
+    bindsym r exec systemctl reboot, mode default
+    bindsym p exec systemctl poweroff, mode default
+
+    bindsym Escape mode default
+    bindsym Return mode default
+}
+
+bindsym $mod+Escape mode "$mode_system"
 
 include ~/.config/sway/local.conf
 include /etc/sway/config.d/*
