@@ -1,5 +1,5 @@
 # Read `man 5 sway` for a complete reference.
-# packages: wezterm, wmenu-run, swayidle, swaylock, swaynag, playerctl, pactl, 
+# packages: wezterm, fuzzel, swayidle, swaylock, swaynag, playerctl, pactl, 
 # brightnessctl, grim, wlsunset, systemctl
 
 ### Variables
@@ -17,7 +17,7 @@ set $right l
 set $term wezterm
 
 # Your preferred application launcher
-set $menu wmenu-run
+set $menu fuzzel --list-executables-in-path
 
 # local variables need to be set in local.conf
 set $latitude LOCAL
@@ -165,6 +165,9 @@ output * bg ~/.config/sway/wallpaper fill
 
     # Move focus to the parent container
     bindsym $mod+a focus parent
+
+    # focus child
+    bindsym $mod+z focus child
 #
 # Scratchpad:
 #
