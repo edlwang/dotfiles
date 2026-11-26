@@ -1,0 +1,11 @@
+image=~/.config/sway/wallpaper
+scaling=fill
+indicator-idle-visible
+indicator-radius=75
+indicator-thickness=7
+inside-color=1e1e2ecc
+ring-color=89b4fa
+text-color=ffffff
+line-uses-inside
+separator-color=00000000
+font=sans-serif
