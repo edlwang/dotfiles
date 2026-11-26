@@ -19,6 +19,13 @@ set $term wezterm
 # Your preferred application launcher
 set $menu wmenu-run
 
+# local variables need to be set in local.conf
+set $latitude LOCAL
+set $longitude LOCAL
+
+# Local configs
+include ~/.config/sway/local.conf
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
@@ -270,5 +277,6 @@ mode "$mode_system" {
 
 bindsym $mod+Escape mode "$mode_system"
 
-include ~/.config/sway/local.conf
+exec wlsunset -l $latitude -L $longitude
+
 include /etc/sway/config.d/*
