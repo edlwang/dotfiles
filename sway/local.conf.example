@@ -1,0 +1,19 @@
+# Example local.conf file to be copied to ~/.config/sway/local.conf included in sway/config
+
+# wlsunset
+set $latitude LATITUDE
+set $longitude LONGITUDE
+
+# Monitor config
+# puts monitor1 to the left of monitor 2
+output "MONITORID1" {
+    mode W1xH1
+    position 0 0
+}
+
+output "MONITORID2" {
+    mode W2xH2
+    position W1 0
+}
+
+

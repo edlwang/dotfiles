@@ -44,7 +44,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── check.sh            Read-only repository configuration smoke checks
-├── init_linux.sh       Linux setup hook (symlinks the Sway config)
+├── init_linux.sh       Linux setup hook (sets up the Sway config)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -371,8 +371,10 @@ layer.
 
 On Linux, `init.sh` loads `init_linux.sh` to symlink `sway/config` into
 `${XDG_CONFIG_HOME:-$HOME/.config}/sway/config`. It uses the existing backup and
-idempotent symlink setup, linking only the config file so other files in the
-destination Sway directory stay in place. macOS and Windows skip this setup.
+idempotent symlink setup. If `local.conf` is missing from the same directory,
+setup copies `sway/local.conf.example` there. Replace the placeholders in your
+copy before loading the Sway config. Re-running setup preserves your local
+file. macOS and Windows skip this setup.
 
 `doctor.sh` checks the exact Sway config symlink on Linux. Setup remains
 config-only; install Sway separately. Apply config edits from an active Sway
