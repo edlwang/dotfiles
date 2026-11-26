@@ -177,6 +177,7 @@ check_link "$DOTFILES_PATH/wezterm" "$(wezterm_config_dir)"
 if [ "$SYSTEM_OS" = Linux ]; then
     check_link "$DOTFILES_PATH/sway/config" "${XDG_CONFIG_HOME:-$HOME/.config}/sway/config"
     check_link "$DOTFILES_PATH/swaylock/config" "${XDG_CONFIG_HOME:-$HOME/.config}/swaylock/config"
+    check_link "$DOTFILES_PATH/fuzzel/fuzzel.ini" "${XDG_CONFIG_HOME:-$HOME/.config}/fuzzel/fuzzel.ini"
 fi
 check_link "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
 check_link "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"

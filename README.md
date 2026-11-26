@@ -44,7 +44,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── check.sh            Read-only repository configuration smoke checks
-├── init_linux.sh       Linux setup hook (sets up Sway and swaylock)
+├── init_linux.sh       Linux setup hook (sets up Sway, swaylock, and Fuzzel)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -64,6 +64,7 @@ auto-reloads its config on save.
 │   └── tmux-testing.md                 Manual test checklist for the command layer
 ├── sway/config         Linux Sway config → ~/.config/sway/config (or $XDG_CONFIG_HOME/sway/config)
 ├── swaylock/config     Linux swaylock config → ~/.config/swaylock/config (or $XDG_CONFIG_HOME/swaylock/config)
+├── fuzzel/fuzzel.ini   Linux Fuzzel config → ~/.config/fuzzel/fuzzel.ini (or $XDG_CONFIG_HOME/fuzzel/fuzzel.ini)
 ├── shared/             Config shared across every agent → symlinked per-agent
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
@@ -370,16 +371,17 @@ layer.
 
 ### Sway (`sway/`)
 
-On Linux, `init.sh` symlinks `sway/config` and `swaylock/config` under
-`${XDG_CONFIG_HOME:-$HOME/.config}`. Setup backs up an existing swaylock config
-as `swaylock/config` inside the backup directory. If `local.conf` is missing
-from the Sway config directory, setup copies `sway/local.conf.example` there.
-Replace the placeholders in your copy before loading the Sway config.
-Re-running setup preserves your local file. macOS and Windows skip this setup.
+On Linux, `init.sh` symlinks `sway/config`, `swaylock/config`, and
+`fuzzel/fuzzel.ini` under `${XDG_CONFIG_HOME:-$HOME/.config}`. Setup backs up
+an existing swaylock config as `swaylock/config` inside the backup directory.
+If `local.conf` is missing from the Sway config directory, setup copies
+`sway/local.conf.example` there. Replace the placeholders in your copy before
+loading the Sway config. Re-running setup preserves your local file. macOS and
+Windows skip this setup.
 
-`doctor.sh` checks both config symlinks on Linux. Install Sway and swaylock
-separately. Apply config edits from an active Sway session with `Mod4+Shift+c`
-(the configured reload binding).
+`doctor.sh` checks all three config symlinks on Linux. Install Sway, swaylock,
+and Fuzzel separately. Apply Sway config edits from an active session with
+`Mod4+Shift+c` (the configured reload binding).
 
 ### Shell (`bashrc`, `bash_aliases`)
 
