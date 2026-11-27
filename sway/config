@@ -1,6 +1,6 @@
 # Read `man 5 sway` for a complete reference.
 # packages: wezterm, fuzzel, swayidle, swaylock, swaynag, playerctl, pactl, 
-# brightnessctl, grim, wlsunset, systemctl, waybar
+# brightnessctl, grim, wlsunset, systemctl, waybar, NetworkManager-tui
 
 ### Variables
 #
