@@ -246,6 +246,7 @@ window#waybar {
 #memory,
 #custom-gpu {
     color: @blue;
+    min-width:50px;
 }
 
 #cpu.warning,
