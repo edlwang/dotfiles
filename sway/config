@@ -264,8 +264,10 @@ exec swayidle -w \
     before-sleep 'swaylock -f' \
     lock 'swaylock -f'
 
-# Yummy display stuff
+# tailscale
+exec tailscale systray
 
+# Yummy display stuff
 # Tokyo Night palette
 set $base      #1a1b26
 set $surface   #24283b
@@ -280,7 +282,8 @@ set $text_dim  #a9b1d6
 gaps inner 0
 gaps outer 0
 smart_gaps on
-default_border normal 4
+default_border pixel 2
+default_floating_border normal 2
 
 #                       border   background text      indicator  child_border
 client.focused          $accent  $accent    $base     $indicator $accent
