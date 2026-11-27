@@ -1,6 +1,6 @@
 # Read `man 5 sway` for a complete reference.
 # packages: wezterm, fuzzel, swayidle, swaylock, swaynag, playerctl, pactl, 
-# brightnessctl, grim, wlsunset, systemctl
+# brightnessctl, grim, wlsunset, systemctl, waybar
 
 ### Variables
 #
@@ -294,25 +294,7 @@ client.placeholder      $base    $base      $text     $base      $base
 #
 # Read `man 5 sway-bar` for more information about this section.
 bar {
-    position top
-
-    # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    status_command while date +'%Y-%m-%d %X'; do sleep 1; done
-
-    colors {
-        background $base
-        statusline $text
-        separator  $muted
-
-        #                  border   background text
-        focused_workspace  $accent  $accent    $base
-        active_workspace   $surface $surface   $text
-        inactive_workspace $base    $base      $muted
-        urgent_workspace   $urgent  $urgent    $base
-        binding_mode       $urgent  $urgent    $base
-    }
-
+    swaybar_command waybar
 }
 
 include /etc/sway/config.d/*

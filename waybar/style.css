@@ -1,0 +1,281 @@
+/* Tokyo Night color palette */
+
+@define-color background #1a1b26;
+@define-color surface    #24283b;
+@define-color foreground #c0caf5;
+@define-color secondary  #a9b1d6;
+@define-color muted      #565f89;
+@define-color border     #414868;
+
+@define-color blue       #7aa2f7;
+@define-color purple     #bb9af7;
+@define-color cyan       #7dcfff;
+@define-color green      #9ece6a;
+@define-color yellow     #e0af68;
+@define-color red        #f7768e;
+
+
+/* Global styling */
+
+* {
+    font-family: "JetBrains Mono", "Symbols Nerd Font Mono", monospace;
+    font-size: 13px;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background-color: @background;
+    color: @foreground;
+}
+
+
+/* Workspaces */
+
+#workspaces button {
+    padding: 0 8px;
+    background: transparent;
+    color: @secondary;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+#workspaces button:hover {
+    background: @surface;
+    color: @purple;
+}
+
+#workspaces button.visible {
+    color: @foreground;
+}
+
+#workspaces button.focused {
+    background: @surface;
+    color: @purple;
+    box-shadow: inset 0 -3px @purple;
+}
+
+#workspaces button.urgent {
+    background: @red;
+    color: @background;
+}
+
+
+/* Module spacing */
+
+#mode,
+#scratchpad,
+#window,
+#mpris,
+#privacy,
+#tray,
+#power-profiles-daemon,
+#idle_inhibitor,
+#battery,
+#bluetooth,
+#network,
+#pulseaudio,
+#cpu,
+#memory,
+#custom-gpu,
+#clock {
+    padding: 0 6px;
+}
+
+
+/* Module group separators */
+
+#power,
+#connectivity,
+#pulseaudio,
+#system,
+#clock {
+    border-left: 1px solid alpha(@purple, 0.35);
+    margin: 6px 0 6px 4px;
+    padding-left: 10px;
+}
+
+#power,
+#connectivity,
+#system {
+    padding-left: 4px;
+}
+
+#power.empty,
+#connectivity.empty,
+#system.empty {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sway mode and scratchpad */
+
+#mode {
+    background: @purple;
+    color: @background;
+    font-weight: bold;
+}
+
+#scratchpad {
+    color: @purple;
+}
+
+/* Center context group */
+
+#window,
+#mpris {
+    margin: 0;
+    border: none;
+}
+
+#window label,
+#mpris {
+    font-size: 12px;
+}
+
+
+/* Focused window */
+
+#window {
+    color: @foreground;
+}
+
+
+/* Media playback */
+
+#mpris {
+    color: @purple;
+}
+
+#mpris.paused,
+#mpris.stopped {
+    color: @secondary;
+}
+
+
+/* Expand the remaining center module */
+
+#context > :only-child #window label,
+#context > :only-child #mpris {
+    min-height: 36px;
+}
+
+
+/* Privacy */
+
+#privacy-item.screenshare {
+    color: @yellow;
+}
+
+#privacy-item.audio-in {
+    color: @red;
+}
+
+/* System tray */
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    background-color: @red;
+}
+
+/* Power management */
+
+#power-profiles-daemon,
+#battery {
+    color: @green;
+}
+
+#power-profiles-daemon.performance {
+    color: @yellow;
+}
+
+#idle_inhibitor.activated {
+    color: @yellow;
+}
+
+#idle_inhibitor.deactivated {
+    color: @secondary;
+}
+
+#battery.discharging.warning {
+    color: @yellow;
+}
+
+#battery.discharging.critical {
+    color: @red;
+}
+
+/* Connectivity */
+
+#bluetooth,
+#network {
+    color: @cyan;
+}
+
+#bluetooth.disabled,
+#bluetooth.off,
+#network.disabled,
+#network.disconnected {
+    color: @muted;
+}
+
+#network.linked {
+    color: @yellow;
+}
+
+/* Audio */
+
+#pulseaudio {
+    color: @purple;
+}
+
+#pulseaudio.muted,
+#pulseaudio.sink-muted {
+    color: @secondary;
+}
+
+
+/* System monitoring */
+
+#cpu,
+#memory,
+#custom-gpu {
+    color: @blue;
+}
+
+#cpu.warning,
+#memory.warning,
+#custom-gpu.warning {
+    color: @yellow;
+}
+
+#cpu.critical,
+#memory.critical,
+#custom-gpu.critical {
+    color: @red;
+}
+
+
+/* Clock */
+
+#clock {
+    color: @purple;
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+
+/* Tooltips */
+
+tooltip {
+    background-color: @surface;
+}
+
+tooltip label {
+    color: @foreground;
+}

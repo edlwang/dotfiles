@@ -99,6 +99,10 @@ optional_command "PDF viewer" "install a viewer for VimTeX PDF preview" zathura 
 optional_command "jai" "install it to use the configured agent sandbox" jai
 optional_command "Rust toolchain" "install rustup/cargo to work on Rust projects" rustup cargo rustc
 optional_command "fzf" "install it for bashrc's Ctrl-R/Ctrl-T fuzzy search" fzf
+if [ "$SYSTEM_OS" = Linux ]; then
+    optional_command "Waybar" "install it to use the configured Sway status bar" waybar
+    optional_command "Python 3" "install it for Waybar's custom GPU module" python3
+fi
 
 nvim_config_dir() {
     if [ -n "${XDG_CONFIG_HOME:-}" ]; then
@@ -178,6 +182,10 @@ if [ "$SYSTEM_OS" = Linux ]; then
     check_link "$DOTFILES_PATH/sway/config" "${XDG_CONFIG_HOME:-$HOME/.config}/sway/config"
     check_link "$DOTFILES_PATH/swaylock/config" "${XDG_CONFIG_HOME:-$HOME/.config}/swaylock/config"
     check_link "$DOTFILES_PATH/fuzzel/fuzzel.ini" "${XDG_CONFIG_HOME:-$HOME/.config}/fuzzel/fuzzel.ini"
+    waybar_dir="${XDG_CONFIG_HOME:-$HOME/.config}/waybar"
+    check_link "$DOTFILES_PATH/waybar/config.jsonc" "$waybar_dir/config"
+    check_link "$DOTFILES_PATH/waybar/style.css" "$waybar_dir/style.css"
+    check_link "$DOTFILES_PATH/waybar/gpu.py" "$waybar_dir/gpu.py"
 fi
 check_link "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
 check_link "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"

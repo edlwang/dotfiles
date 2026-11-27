@@ -2,8 +2,8 @@
 
 > Runs on **Linux**, **macOS**, and **Windows** (via Git Bash).
 
-Personal dotfiles for bash, Neovim, WezTerm, and Sway (Linux). `init.sh` symlinks
-the tracked files in this repo into `$HOME`, so **editing a file here immediately
+Personal dotfiles for bash, Neovim, WezTerm, and Sway with Waybar (Linux).
+`init.sh` symlinks tracked files into `$HOME`, so **editing a file here immediately
 changes the live config** (the symlinks point back into this repo). There is no build step —
 the "product" is the configuration itself — but `check.sh` provides repeatable
 repository smoke checks. The Neovim config is the bulk of the repository.
@@ -44,7 +44,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── check.sh            Read-only repository configuration smoke checks
-├── init_linux.sh       Linux setup hook (sets up Sway, swaylock, and Fuzzel)
+├── init_linux.sh       Linux setup hook (sets up Sway, swaylock, Fuzzel, and Waybar)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -65,6 +65,7 @@ auto-reloads its config on save.
 ├── sway/config         Linux Sway config → ~/.config/sway/config (or $XDG_CONFIG_HOME/sway/config)
 ├── swaylock/config     Linux swaylock config → ~/.config/swaylock/config (or $XDG_CONFIG_HOME/swaylock/config)
 ├── fuzzel/fuzzel.ini   Linux Fuzzel config → ~/.config/fuzzel/fuzzel.ini (or $XDG_CONFIG_HOME/fuzzel/fuzzel.ini)
+├── waybar/             Linux Waybar config, stylesheet, and GPU helper → ~/.config/waybar/ (or $XDG_CONFIG_HOME/waybar/)
 ├── shared/             Config shared across every agent → symlinked per-agent
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
@@ -379,9 +380,17 @@ If `local.conf` is missing from the Sway config directory, setup copies
 loading the Sway config. Re-running setup preserves your local file. macOS and
 Windows skip this setup.
 
-`doctor.sh` checks all three config symlinks on Linux. Install Sway, swaylock,
-and Fuzzel separately. Apply Sway config edits from an active session with
-`Mod4+Shift+c` (the configured reload binding).
+Sway starts Waybar as its status bar. On Linux, `init.sh` links
+`waybar/config.jsonc` to `waybar/config` under `${XDG_CONFIG_HOME:-$HOME/.config}`
+because Waybar looks for `config` first. It links `style.css` and `gpu.py`
+alongside it. Setup backs up any replaced Waybar files under `waybar/` in the
+backup directory and preserves neighboring files.
+
+`doctor.sh` checks the Sway, swaylock, Fuzzel, and Waybar symlinks on Linux.
+Install Sway, swaylock, Fuzzel, and Waybar separately. The Waybar GPU module
+uses Python 3 and reads AMD GPU metrics from `/sys/class/drm/card1/device`.
+Apply Sway config edits from an active session with `Mod4+Shift+c` (the
+configured reload binding).
 
 ### Shell (`bashrc`, `bash_aliases`)
 

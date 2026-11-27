@@ -106,6 +106,29 @@ check_json() {
 	if ((failed)); then fail "JSON syntax"; else pass "JSON syntax"; fi
 }
 
+check_waybar() {
+	# Neovim 0.12 added comment support to its JSON decoder.
+	if nvim --clean --headless -u NONE -i NONE \
+		-c 'if !has("nvim-0.12") | cquit | endif' -c 'quitall!' >/dev/null 2>&1; then
+		run_quiet "Waybar JSONC syntax" nvim --clean --headless -u NONE -i NONE \
+			-c 'lua
+				local ok, err = pcall(function()
+					local config = table.concat(vim.fn.readfile("waybar/config.jsonc"), "\n")
+					vim.json.decode(config, { skip_comments = true })
+				end)
+				if not ok then io.stderr:write(err .. "\n"); vim.cmd("cquit") end' \
+			-c 'quitall!'
+	else
+		skip "Waybar JSONC syntax (Neovim 0.12 or newer unavailable)"
+	fi
+	if command -v python3 >/dev/null 2>&1; then
+		run_quiet "Waybar GPU helper syntax" python3 -c \
+			'from pathlib import Path; path = Path("waybar/gpu.py"); compile(path.read_bytes(), str(path), "exec")'
+	else
+		skip "Waybar GPU helper syntax (Python 3 unavailable)"
+	fi
+}
+
 check_toml() {
 	local file output failed=0
 	if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import tomllib' >/dev/null 2>&1; then
@@ -228,6 +251,7 @@ else
 	check_lua
 	check_json
 	check_toml
+	check_waybar
 	run_quiet "Git whitespace errors" git diff --check
 	check_prompt_parity
 	check_whitelists

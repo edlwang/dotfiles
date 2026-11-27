@@ -1,0 +1,272 @@
+// -*- mode: jsonc -*-
+{
+    "layer": "top",
+    "position": "top",
+    "fixed-center": true,
+    "height": 36,
+    "spacing": 0,
+    "reload_style_on_change": true,
+    // Choose the order of the modules
+    "modules-left": [
+        "sway/workspaces",
+        "sway/mode",
+        "sway/scratchpad"
+    ],
+    "modules-center": [
+        "group/context"
+    ],
+    "modules-right": [
+        "privacy",
+        "tray", // TODO: Fcitx5
+        "group/power",
+        "group/connectivity",
+        "pulseaudio",
+        "group/system",
+        "clock"
+    ],
+    // left
+    "sway/scratchpad": {
+        "format": " {count}",
+        "on-click": "swaymsg scratchpad show"
+    },
+    // center
+    "group/context": {
+        "orientation": "vertical",
+        "modules": [
+            "sway/window",
+            "mpris"
+        ]
+    },
+    "sway/window": {
+        "format": "{}",
+        "min-length": 60,
+        "max-length": 60,
+        "tooltip": false,
+        "icon": false,
+        "all-outputs": true,
+        "align": 0.5
+    },
+    "mpris": {
+        "format": "{status_icon} {dynamic}",
+        "format-paused": "{status_icon} <i>{dynamic}</i>",
+        "tooltip-format": "<b>{title}</b>\n{artist}\n{album}\n\nPlayback: {position}/{length}\nPlayer: {player}\nStatus: {status}",
+        "interval": 1,
+        "min-length": 60,
+        "max-length": 60,
+        "dynamic-len": 58,
+        "title-len": 35,
+        "artist-len": 20,
+        "status-icons": {
+            "playing": "▶",
+            "paused": "⏸",
+            "stopped": "■"
+        },
+        "dynamic-order": [
+            "artist",
+            "title",
+            "position",
+            "length"
+        ],
+        "dynamic-importance-order": [
+            "position",
+            "length",
+            "title",
+            "artist"
+        ],
+        "align": 0.5
+    },
+    // right
+    "group/power": {
+        "orientation": "horizontal",
+        "modules": [
+            "power-profiles-daemon",
+            "idle_inhibitor",
+            "battery"
+        ]
+    },
+    "group/connectivity": {
+        "orientation": "horizontal",
+        "modules": [
+            "bluetooth",
+            "network" // TODO: nmtui
+        ]
+    },
+    "group/system": {
+        "orientation": "horizontal",
+        "modules": [
+            "cpu",
+            "memory",
+            "custom/gpu"
+        ]
+    },
+    "privacy": {
+        "icon-spacing": 4,
+        "icon-size": 16,
+        "transition-duration": 150,
+        "modules": [
+            {
+                "type": "screenshare"
+            },
+            {
+                "type": "audio-in"
+            }
+        ]
+    },
+    "cpu": {
+        "interval": 1,
+        "format": " {usage}%",
+        "tooltip-format": "<b>CPU Usage: {usage}%</b>\n\nLoad average: {load1:.2f}, {load5:.2f}, {load15:.2f}\nAverage frequency: {avg_frequency:.2f} GHz\nMaximum frequency: {max_frequency:.2f} GHz\nMinimum frequency: {min_frequency:.2f} GHz",
+        "states": {
+            "warning": 70,
+            "critical": 90
+        },
+        "on-click": "swaymsg 'exec $term -e btop'"
+    },
+    "memory": {
+        "interval": 5,
+        "format": " {percentage}%",
+        "tooltip-format": "<b>RAM: {percentage}%</b>\nUsed: {used:.1f}/{total:.1f} GiB\nAvailable: {avail:.1f} GiB\n\n<b>Swap: {swapPercentage}%</b>\nUsed: {swapUsed:.1f}/{swapTotal:.1f} GiB\nAvailable: {swapAvail:.1f} GiB",
+        "states": {
+            "warning": 80,
+            "critical": 90
+        },
+        "on-click": "swaymsg 'exec $term -e btop'"
+    },
+    "custom/gpu": {
+        "format": "󰢮 {}",
+        "exec": "\"${XDG_CONFIG_HOME:-$HOME/.config}/waybar/gpu.py\"",
+        "return-type": "json",
+        "interval": 3,
+        "on-click": "swaymsg 'exec $term -e nvtop'",
+        "hide-empty-text": true,
+        "exec-on-event": false
+    },
+    "power-profiles-daemon": {
+        "format": "{icon}",
+        "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+        "format-icons": {
+            "default": "",
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        }
+    },
+    "battery": {
+        "interval": 30,
+        "format": "{icon} {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-time": "{H}h {M}m",
+        "format-icons": {
+            "default": [
+                "󰁺",
+                "󰁼",
+                "󰁾",
+                "󰂀",
+                "󰁹"
+            ],
+            "charging": [
+                "󰢜",
+                "󰂇",
+                "󰢝",
+                "󰂊",
+                "󰂅"
+            ]
+        },
+        "tooltip-format": "<b>Battery: {capacity}%</b>\n{timeTo}\nPower: {power:.1f} W\nHealth: {health}%\nCycles: {cycles}",
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "events": {
+            "on-discharging-warning": "notify-send -u normal 'Low battery'",
+            "on-discharging-critical": "notify-send -u critical 'Very low battery'"
+        }
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        }
+    },
+    "bluetooth": {
+        "format": "󰂯",
+        "format-disabled": "󰂲",
+        "format-off": "󰂲",
+        "format-connected": "󰂱",
+        "format-no-controller": "",
+        "tooltip-format": "Bluetooth: {status}",
+        "tooltip-format-connected": "<b>Bluetooth: {num_connections} connected</b>\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}: {device_battery_percentage}%",
+        "on-click": "kcmshell6 kcm_bluetooth",
+        "on-click-right": "bluetoothctl show | grep -q 'Powered: yes' && bluetoothctl power off || bluetoothctl power on"
+    },
+    "network": {
+        "interval": 2,
+        "format": "󰈀",
+        "format-wifi": "{icon}",
+        "format-ethernet": "󰈀",
+        "format-linked": "󰌘",
+        "format-disconnected": "󰖪",
+        "format-disabled": "󰀝",
+        "format-icons": [
+            "󰤟",
+            "󰤢",
+            "󰤥",
+            "󰤨"
+        ],
+        "tooltip-format": "Interface: {ifname}\nIP: {ipaddr}/{cidr}",
+        "tooltip-format-wifi": "<b>{essid}</b>\nSignal: {signalStrength}% ({signaldBm} dBm)\nFrequency: {frequency} GHz\nInterface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}\n\nDownload: {bandwidthDownBytes}\nUpload: {bandwidthUpBytes}",
+        "tooltip-format-ethernet": "<b>Ethernet</b>\nInterface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}\n\nDownload: {bandwidthDownBytes}\nUpload: {bandwidthUpBytes}",
+        "tooltip-format-disconnected": "Network disconnected",
+        "tooltip-format-disabled": "Wireless networking disabled",
+        "on-click": "kcmshell6 kcm_networkmanagement"
+    },
+    "pulseaudio": {
+        "format": "{format_source}  {icon}  {volume}%",
+        "format-muted": "{format_source}  󰖁  {volume}%",
+        "format-source": "󰍬",
+        "format-source-muted": "󰍭",
+        "format-icons": {
+            "headphone": "󰋋",
+            "headset": "󰋎",
+            "hands-free": "󰋎",
+            "hdmi": "󰡁",
+            "default": [
+                "󰕿",
+                "󰖀",
+                "󰕾"
+            ]
+        },
+        "tooltip-format": "<b>Output: {volume}%</b>\n{desc}\n\n<b>Input: {source_volume}% {format_source}</b>\n{source_desc}",
+        "scroll-step": 5,
+        "on-click": "kcmshell6 kcm_pulseaudio",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+    },
+    "tray": {
+        "icon-size": 18,
+        "spacing": 8,
+        "show-passive-items": true
+    },
+    "clock": {
+        "format": "{:%a %b %d  %H:%M}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "format": {
+                "months": "<b>{}</b>",
+                "weekdays": "<b>{}</b>",
+                "today": "<span color='#bb9af7'><b><u>{}</u></b></span>"
+            }
+        },
+        "actions": {
+            "on-click-right": "mode",
+            "on-click-middle": "shift_reset",
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        }
+    }
+}
