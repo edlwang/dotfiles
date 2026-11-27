@@ -1,6 +1,6 @@
 # Read `man 5 sway` for a complete reference.
 # packages: wezterm, fuzzel, swayidle, swaylock, swaynag, playerctl, pactl, 
-# brightnessctl, grim, wlsunset, systemctl, waybar, NetworkManager-tui
+# brightnessctl, grim, wlsunset, systemctl, waybar, NetworkManager-tui, SwayNotificationCenter
 
 ### Variables
 #
@@ -251,6 +251,9 @@ mode "$mode_system" {
 
 bindsym $mod+grave mode "$mode_system"
 
+# notification center
+bindsym $mod+Shift+n exec swaync-client -t -sw
+
 # wlsunset
 exec wlsunset -l $latitude -L $longitude
 
@@ -266,6 +269,9 @@ exec swayidle -w \
 
 # tailscale
 exec tailscale systray
+
+# notifications
+exec swaync
 
 # Yummy display stuff
 # Tokyo Night palette

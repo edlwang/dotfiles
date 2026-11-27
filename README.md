@@ -44,7 +44,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── check.sh            Read-only repository configuration smoke checks
-├── init_linux.sh       Linux setup hook (sets up Sway, swaylock, Fuzzel, Waybar, and nmtui)
+├── init_linux.sh       Linux setup hook (Sway, swaylock, Fuzzel, Waybar, swaync, nmtui)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -66,6 +66,7 @@ auto-reloads its config on save.
 ├── swaylock/config     Linux swaylock config → ~/.config/swaylock/config (or $XDG_CONFIG_HOME/swaylock/config)
 ├── fuzzel/fuzzel.ini   Linux Fuzzel config → ~/.config/fuzzel/fuzzel.ini (or $XDG_CONFIG_HOME/fuzzel/fuzzel.ini)
 ├── waybar/             Linux Waybar config, stylesheet, and GPU helper → ~/.config/waybar/ (or $XDG_CONFIG_HOME/waybar/)
+├── swaync/             Linux SwayNotificationCenter config and stylesheet → ~/.config/swaync/ (or $XDG_CONFIG_HOME/swaync/)
 ├── nmtui/palette       Linux nmtui colors → ~/.config/nmtui/palette (or $XDG_CONFIG_HOME/nmtui/palette)
 ├── shared/             Config shared across every agent → symlinked per-agent
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
@@ -394,7 +395,17 @@ through `NEWT_COLORS_FILE` and `NMT_NEWT_COLORS_FILE`. On Linux, `init.sh` links
 replaced palette as `nmtui/palette` inside the backup directory. Install nmtui
 separately (the `NetworkManager-tui` package on Fedora).
 
-`doctor.sh` checks the Sway, swaylock, Fuzzel, Waybar, and nmtui symlinks on Linux.
+Sway starts SwayNotificationCenter (`swaync`), which you install separately.
+`init.sh` links its `config.json` and `style.css` under
+`${XDG_CONFIG_HOME:-$HOME/.config}/swaync` on Linux and backs up replaced files
+under `swaync/` in the backup directory. Open the notification center with
+`Mod4+Shift+n` or left-click Waybar's notification icon. Right-click toggles
+Do Not Disturb and middle-click clears notifications. After editing the
+notification configuration or stylesheet, run `swaync-client --reload-config`
+or `swaync-client --reload-css`.
+
+`doctor.sh` checks the Sway, swaylock, Fuzzel, Waybar, swaync, and nmtui symlinks
+on Linux.
 Install Sway, swaylock, Fuzzel, and Waybar separately. The Waybar GPU module
 uses Python 3 and reads AMD GPU metrics from `/sys/class/drm/card1/device`.
 Apply Sway config edits from an active session with `Mod4+Shift+c` (the

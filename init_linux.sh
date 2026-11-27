@@ -3,6 +3,7 @@
 setup_os() {
     local config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"
     local sway_dir="$config_dir/sway"
+    local swaync_dir="$config_dir/swaync"
     local waybar_dir="$config_dir/waybar"
     local local_conf="$sway_dir/local.conf"
 
@@ -11,6 +12,9 @@ setup_os() {
     BACKUP_DIR="$BACKUP_DIR/swaylock" setup_symlink "$DOTFILES_PATH/swaylock/config" "$config_dir/swaylock/config"
     setup_symlink "$DOTFILES_PATH/fuzzel/fuzzel.ini" "$config_dir/fuzzel/fuzzel.ini"
     BACKUP_DIR="$BACKUP_DIR/nmtui" setup_symlink "$DOTFILES_PATH/nmtui/palette" "$config_dir/nmtui/palette"
+
+    BACKUP_DIR="$BACKUP_DIR/swaync" setup_symlink "$DOTFILES_PATH/swaync/config.json" "$swaync_dir/config.json"
+    BACKUP_DIR="$BACKUP_DIR/swaync" setup_symlink "$DOTFILES_PATH/swaync/style.css" "$swaync_dir/style.css"
 
     # Waybar looks for config before config.jsonc. Keep its backups separate
     # from Sway's config while preserving other files in the Waybar directory.

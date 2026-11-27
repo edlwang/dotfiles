@@ -261,6 +261,30 @@ window#waybar {
     color: @red;
 }
 
+/* Notification */
+
+#custom-notification {
+    color: @purple;
+    padding: 0 6px;
+
+    border-left: 1px solid alpha(@purple, 0.35);
+    margin: 6px 0 6px 4px;
+    padding-left: 10px;
+}
+
+#custom-notification.none {
+    color: @secondary;
+}
+
+#custom-notification.dnd-notification,
+#custom-notification.dnd-none,
+#custom-notification.inhibited-notification,
+#custom-notification.inhibited-none,
+#custom-notification.dnd-inhibited-notification,
+#custom-notification.dnd-inhibited-none {
+    color: @yellow;
+}
+
 
 /* Clock */
 

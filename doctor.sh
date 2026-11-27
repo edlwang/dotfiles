@@ -102,6 +102,11 @@ optional_command "fzf" "install it for bashrc's Ctrl-R/Ctrl-T fuzzy search" fzf
 if [ "$SYSTEM_OS" = Linux ]; then
     optional_command "Waybar" "install it to use the configured Sway status bar" waybar
     optional_command "Python 3" "install it for Waybar's custom GPU module" python3
+    if have_cmd swaync && have_cmd swaync-client; then
+        pass "SwayNotificationCenter (optional): swaync and swaync-client found"
+    else
+        warn "SwayNotificationCenter is optional; install swaync and swaync-client for Sway notifications"
+    fi
 fi
 
 nvim_config_dir() {
@@ -183,6 +188,9 @@ if [ "$SYSTEM_OS" = Linux ]; then
     check_link "$DOTFILES_PATH/swaylock/config" "${XDG_CONFIG_HOME:-$HOME/.config}/swaylock/config"
     check_link "$DOTFILES_PATH/fuzzel/fuzzel.ini" "${XDG_CONFIG_HOME:-$HOME/.config}/fuzzel/fuzzel.ini"
     check_link "$DOTFILES_PATH/nmtui/palette" "${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette"
+    swaync_dir="${XDG_CONFIG_HOME:-$HOME/.config}/swaync"
+    check_link "$DOTFILES_PATH/swaync/config.json" "$swaync_dir/config.json"
+    check_link "$DOTFILES_PATH/swaync/style.css" "$swaync_dir/style.css"
     waybar_dir="${XDG_CONFIG_HOME:-$HOME/.config}/waybar"
     check_link "$DOTFILES_PATH/waybar/config.jsonc" "$waybar_dir/config"
     check_link "$DOTFILES_PATH/waybar/style.css" "$waybar_dir/style.css"
