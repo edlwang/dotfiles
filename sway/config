@@ -273,6 +273,9 @@ exec tailscale systray
 # notifications
 exec swaync
 
+# polkit auth agent
+exec env QT_QPA_PLATFORMTHEME=kde QT_STYLE_OVERRIDE=Breeze /usr/libexec/kf6/polkit-kde-authentication-agent-1
+
 # Yummy display stuff
 # Tokyo Night palette
 set $base      #1a1b26
