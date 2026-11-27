@@ -259,10 +259,10 @@ exec wlsunset -l $latitude -L $longitude
 
 # Idle and Power
 exec swayidle -w \
-    timeout 10 'pgrep -x swaylock >/dev/null && swaymsg "output * power off"' \
+    timeout 60 'pgrep -x swaylock >/dev/null && swaymsg "output * power off"' \
         resume 'swaymsg "output * power on"' \
     timeout 300 'swaylock -f' \
-    timeout 310 'swaymsg "output * power off"' \
+    timeout 360 'swaymsg "output * power off"' \
         resume 'swaymsg "output * power on"' \
     before-sleep 'swaylock -f' \
     lock 'swaylock -f'
