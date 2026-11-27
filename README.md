@@ -44,7 +44,7 @@ auto-reloads its config on save.
 ├── init.sh             Idempotent setup: symlinks dotfiles (config-only)
 ├── doctor.sh           Read-only dependency, version, and symlink diagnostics
 ├── check.sh            Read-only repository configuration smoke checks
-├── init_linux.sh       Linux setup hook (sets up Sway, swaylock, Fuzzel, and Waybar)
+├── init_linux.sh       Linux setup hook (sets up Sway, swaylock, Fuzzel, Waybar, and nmtui)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
@@ -66,6 +66,7 @@ auto-reloads its config on save.
 ├── swaylock/config     Linux swaylock config → ~/.config/swaylock/config (or $XDG_CONFIG_HOME/swaylock/config)
 ├── fuzzel/fuzzel.ini   Linux Fuzzel config → ~/.config/fuzzel/fuzzel.ini (or $XDG_CONFIG_HOME/fuzzel/fuzzel.ini)
 ├── waybar/             Linux Waybar config, stylesheet, and GPU helper → ~/.config/waybar/ (or $XDG_CONFIG_HOME/waybar/)
+├── nmtui/palette       Linux nmtui colors → ~/.config/nmtui/palette (or $XDG_CONFIG_HOME/nmtui/palette)
 ├── shared/             Config shared across every agent → symlinked per-agent
 │   └── agent-instructions.md   Global instructions → ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.gemini/GEMINI.md
 ├── claude/             Claude Code config → symlinked into ~/.claude
@@ -386,7 +387,14 @@ because Waybar looks for `config` first. It links `style.css` and `gpu.py`
 alongside it. Setup backs up any replaced Waybar files under `waybar/` in the
 backup directory and preserves neighboring files.
 
-`doctor.sh` checks the Sway, swaylock, Fuzzel, and Waybar symlinks on Linux.
+Waybar's network module opens `nmtui connect` on left click and `nmtui edit` on
+right click. Both launchers pass the installed palette to Newt and NetworkManager
+through `NEWT_COLORS_FILE` and `NMT_NEWT_COLORS_FILE`. On Linux, `init.sh` links
+`nmtui/palette` under `${XDG_CONFIG_HOME:-$HOME/.config}` and backs up any
+replaced palette as `nmtui/palette` inside the backup directory. Install nmtui
+separately (the `NetworkManager-tui` package on Fedora).
+
+`doctor.sh` checks the Sway, swaylock, Fuzzel, Waybar, and nmtui symlinks on Linux.
 Install Sway, swaylock, Fuzzel, and Waybar separately. The Waybar GPU module
 uses Python 3 and reads AMD GPU metrics from `/sys/class/drm/card1/device`.
 Apply Sway config edits from an active session with `Mod4+Shift+c` (the
@@ -430,7 +438,8 @@ configured reload binding).
 - **`init.sh`'s OS-specific setup lives in per-OS files** (`init_<os>.sh`), sourced
   from the repo copy (init-time only, not symlinked). `init.sh` defines a no-op
   `setup_os` hook that a present `init_<os>.sh` can override (and can set env like
-  `MSYS`): `init_windows.sh` only sets `MSYS`; Linux and macOS have no file. Small
+  `MSYS`). `init_windows.sh` sets `MSYS`, `init_linux.sh` links the Linux configs,
+  and macOS uses the default hook. Small
   per-OS *values* (nvim dir, pyenv path) stay as inline `SYSTEM_OS` branches; only
   *procedures* move out.
 - **The prompt comes from starship** (which you install). `bashrc` runs `starship

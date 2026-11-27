@@ -10,6 +10,7 @@ setup_os() {
     # Keep both files when backing up the two configs in the same run.
     BACKUP_DIR="$BACKUP_DIR/swaylock" setup_symlink "$DOTFILES_PATH/swaylock/config" "$config_dir/swaylock/config"
     setup_symlink "$DOTFILES_PATH/fuzzel/fuzzel.ini" "$config_dir/fuzzel/fuzzel.ini"
+    BACKUP_DIR="$BACKUP_DIR/nmtui" setup_symlink "$DOTFILES_PATH/nmtui/palette" "$config_dir/nmtui/palette"
 
     # Waybar looks for config before config.jsonc. Keep its backups separate
     # from Sway's config while preserving other files in the Waybar directory.

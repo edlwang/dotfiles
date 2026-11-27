@@ -182,6 +182,7 @@ if [ "$SYSTEM_OS" = Linux ]; then
     check_link "$DOTFILES_PATH/sway/config" "${XDG_CONFIG_HOME:-$HOME/.config}/sway/config"
     check_link "$DOTFILES_PATH/swaylock/config" "${XDG_CONFIG_HOME:-$HOME/.config}/swaylock/config"
     check_link "$DOTFILES_PATH/fuzzel/fuzzel.ini" "${XDG_CONFIG_HOME:-$HOME/.config}/fuzzel/fuzzel.ini"
+    check_link "$DOTFILES_PATH/nmtui/palette" "${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette"
     waybar_dir="${XDG_CONFIG_HOME:-$HOME/.config}/waybar"
     check_link "$DOTFILES_PATH/waybar/config.jsonc" "$waybar_dir/config"
     check_link "$DOTFILES_PATH/waybar/style.css" "$waybar_dir/style.css"

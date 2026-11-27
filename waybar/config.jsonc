@@ -224,8 +224,8 @@
         "tooltip-format-ethernet": "<b>Ethernet</b>\nInterface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}\n\nDownload: {bandwidthDownBytes}\nUpload: {bandwidthUpBytes}",
         "tooltip-format-disconnected": "Network disconnected",
         "tooltip-format-disabled": "Wireless networking disabled",
-        "on-click": "swaymsg 'exec $term -e nmtui connect'",
-        "on-click-right": "swaymsg 'exec $term -e nmtui edit'"
+        "on-click": "swaymsg 'exec $term -e env NEWT_COLORS_FILE=\"${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette\" NMT_NEWT_COLORS_FILE=\"${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette\" nmtui connect'",
+        "on-click-right": "swaymsg 'exec $term -e env NEWT_COLORS_FILE=\"${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette\" NMT_NEWT_COLORS_FILE=\"${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette\" nmtui edit'"
     },
     "pulseaudio": {
         "format": "{format_source}  {icon}  {volume}%",
