@@ -399,6 +399,11 @@ seconds and shows when the night light is unavailable.
 the logout confirmation. Logout, reboot, and power off require `y` or Enter
 to confirm. Press `n` or Escape to cancel.
 
+Install `grimshot` to use screenshot mode. Press `Mod4+p`, then `r` for a
+region, `w` for the focused window, `m` for the focused monitor, or `a` for
+all monitors. These keys copy the capture to the clipboard. Hold Shift with
+the capture key to save it to a file, or press Escape to cancel the mode.
+
 Waybar's network module opens `nmtui connect` on left click and `nmtui edit` on
 right click. Both launchers pass the installed palette to Newt and NetworkManager
 through `NEWT_COLORS_FILE` and `NMT_NEWT_COLORS_FILE`. On Linux, `init.sh` links

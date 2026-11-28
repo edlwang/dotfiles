@@ -1,7 +1,7 @@
 # Read `man 5 sway` for a complete reference.
 # packages: wezterm, fuzzel, swayidle, swaylock, playerctl, pactl,
-# brightnessctl, grim, wlsunset, systemctl, waybar, NetworkManager-tui, SwayNotificationCenter
-# pavucontrol, blueman
+# brightnessctl, grimshot, wlsunset, systemctl, waybar, NetworkManager-tui,
+# SwayNotificationCenter, pavucontrol, blueman
 
 ### Variables
 #
@@ -20,6 +20,8 @@ set $term wezterm
 # Your preferred application launcher
 set $menu fuzzel --list-executables-in-path
 
+set $lock_command swaylock -f
+
 # local variables need to be set in local.conf
 set $latitude LOCAL
 set $longitude LOCAL
@@ -28,34 +30,17 @@ set $longitude LOCAL
 include '"${XDG_CONFIG_HOME:-$HOME/.config}/sway/local.conf"'
 
 ### Output configuration
-#
+# List outputs with: swaymsg -t get_outputs
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
 # ln -sfn path/to/image "${XDG_CONFIG_HOME:-$HOME/.config}/sway/wallpaper"
 output * bg '"${XDG_CONFIG_HOME:-$HOME/.config}/sway/wallpaper"' fill #1a1b26
-#
-# Example configuration:
-#
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0
-#
-# You can get the names of your outputs by running: swaymsg -t get_outputs
 
 ### Input configuration
-#
-# Example configuration:
-#
-#   input type:touchpad {
-#       dwt enabled
-#       tap enabled
-#       natural_scroll enabled
-#       middle_emulation enabled
-#   }
-#
-#   input type:keyboard {
-#       xkb_layout "eu"
-#   }
-#
-# You can also configure each device individually.
-# Read `man 5 sway-input` for more information about this section.
+# Read man 5 sway-input for more input options.
+input type:pointer {
+    accel_profile flat
+    pointer_accel 0.2
+}
 
 ### Key bindings
 #
@@ -181,8 +166,33 @@ output * bg '"${XDG_CONFIG_HOME:-$HOME/.config}/sway/wallpaper"' fill #1a1b26
     # If there are multiple scratchpad windows, this command cycles through them.
     bindsym $mod+minus scratchpad show
 #
-# Resizing containers:
+# Utilities:
 #
+    # Special keys to adjust volume via PulseAudio
+    bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
+    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%
+    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%
+    bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
+
+    # Special keys to control media via playerctl
+    bindsym --locked XF86AudioPlay exec playerctl play-pause
+    bindsym --locked XF86AudioPause exec playerctl play-pause
+    bindsym --locked XF86AudioPrev exec playerctl previous
+    bindsym --locked XF86AudioNext exec playerctl next
+    bindsym --locked XF86AudioStop exec playerctl stop
+
+    # Special keys to adjust brightness via brightnessctl
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+
+    # Toggle the notification center
+    bindsym $mod+Shift+n exec swaync-client -t -sw
+
+### Modes
+
+# Resize mode
+bindsym $mod+r mode "resize"
+
 mode "resize" {
     # left will shrink the containers width
     # right will grow the containers width
@@ -203,26 +213,6 @@ mode "resize" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
-bindsym $mod+r mode "resize"
-#
-# Utilities:
-#
-    # Special keys to adjust volume via PulseAudio
-    bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
-    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%
-    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%
-    bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
-
-    # Special keys to control media via playerctl
-    bindsym --locked XF86AudioPlay exec playerctl play-pause
-    bindsym --locked XF86AudioPause exec playerctl play-pause
-    bindsym --locked XF86AudioPrev exec playerctl previous
-    bindsym --locked XF86AudioNext exec playerctl next
-    bindsym --locked XF86AudioStop exec playerctl stop
-
-    # Special keys to adjust brightness via brightnessctl
-    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
-    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
 
 # Screenshot mode
 set $mode_screenshot "Capture: [r]egion [w]indow [m]onitor [a]ll (Shift to save)"
@@ -248,21 +238,17 @@ mode $mode_screenshot {
     bindsym $mod+p mode default
 }
 
-
-# libinput mouse settings
-input type:pointer {
-    accel_profile flat
-    pointer_accel 0.2
-}
-
 # System mode
 set $mode_system System: [l]ock [s]uspend [e]xit [r]eboot [p]ower off
 set $mode_logout Logout? [y]es [n]o
 set $mode_reboot Reboot? [y]es [n]o
 set $mode_poweroff Power off? [y]es [n]o
 
+bindsym $mod+grave mode "$mode_system"
+bindsym $mod+Shift+e mode "$mode_logout"
+
 mode "$mode_system" {
-    bindsym l exec swaylock -f, mode default
+    bindsym l exec $lock_command, mode default
     bindsym s exec systemctl suspend, mode default
     bindsym e mode "$mode_logout"
     bindsym r mode "$mode_reboot"
@@ -293,11 +279,7 @@ mode "$mode_poweroff" {
     bindsym Escape mode default
 }
 
-bindsym $mod+grave mode "$mode_system"
-bindsym $mod+Shift+e mode "$mode_logout"
-
-# notification center
-bindsym $mod+Shift+n exec swaync-client -t -sw
+### Session startup
 
 # wlsunset
 exec "${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh" start -l $latitude -L $longitude
@@ -306,11 +288,11 @@ exec "${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh" start -l $latitude
 exec swayidle -w \
     timeout 60 'pgrep -x swaylock >/dev/null && swaymsg "output * power off"' \
         resume 'swaymsg "output * power on"' \
-    timeout 300 'swaylock -f' \
+    timeout 300 '$lock_command' \
     timeout 360 'swaymsg "output * power off"' \
         resume 'swaymsg "output * power on"' \
-    before-sleep 'swaylock -f' \
-    lock 'swaylock -f'
+    before-sleep '$lock_command' \
+    lock '$lock_command'
 
 # tailscale
 exec tailscale systray
@@ -321,7 +303,8 @@ exec swaync
 # polkit auth agent
 exec env QT_QPA_PLATFORMTHEME=kde QT_STYLE_OVERRIDE=Breeze /usr/libexec/kf6/polkit-kde-authentication-agent-1
 
-# Yummy display stuff
+### Appearance
+
 # Tokyo Night palette
 set $base      #1a1b26
 set $surface   #24283b
@@ -346,9 +329,8 @@ client.unfocused        $base    $base      $text_dim $muted     $base
 client.urgent           $urgent  $urgent    $base     $urgent    $urgent
 client.placeholder      $base    $base      $text     $base      $base
 
-#
-# Status Bar:
-#
+### Status bar
+
 # Read `man 5 sway-bar` for more information about this section.
 bar {
     swaybar_command waybar
