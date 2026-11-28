@@ -18,7 +18,7 @@ set $right l
 set $term wezterm
 
 # Your preferred application launcher
-set $menu fuzzel --list-executables-in-path
+set $menu fuzzel
 
 set $lock_command swaylock -f
 
