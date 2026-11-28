@@ -79,7 +79,8 @@ window#waybar {
 #cpu,
 #memory,
 #custom-gpu,
-#clock {
+#clock,
+#custom-nightlight {
     padding: 0 6px;
 }
 
@@ -303,4 +304,22 @@ tooltip {
 
 tooltip label {
     color: @foreground;
+}
+
+/* nightlight */
+
+#custom-nightlight.auto {
+    color: #7aa2f7;
+}
+
+#custom-nightlight.day {
+    color: #c0caf5;
+}
+
+#custom-nightlight.night {
+    color: #e0af68;
+}
+
+#custom-nightlight.off {
+    color: #565f89;
 }

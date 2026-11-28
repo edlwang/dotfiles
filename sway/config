@@ -1,5 +1,5 @@
 # Read `man 5 sway` for a complete reference.
-# packages: wezterm, fuzzel, swayidle, swaylock, swaynag, playerctl, pactl, 
+# packages: wezterm, fuzzel, swayidle, swaylock, playerctl, pactl,
 # brightnessctl, grim, wlsunset, systemctl, waybar, NetworkManager-tui, SwayNotificationCenter
 # pavucontrol
 
@@ -24,14 +24,14 @@ set $menu fuzzel --list-executables-in-path
 set $latitude LOCAL
 set $longitude LOCAL
 
-# Local configs
-include ~/.config/sway/local.conf
+# Sway strips the outer quotes before expanding the path.
+include '"${XDG_CONFIG_HOME:-$HOME/.config}/sway/local.conf"'
 
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-# ln -sfn path/to/image ~/.config/sway/wallpaper
-output * bg ~/.config/sway/wallpaper fill
+# ln -sfn path/to/image "${XDG_CONFIG_HOME:-$HOME/.config}/sway/wallpaper"
+output * bg '"${XDG_CONFIG_HOME:-$HOME/.config}/sway/wallpaper"' fill #1a1b26
 #
 # Example configuration:
 #
@@ -80,8 +80,6 @@ output * bg ~/.config/sway/wallpaper fill
     # Reload the configuration file
     bindsym $mod+Shift+c reload
 
-    # Exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
 #
@@ -237,26 +235,51 @@ input type:pointer {
 }
 
 # System mode
-set $mode_system System: [l]ock [n]ight light [s]uspend [r]eboot [p]ower off
+set $mode_system System: [l]ock [s]uspend [e]xit [r]eboot [p]ower off
+set $mode_logout Logout? [y]es [n]o
+set $mode_reboot Reboot? [y]es [n]o
+set $mode_poweroff Power off? [y]es [n]o
 
 mode "$mode_system" {
     bindsym l exec swaylock -f, mode default
-    bindsym n exec pkill -USR1 -x wlsunset, mode default
     bindsym s exec systemctl suspend, mode default
-    bindsym r exec systemctl reboot, mode default
-    bindsym p exec systemctl poweroff, mode default
+    bindsym e mode "$mode_logout"
+    bindsym r mode "$mode_reboot"
+    bindsym p mode "$mode_poweroff"
 
     bindsym Escape mode default
     bindsym Return mode default
 }
 
+mode "$mode_logout" {
+    bindsym y exit
+    bindsym Return exit
+    bindsym n mode default
+    bindsym Escape mode default
+}
+
+mode "$mode_reboot" {
+    bindsym y exec systemctl reboot, mode default
+    bindsym Return exec systemctl reboot, mode default
+    bindsym n mode default
+    bindsym Escape mode default
+}
+
+mode "$mode_poweroff" {
+    bindsym y exec systemctl poweroff, mode default
+    bindsym Return exec systemctl poweroff, mode default
+    bindsym n mode default
+    bindsym Escape mode default
+}
+
 bindsym $mod+grave mode "$mode_system"
+bindsym $mod+Shift+e mode "$mode_logout"
 
 # notification center
 bindsym $mod+Shift+n exec swaync-client -t -sw
 
 # wlsunset
-exec wlsunset -l $latitude -L $longitude
+exec "${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh" start -l $latitude -L $longitude
 
 # Idle and Power
 exec swayidle -w \

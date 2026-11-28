@@ -65,7 +65,7 @@ auto-reloads its config on save.
 ├── sway/config         Linux Sway config → ~/.config/sway/config (or $XDG_CONFIG_HOME/sway/config)
 ├── swaylock/config     Linux swaylock config → ~/.config/swaylock/config (or $XDG_CONFIG_HOME/swaylock/config)
 ├── fuzzel/fuzzel.ini   Linux Fuzzel config → ~/.config/fuzzel/fuzzel.ini (or $XDG_CONFIG_HOME/fuzzel/fuzzel.ini)
-├── waybar/             Linux Waybar config, stylesheet, and GPU helper → ~/.config/waybar/ (or $XDG_CONFIG_HOME/waybar/)
+├── waybar/             Linux Waybar config, stylesheet, and helpers → ~/.config/waybar/ (or $XDG_CONFIG_HOME/waybar/)
 ├── swaync/             Linux SwayNotificationCenter config and stylesheet → ~/.config/swaync/ (or $XDG_CONFIG_HOME/swaync/)
 ├── nmtui/palette       Linux nmtui colors → ~/.config/nmtui/palette (or $XDG_CONFIG_HOME/nmtui/palette)
 ├── shared/             Config shared across every agent → symlinked per-agent
@@ -384,9 +384,19 @@ Windows skip this setup.
 
 Sway starts Waybar as its status bar. On Linux, `init.sh` links
 `waybar/config.jsonc` to `waybar/config` under `${XDG_CONFIG_HOME:-$HOME/.config}`
-because Waybar looks for `config` first. It links `style.css` and `gpu.py`
-alongside it. Setup backs up any replaced Waybar files under `waybar/` in the
-backup directory and preserves neighboring files.
+because Waybar looks for `config` first. It links `style.css`, `gpu.py`, and
+`nightlight.sh` alongside it. Setup backs up any replaced Waybar files under
+`waybar/` in the backup directory and preserves neighboring files.
+
+Install `wlsunset` and set `$latitude` and `$longitude` in `sway/local.conf`
+to use the night light. Sign out of Sway and back in after running setup so
+Sway starts the helper. Click the Waybar icon to cycle through forced day,
+forced night, and automatic mode. The indicator updates on its next two-second
+poll and shows when the night light is unavailable.
+
+`Mod4+grave` opens Sway's system menu, and `Mod4+Shift+e` goes straight to
+the logout confirmation. Logout, reboot, and power off require `y` or Enter
+to confirm. Press `n` or Escape to cancel.
 
 Waybar's network module opens `nmtui connect` on left click and `nmtui edit` on
 right click. Both launchers pass the installed palette to Newt and NetworkManager
@@ -405,7 +415,9 @@ notification configuration or stylesheet, run `swaync-client --reload-config`
 or `swaync-client --reload-css`.
 
 `doctor.sh` checks the Sway, swaylock, Fuzzel, Waybar, swaync, and nmtui symlinks
-on Linux.
+and the optional `wlsunset` command on Linux. `check.sh` validates the
+night-light helper's shell syntax and checks the Sway config with a headless
+backend when Sway is installed.
 Install Sway, swaylock, Fuzzel, and Waybar separately. The Waybar GPU module
 uses Python 3 and reads AMD GPU metrics from `/sys/class/drm/card1/device`.
 Apply Sway config edits from an active session with `Mod4+Shift+c` (the

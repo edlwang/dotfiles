@@ -21,6 +21,7 @@ setup_os() {
     BACKUP_DIR="$BACKUP_DIR/waybar" setup_symlink "$DOTFILES_PATH/waybar/config.jsonc" "$waybar_dir/config"
     BACKUP_DIR="$BACKUP_DIR/waybar" setup_symlink "$DOTFILES_PATH/waybar/style.css" "$waybar_dir/style.css"
     BACKUP_DIR="$BACKUP_DIR/waybar" setup_symlink "$DOTFILES_PATH/waybar/gpu.py" "$waybar_dir/gpu.py"
+    BACKUP_DIR="$BACKUP_DIR/waybar" setup_symlink "$DOTFILES_PATH/waybar/nightlight.sh" "$waybar_dir/nightlight.sh"
 
     if [ ! -e "$local_conf" ] && [ ! -L "$local_conf" ]; then
         echo "Copying Sway local config template to $local_conf"

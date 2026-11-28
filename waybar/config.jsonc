@@ -80,6 +80,7 @@
     "group/power": {
         "orientation": "horizontal",
         "modules": [
+            "custom/nightlight",
             "power-profiles-daemon",
             "idle_inhibitor",
             "battery"
@@ -144,6 +145,15 @@
         "hide-empty-text": true,
         "exec-on-event": false,
         "align": 0.0
+    },
+    "custom/nightlight": {
+        "exec": "\"${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh\"",
+        "return-type": "json",
+        "format": "{}",
+        "interval": 2,
+        "exec-on-event": false,
+        "tooltip": true,
+        "on-click": "\"${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh\" toggle"
     },
     "power-profiles-daemon": {
         "format": "{icon}",

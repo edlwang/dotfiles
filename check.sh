@@ -127,6 +127,7 @@ check_waybar() {
 	else
 		skip "Waybar GPU helper syntax (Python 3 unavailable)"
 	fi
+	run_quiet "Waybar night-light helper syntax" bash -n waybar/nightlight.sh
 }
 
 check_toml() {
@@ -210,6 +211,19 @@ ensure_tmp_dir() {
 	fi
 }
 
+check_sway() {
+	if ! command -v sway >/dev/null 2>&1; then
+		skip "Sway config validation (Sway unavailable)"
+	elif ! ensure_tmp_dir; then
+		skip "Sway config validation (temporary isolation directory unavailable)"
+	else
+		mkdir -m 700 "$tmp_dir/sway-runtime"
+		run_quiet "Sway config validation" env HOME="$tmp_dir/sway-home" \
+			XDG_CONFIG_HOME="$tmp_dir/sway-config" XDG_RUNTIME_DIR="$tmp_dir/sway-runtime" \
+			WLR_BACKENDS=headless WLR_RENDERER=pixman sway --validate --config "$ROOT/sway/config"
+	fi
+}
+
 check_nvim_load() {
 	if ! command -v nvim >/dev/null 2>&1; then
 		skip "Neovim config load (Neovim unavailable)"
@@ -252,6 +266,7 @@ else
 	check_json
 	check_toml
 	check_waybar
+	check_sway
 	run_quiet "Git whitespace errors" git diff --check
 	check_prompt_parity
 	check_whitelists

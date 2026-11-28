@@ -102,6 +102,7 @@ optional_command "fzf" "install it for bashrc's Ctrl-R/Ctrl-T fuzzy search" fzf
 if [ "$SYSTEM_OS" = Linux ]; then
     optional_command "Waybar" "install it to use the configured Sway status bar" waybar
     optional_command "Python 3" "install it for Waybar's custom GPU module" python3
+    optional_command "wlsunset" "install it for the night light in Sway and Waybar" wlsunset
     if have_cmd swaync && have_cmd swaync-client; then
         pass "SwayNotificationCenter (optional): swaync and swaync-client found"
     else
@@ -195,6 +196,7 @@ if [ "$SYSTEM_OS" = Linux ]; then
     check_link "$DOTFILES_PATH/waybar/config.jsonc" "$waybar_dir/config"
     check_link "$DOTFILES_PATH/waybar/style.css" "$waybar_dir/style.css"
     check_link "$DOTFILES_PATH/waybar/gpu.py" "$waybar_dir/gpu.py"
+    check_link "$DOTFILES_PATH/waybar/nightlight.sh" "$waybar_dir/nightlight.sh"
 fi
 check_link "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
 check_link "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
