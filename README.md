@@ -391,8 +391,9 @@ because Waybar looks for `config` first. It links `style.css`, `gpu.py`, and
 Install `wlsunset` and set `$latitude` and `$longitude` in `sway/local.conf`
 to use the night light. Sign out of Sway and back in after running setup so
 Sway starts the helper. Click the Waybar icon to cycle through forced day,
-forced night, and automatic mode. The indicator updates on its next two-second
-poll and shows when the night light is unavailable.
+forced night, and automatic mode. A click requests a refresh after 100 ms
+to give `wlsunset` time to log the new mode. Waybar also checks every two
+seconds and shows when the night light is unavailable.
 
 `Mod4+grave` opens Sway's system menu, and `Mod4+Shift+e` goes straight to
 the logout confirmation. Logout, reboot, and power off require `y` or Enter

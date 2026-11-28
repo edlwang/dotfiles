@@ -151,9 +151,11 @@
         "return-type": "json",
         "format": "{}",
         "interval": 2,
+        "signal": 8,
         "exec-on-event": false,
         "tooltip": true,
-        "on-click": "\"${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh\" toggle"
+        // Give wlsunset time to log the new mode before signaling Waybar.
+        "on-click": "\"${XDG_CONFIG_HOME:-$HOME/.config}/waybar/nightlight.sh\" toggle && sleep 0.1 && env kill -s RTMIN+8 \"$PPID\""
     },
     "power-profiles-daemon": {
         "format": "{icon}",
