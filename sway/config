@@ -303,6 +303,9 @@ exec swaync
 # polkit auth agent
 exec env QT_QPA_PLATFORMTHEME=kde QT_STYLE_OVERRIDE=Breeze /usr/libexec/kf6/polkit-kde-authentication-agent-1
 
+# kwallet
+exec /usr/libexec/pam_kwallet_init
+
 ### Appearance
 
 # Tokyo Night palette
