@@ -215,8 +215,8 @@
         "tooltip-format-connected": "<b>Bluetooth: {num_connections} connected</b>\n\n{device_enumerate}",
         "tooltip-format-enumerate-connected": "{device_alias}",
         "tooltip-format-enumerate-connected-battery": "{device_alias}: {device_battery_percentage}%",
-        "on-click": "kcmshell6 kcm_bluetooth",
-        "on-click-right": "bluetoothctl show | grep -q 'Powered: yes' && bluetoothctl power off || bluetoothctl power on"
+        "on-click": "blueman-manager",
+        "on-click-right": "if bluetoothctl show | grep -q 'Powered: yes'; then bluetoothctl power off; else rfkill unblock bluetooth && bluetoothctl power on; fi"
     },
     "network": {
         "interval": 2,
@@ -265,7 +265,10 @@
     "tray": {
         "icon-size": 18,
         "spacing": 8,
-        "show-passive-items": true
+        "show-passive-items": true,
+        "ignore-list": [
+            "blueman"
+        ]
     },
     "custom/notification": {
         "format": "{icon} {0}",
