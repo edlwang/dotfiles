@@ -309,17 +309,17 @@ tooltip label {
 /* nightlight */
 
 #custom-nightlight.auto {
-    color: #7aa2f7;
+    color: @blue;
 }
 
 #custom-nightlight.day {
-    color: #c0caf5;
+    color: @foreground;
 }
 
 #custom-nightlight.night {
-    color: #e0af68;
+    color: @yellow;
 }
 
 #custom-nightlight.off {
-    color: #565f89;
+    color: @muted;
 }
