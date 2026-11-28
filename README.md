@@ -46,6 +46,7 @@ auto-reloads its config on save.
 ├── check.sh            Read-only repository configuration smoke checks
 ├── init_linux.sh       Linux setup hook (Sway, swaylock, Fuzzel, Waybar, swaync, nmtui)
 ├── init_windows.sh     Windows setup hook (enables real symlinks)
+├── linux_desktop_links.sh  Linux desktop symlink list for setup and doctor
 ├── shellenv            Sets $SYSTEM_OS + shared shell helpers; sourced by bashrc + init.sh
 ├── bashrc              Cross-platform shell config (the entry point)
 ├── bash_aliases        Cross-platform aliases

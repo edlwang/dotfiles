@@ -185,18 +185,11 @@ check_link "$DOTFILES_PATH/bash_profile" "$HOME/.bash_profile"
 check_link "$DOTFILES_PATH/nvim" "$(nvim_config_dir)"
 check_link "$DOTFILES_PATH/wezterm" "$(wezterm_config_dir)"
 if [ "$SYSTEM_OS" = Linux ]; then
-    check_link "$DOTFILES_PATH/sway/config" "${XDG_CONFIG_HOME:-$HOME/.config}/sway/config"
-    check_link "$DOTFILES_PATH/swaylock/config" "${XDG_CONFIG_HOME:-$HOME/.config}/swaylock/config"
-    check_link "$DOTFILES_PATH/fuzzel/fuzzel.ini" "${XDG_CONFIG_HOME:-$HOME/.config}/fuzzel/fuzzel.ini"
-    check_link "$DOTFILES_PATH/nmtui/palette" "${XDG_CONFIG_HOME:-$HOME/.config}/nmtui/palette"
-    swaync_dir="${XDG_CONFIG_HOME:-$HOME/.config}/swaync"
-    check_link "$DOTFILES_PATH/swaync/config.json" "$swaync_dir/config.json"
-    check_link "$DOTFILES_PATH/swaync/style.css" "$swaync_dir/style.css"
-    waybar_dir="${XDG_CONFIG_HOME:-$HOME/.config}/waybar"
-    check_link "$DOTFILES_PATH/waybar/config.jsonc" "$waybar_dir/config"
-    check_link "$DOTFILES_PATH/waybar/style.css" "$waybar_dir/style.css"
-    check_link "$DOTFILES_PATH/waybar/gpu.py" "$waybar_dir/gpu.py"
-    check_link "$DOTFILES_PATH/waybar/nightlight.sh" "$waybar_dir/nightlight.sh"
+    if . "$DOTFILES_PATH/linux_desktop_links.sh"; then
+        for_each_linux_desktop_link check_link
+    else
+        fail "Could not load $DOTFILES_PATH/linux_desktop_links.sh."
+    fi
 fi
 check_link "$DOTFILES_PATH/bash_aliases" "$HOME/.bash_aliases"
 check_link "$DOTFILES_PATH/gitconfig" "$HOME/.gitconfig"
