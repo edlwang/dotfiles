@@ -224,8 +224,29 @@ bindsym $mod+r mode "resize"
     bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
     bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
 
-    # Special key to take a screenshot with grim
-    bindsym Print exec grim
+# Screenshot mode
+set $mode_screenshot "Capture: [r]egion [w]indow [m]onitor [a]ll (Shift to save)"
+
+bindsym $mod+p mode $mode_screenshot
+
+mode $mode_screenshot {
+    # Copy to clipboard
+    bindsym r mode default; exec grimshot --notify copy area
+    bindsym w mode default; exec grimshot --notify copy active
+    bindsym m mode default; exec grimshot --notify copy output
+    bindsym a mode default; exec grimshot --notify copy screen
+
+    # Save to file
+    bindsym Shift+r mode default; exec grimshot --notify save area
+    bindsym Shift+w mode default; exec grimshot --notify save active
+    bindsym Shift+m mode default; exec grimshot --notify save output
+    bindsym Shift+a mode default; exec grimshot --notify save screen
+
+    # Exit mode
+    bindsym Escape mode default
+    bindsym Return mode default
+    bindsym $mod+p mode default
+}
 
 
 # libinput mouse settings
